@@ -11,6 +11,9 @@ namespace Client.UWP
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        // temporar variable to keep sample texture for demo purposes.
+        private Texture2D unitsSprite;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -39,7 +42,7 @@ namespace Client.UWP
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            unitsSprite = Content.Load<Texture2D>(@"DesertRatsSprites");
         }
 
         /// <summary>
@@ -69,9 +72,19 @@ namespace Client.UWP
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            // get screen center
+            var x = graphics.GraphicsDevice.Viewport.Width / 2;
+            var y = graphics.GraphicsDevice.Viewport.Height / 2;
+
+            // display sample tank
+            var spriteSize = new Rectangle(1+1+32, 1, 32, 32);
+            spriteBatch.Draw(unitsSprite, new Vector2(x, y), spriteSize, Color.White);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
