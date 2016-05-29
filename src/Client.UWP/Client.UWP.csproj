@@ -8,7 +8,7 @@
     <ProjectGuid>{485DDAC8-1422-46D2-805B-CB9F7E6C57F8}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Client.UWP</RootNamespace>
+    <RootNamespace>Client</RootNamespace>
     <AssemblyName>Client.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -94,6 +94,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviors\SpriteDrawCommand.cs" />
+    <Compile Include="Domain\IslandEntityExtensions.cs" />
+    <Compile Include="Domain\GeoPoint.cs" />
+    <Compile Include="Domain\IslandEntity.cs" />
     <Compile Include="GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </Compile>
