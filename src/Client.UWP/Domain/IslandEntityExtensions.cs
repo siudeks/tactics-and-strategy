@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Client.Domain
 {
@@ -13,7 +14,7 @@ namespace Client.Domain
             return entries
                 .Select(it => FillPolygon(it.Corners))
                 .SelectMany(it => it)
-                .Select(o => new SpriteDrawCommand())
+                .Select(o => new SpriteDrawCommand() { X = (int)o.X, Y = (int)o.Y })
                 .ToArray();
         }
 
@@ -62,14 +63,15 @@ namespace Client.Domain
             foreach (var item in lines)
             {
                 var liney = item.Item1.Y;
+
+                //horizontal line contains at least initial point
                 points.Enqueue(new Vector2(item.Item1.X, liney));
 
+                // if initial point is the same as end point, need to go to the next line.
                 if (item.Item1.X == item.Item2.X) break;
 
                 for (int x = item.Item1.X + 1; x < item.Item2.X; x++)
-                {
-                    points.Enqueue(new Vector2(item.Item2.X, liney));
-                }
+                    points.Enqueue(new Vector2(x, liney));
 
                 points.Enqueue(new Vector2(item.Item2.X, liney));
             }
