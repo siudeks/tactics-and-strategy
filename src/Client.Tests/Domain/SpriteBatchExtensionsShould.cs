@@ -19,12 +19,12 @@ namespace Client.Domain
                 Corners = new[] { new GeoPoint(0, 0), new GeoPoint(2, 0), new GeoPoint(2, 2), new GeoPoint(0, 2) }
             };
 
-            var actual = new[] { island }.Draw();
+            var actual = new[] { island }.GeneratePoints();
 
-            var expected = new List<SpriteDrawCommand>();
+            var expected = new List<GeoPoint>();
             for (int x = 0; x < 3; x++)
                 for (int y = 0; y < 3; y++)
-                    expected.Add(new SpriteDrawCommand { X = x, Y = y });
+                    expected.Add(new GeoPoint { X = x, Y = y });
 
             Func<dynamic, dynamic, bool> cmp = (o1, o2) => o1.X == o2.X && o1.Y == o2.Y;
 

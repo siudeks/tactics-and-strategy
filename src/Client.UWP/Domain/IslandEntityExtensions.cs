@@ -9,12 +9,12 @@ namespace Client.Domain
 {
     public static class IslandEntityExtensions
     {
-        public static SpriteDrawCommand[] Draw(this IslandEntity[] entries)
+        public static GeoPoint[] GeneratePoints(this IslandEntity[] entries)
         {
             return entries
                 .Select(it => FillPolygon(it.Corners))
                 .SelectMany(it => it)
-                .Select(o => new SpriteDrawCommand() { X = (int)o.X, Y = (int)o.Y })
+                .Select(o => new GeoPoint((int)o.X, (int)o.Y ))
                 .ToArray();
         }
 
