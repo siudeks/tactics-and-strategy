@@ -1,6 +1,4 @@
-﻿using Client.Behaviors;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -12,7 +10,7 @@ namespace Client.Domain
     public sealed class IslandEntityExtensionsShould
     {
         [TestMethod]
-        public void DrawIsland()
+        public void GeneratePoints()
         {
             var island = new IslandEntity
             {
