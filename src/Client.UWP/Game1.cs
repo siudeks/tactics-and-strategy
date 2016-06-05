@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Client.Domain;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Client.UWP
@@ -11,8 +12,9 @@ namespace Client.UWP
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        // temporar variable to keep sample texture for demo purposes.
+        // temporar variables to keep sample textures for demo purposes.
         private Texture2D unitsSprite;
+        private Texture2D backgroundSprite;
 
         public Game1()
         {
@@ -43,6 +45,7 @@ namespace Client.UWP
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             unitsSprite = Content.Load<Texture2D>(@"DesertRatsSprites");
+            backgroundSprite = Content.Load<Texture2D>(@"Background");
         }
 
         /// <summary>
@@ -80,9 +83,24 @@ namespace Client.UWP
             var x = graphics.GraphicsDevice.Viewport.Width / 2;
             var y = graphics.GraphicsDevice.Viewport.Height / 2;
 
+            // display sample island
+            {
+                var spriteSize = new Rectangle(1, 1 + 1 + 32, 32, 32);
+                var island = new IslandEntity
+                {
+                    Corners = new[] { new GeoPoint(0, 0), new GeoPoint(2, 0), new GeoPoint(2, 2), new GeoPoint(0, 2) }
+                };
+                var points = new[] { island }.GeneratePoints();
+                foreach (var point in points)
+                {
+                    spriteBatch.Draw(backgroundSprite, new Vector2(x + point.X * 32, y + point.Y * 32), spriteSize, Color.White);
+                }
+            }
             // display sample tank
-            var spriteSize = new Rectangle(1+1+32, 1, 32, 32);
-            spriteBatch.Draw(unitsSprite, new Vector2(x, y), spriteSize, Color.White);
+            {
+                var spriteSize = new Rectangle(1 + 1 + 32, 1, 32, 32);
+                spriteBatch.Draw(unitsSprite, new Vector2(x, y), spriteSize, Color.White);
+            }
 
             spriteBatch.End();
 

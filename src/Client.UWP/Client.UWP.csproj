@@ -98,6 +98,7 @@
     <Compile Include="Domain\IslandEntityExtensions.cs" />
     <Compile Include="Domain\GeoPoint.cs" />
     <Compile Include="Domain\IslandEntity.cs" />
+    <Compile Include="Domain\TerrainCategory.cs" />
     <Compile Include="GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </Compile>
@@ -105,6 +106,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Background.png" />
     <Content Include="Content\DesertRatsSprites.png" />
     <None Include="project.json" />
   </ItemGroup>
