@@ -10,9 +10,15 @@ namespace Client.Domain
         public static GeoPoint[] GeneratePoints(this IslandEntity[] entries)
         {
             return entries
-                .Select(it => FillPolygon(it.Corners))
+                .Select(it => GeneratePoints(it))
                 .SelectMany(it => it)
-                .Select(o => new GeoPoint((int)o.X, (int)o.Y ))
+                .ToArray();
+        }
+
+        public static GeoPoint[] GeneratePoints(this IslandEntity entries)
+        {
+            return FillPolygon(entries.Corners)
+                .Select(o => new GeoPoint((int)o.X, (int)o.Y))
                 .ToArray();
         }
 

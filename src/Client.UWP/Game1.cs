@@ -15,6 +15,7 @@ namespace Client.UWP
         // temporar variables to keep sample textures for demo purposes.
         private Texture2D unitsSprite;
         private Texture2D backgroundSprite;
+        private GeoPoint[] island = IslandEntityGenerator.Random().GeneratePoints();
 
         public Game1()
         {
@@ -86,12 +87,8 @@ namespace Client.UWP
             // display sample island
             {
                 var spriteSize = new Rectangle(1, 1 + 1 + 32, 32, 32);
-                var island = new IslandEntity
-                {
-                    Corners = new[] { new GeoPoint(0, 0), new GeoPoint(2, 0), new GeoPoint(2, 2), new GeoPoint(0, 2) }
-                };
-                var points = new[] { island }.GeneratePoints();
-                foreach (var point in points)
+                
+                foreach (var point in island)
                 {
                     spriteBatch.Draw(backgroundSprite, new Vector2(x + point.X * 32, y + point.Y * 32), spriteSize, Color.White);
                 }

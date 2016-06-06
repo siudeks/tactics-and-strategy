@@ -98,6 +98,7 @@
     <Compile Include="Domain\IslandEntityExtensions.cs" />
     <Compile Include="Domain\GeoPoint.cs" />
     <Compile Include="Domain\IslandEntity.cs" />
+    <Compile Include="Domain\IslandEntityGenerator.cs" />
     <Compile Include="Domain\TerrainCategory.cs" />
     <Compile Include="GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>
