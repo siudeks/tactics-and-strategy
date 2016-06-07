@@ -13,7 +13,7 @@ namespace Client.UWP
         SpriteBatch spriteBatch;
 
         // temporar variables to keep sample textures for demo purposes.
-        private Texture2D unitsSprite;
+        private Texture2D terrainSprite;
         private Texture2D backgroundSprite;
         private GeoPoint[] island = IslandEntityGenerator.Random().GeneratePoints();
 
@@ -45,7 +45,7 @@ namespace Client.UWP
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            unitsSprite = Content.Load<Texture2D>(@"DesertRatsSprites");
+            terrainSprite = Content.Load<Texture2D>(@"Terrain");
             backgroundSprite = Content.Load<Texture2D>(@"Background");
         }
 
@@ -87,7 +87,7 @@ namespace Client.UWP
             // display sample island
             {
                 var spriteSize = new Rectangle(1, 1 + 1 + 32, 32, 32);
-                
+
                 foreach (var point in island)
                 {
                     spriteBatch.Draw(backgroundSprite, new Vector2(x + point.X * 32, y + point.Y * 32), spriteSize, Color.White);
@@ -95,8 +95,8 @@ namespace Client.UWP
             }
             // display sample tank
             {
-                var spriteSize = new Rectangle(1 + 1 + 32, 1, 32, 32);
-                spriteBatch.Draw(unitsSprite, new Vector2(x, y), spriteSize, Color.White);
+                var spriteSize = new Rectangle(7 * 32, 9 * 32, 32, 32);
+                spriteBatch.Draw(terrainSprite, new Vector2(x, y), spriteSize, Color.White);
             }
 
             spriteBatch.End();

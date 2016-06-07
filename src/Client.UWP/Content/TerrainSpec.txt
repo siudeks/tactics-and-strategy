@@ -1,0 +1,226 @@
+﻿The terrain sheets can be of any size. However, each terrain icon must be square, 
+and they all have to have the same side length. The side length is specified when the user configures 
+the INI file for that sheet.
+
+Also, the sheet must have 20 icons per row, with the icons contiguous in each row, and each row contiguous 
+with the other rows. Everything starts at the origin of the bitmap.
+
+The icons must be placed be in the following order:
+
+
+----ROW 1----
+ Clear #1
+ Clear #2
+ Sea #1
+ Sea #2
+ Coast #1 with land to the North
+ Coast #2 with land to the North
+ Coast #1 with land to the East 
+ Coast #2 with land to the East 
+ Coast #1 with land to the North, East
+ Coast #2 with land to the North, East
+ Coast #1 with land to the South
+ Coast #2 with land to the South
+ Coast #1 with land to the North, South
+ Coast #2 with land to the North, South
+ Coast #1 with land to the East, South
+ Coast #2 with land to the East, South
+ Coast #1 with land to the North, East, South
+ Coast #2 with land to the North, East, South
+ Coast #1 with land to the West
+ Coast #2 with land to the West
+ 
+ ----Row 2----
+ Coast #1 with land to the North, West
+ Coast #2 with land to the North, West
+ Coast #1 with land to the East, West
+ Coast #2 with land to the East, West
+ Coast #1 with land to the North, East, West
+ Coast #2 with land to the North, East, West
+ Coast #1 with land to the South, West
+ Coast #2 with land to the South, West
+ Coast #1 with land to the North, South, West
+ Coast #2 with land to the North, South, West
+ Coast #1 with land to the East, South, West
+ Coast #2 with land to the East, South, West
+ Coast #1 with land to the North, East, South, West
+ Coast #2 with land to the North, East, South, West
+ Forest #1
+ Forest #2
+ Forest #1 with Forest to the North
+ Forest #2 with Forest to the North
+ Forest #1 with Forest to the East 
+ Forest #2 with Forest to the East 
+ 
+ ----Row 3----
+ Forest #1 with Forest to the North, East
+ Forest #2 with Forest to the North, East
+ Forest #1 with Forest to the South
+ Forest #2 with Forest to the South
+ Forest #1 with Forest to the North, South
+ Forest #2 with Forest to the North, South
+ Forest #1 with Forest to the East, South
+ Forest #2 with Forest to the East, South
+ Forest #1 with Forest to the North, East, South
+ Forest #2 with Forest to the North, East, South
+ Forest #1 with Forest to the West
+ Forest #2 with Forest to the West
+ Forest #1 with Forest to the North, West
+ Forest #2 with Forest to the North, West
+ Forest #1 with Forest to the East, West
+ Forest #2 with Forest to the East, West
+ Forest #1 with Forest to the North, East, West
+ Forest #2 with Forest to the North, East, West
+ Forest #1 with Forest to the South, West
+ Forest #2 with Forest to the South, West
+ 
+ ----Row #4----
+ Forest #1 with Forest to the North, South, West
+ Forest #2 with Forest to the North, South, West
+ Forest #1 with Forest to the East, South, West
+ Forest #2 with Forest to the East, South, West
+ Forest #1 with Forest to the North, East, South, West
+ Forest #2 with Forest to the North, East, South, West
+ Rough #1
+ Rough #2
+ Rough #1 with Rough to the North
+ Rough #2 with Rough to the North
+ Rough #1 with Rough to the East 
+ Rough #2 with Rough to the East 
+ Rough #1 with Rough to the North, East
+ Rough #2 with Rough to the North, East
+ Rough #1 with Rough to the South
+ Rough #2 with Rough to the South
+ Rough #1 with Rough to the North, South
+ Rough #2 with Rough to the North, South
+ Rough #1 with Rough to the East, South
+ Rough #2 with Rough to the East, South
+ 
+ ----Row 5----
+ Rough #1 with Rough to the North, East, South
+ Rough #2 with Rough to the North, East, South
+ Rough #1 with Rough to the West
+ Rough #2 with Rough to the West
+ Rough #1 with Rough to the North, West
+ Rough #2 with Rough to the North, West
+ Rough #1 with Rough to the East, West
+ Rough #2 with Rough to the East, West
+ Rough #1 with Rough to the North, East, West
+ Rough #2 with Rough to the North, East, West
+ Rough #1 with Rough to the South, West
+ Rough #2 with Rough to the South, West
+ Rough #1 with Rough to the North, South, West
+ Rough #2 with Rough to the North, South, West
+ Rough #1 with Rough to the East, South, West
+ Rough #2 with Rough to the East, South, West
+ Rough #1 with Rough to the North, East, South, West
+ Rough #2 with Rough to the North, East, South, West
+ Mountain #1
+ Mountain #2
+ 
+ ----Row 6----
+ Mountain #1 with Mountain to the North
+ Mountain #2 with Mountain to the North
+ Mountain #1 with Mountain to the East 
+ Mountain #2 with Mountain to the East 
+ Mountain #1 with Mountain to the North, East
+ Mountain #2 with Mountain to the North, East
+ Mountain #1 with Mountain to the South
+ Mountain #2 with Mountain to the South
+ Mountain #1 with Mountain to the North, South
+ Mountain #2 with Mountain to the North, South
+ Mountain #1 with Mountain to the East, South
+ Mountain #2 with Mountain to the East, South
+ Mountain #1 with Mountain to the North, East, South
+ Mountain #2 with Mountain to the North, East, South
+ Mountain #1 with Mountain to the West
+ Mountain #2 with Mountain to the West
+ Mountain #1 with Mountain to the North, West
+ Mountain #2 with Mountain to the North, West
+ Mountain #1 with Mountain to the East, West
+ Mountain #2 with Mountain to the East, West
+ 
+ ----Row 7----
+ Mountain #1 with Mountain to the North, East, West
+ Mountain #2 with Mountain to the North, East, West
+ Mountain #1 with Mountain to the South, West
+ Mountain #2 with Mountain to the South, West
+ Mountain #1 with Mountain to the North, South, West
+ Mountain #2 with Mountain to the North, South, West
+ Mountain #1 with Mountain to the East, South, West
+ Mountain #2 with Mountain to the East, South, West
+ Mountain #1 with Mountain to the North, East, South, West
+ Mountain #2 with Mountain to the North, East, South, West
+ Lake #1
+ Lake #2
+ River #1 with river or coast to the North
+ River #2 with river or coast to the North
+ River #1 with river or coast to the East 
+ River #2 with river or coast to the East 
+ River #1 with river or coast to the North, East
+ River #2 with river or coast to the North, East
+ River #1 with river or coast to the South
+ River #2 with river or coast to the South
+ 
+ ----Row 8----
+ River #1 with river or coast to the North, South
+ River #2 with river or coast to the North, South
+ River #1 with river or coast to the East, South
+ River #2 with river or coast to the East, South
+ River #1 with river or coast to the North, East, South
+ River #2 with river or coast to the North, East, South
+ River #1 with river or coast to the West
+ River #2 with river or coast to the West
+ River #1 with river or coast to the North, West
+ River #2 with river or coast to the North, West
+ River #1 with river or coast to the East, West
+ River #2 with river or coast to the East, West
+ River #1 with river or coast to the North, East, West
+ River #2 with river or coast to the North, East, West
+ River #1 with river or coast to the South, West
+ River #2 with river or coast to the South, West
+ River #1 with river or coast to the North, South, West
+ River #2 with river or coast to the North, South, West
+ River #1 with river or coast to the East, South, West
+ River #2 with river or coast to the East, South, West
+ 
+ ----Row 9----
+ River #1 with river or coast to the North, East, South, West
+ River #2 with river or coast to the North, East, South, West
+ City #1 (old style, not used)
+ City #2 (old style, not used)
+ Northern icecap with sea to the south #1
+ Northern icecap with sea to the south #2
+ Southern icecap with sea to the north #1
+ Southern icecap with sea to the north #2
+ Northern icecap with land to the south #1
+ Northern icecap with land to the south #2
+ Southern icecap with land to the north #1
+ Southern icecap with land to the north #2
+ Map edge
+ Survey cursor
+ Button for editor (single draw)
+ Button for editor (multi draw)
+ Alternate cursor
+ Unexplored blit
+ (not used)
+ (not used)
+ 
+ ----Row 10----
+ Neutral City Icon Level #1
+ Neutral City Icon Level #2
+ Neutral City Icon Level #3
+ Neutral City Icon Level #4
+ Neutral City Icon Level #5
+ Neutral City Icon Level #6
+ Neutral City Icon Level #7
+ Neutral City Icon Level #8
+ North Wrap border with sea to West, land to East
+ North Wrap border with sea to East, land to west
+ South Wrap border with sea to West, land to East
+ South Wrap border with sea to East, land to west
+ North Wrap border with land to East and West
+ South Wrap border with land to East and West
+ Remaining squares unused
+
+---END---
