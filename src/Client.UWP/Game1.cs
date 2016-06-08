@@ -1,4 +1,5 @@
 ﻿using Client.Domain;
+using Client.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,8 +15,7 @@ namespace Client.UWP
 
         // temporar variables to keep sample textures for demo purposes.
         private Texture2D terrainSprite;
-        private Texture2D backgroundSprite;
-        private GeoPoint[] island = IslandEntityGenerator.Random().GeneratePoints();
+        private IslandEntity island = IslandEntityGenerator.Random(new GeoPoint(20,20));
 
         public Game1()
         {
@@ -46,7 +46,6 @@ namespace Client.UWP
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             terrainSprite = Content.Load<Texture2D>(@"Terrain");
-            backgroundSprite = Content.Load<Texture2D>(@"Background");
         }
 
         /// <summary>
@@ -81,22 +80,28 @@ namespace Client.UWP
             spriteBatch.Begin();
 
             // get screen center
-            var x = graphics.GraphicsDevice.Viewport.Width / 2;
-            var y = graphics.GraphicsDevice.Viewport.Height / 2;
+            var offsetx = graphics.GraphicsDevice.Viewport.Width / 2;
+            var offsety = graphics.GraphicsDevice.Viewport.Height / 2;
 
             // display sample island
             {
                 var spriteSize = new Rectangle(1, 1 + 1 + 32, 32, 32);
-
-                foreach (var point in island)
+                var window = new Window(
+                    new TextureHolder(terrainSprite, new Rectangle(2 * 32, 0, 32, 32)),
+                    new TextureHolder(terrainSprite, new Rectangle(0 * 32, 0, 32, 32)),
+                    new TextureHolder(terrainSprite, new Rectangle(7 * 32, 9 * 32, 32, 32)));
+                window.AddIsland(island);
+                window.AddCity(new CityEntity(20, 20));
+                for (int x = 0; x < 100; x++)
+                    for (int y = 0; y < 100; y++)
+                    {
+                        var position = new Vector2(x * 32, y * 32);
+                        var texture = window[x, y];
+                        spriteBatch.Draw(position, texture);
+                    }
                 {
-                    spriteBatch.Draw(backgroundSprite, new Vector2(x + point.X * 32, y + point.Y * 32), spriteSize, Color.White);
+
                 }
-            }
-            // display sample tank
-            {
-                var spriteSize = new Rectangle(7 * 32, 9 * 32, 32, 32);
-                spriteBatch.Draw(terrainSprite, new Vector2(x, y), spriteSize, Color.White);
             }
 
             spriteBatch.End();

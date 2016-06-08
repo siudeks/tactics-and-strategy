@@ -5,7 +5,7 @@ namespace Client.Domain
 {
     public static class IslandEntityGenerator
     {
-        public static IslandEntity Random()
+        public static IslandEntity Random(GeoPoint center)
         {
             var random = new Random();
 
@@ -19,7 +19,7 @@ namespace Client.Domain
                 currentAngle += actual;
                 var x = (int) (Math.Cos(currentAngle * Math.PI / 360 * 2 ) * length);
                 var y = (int) (Math.Sin(currentAngle * Math.PI / 360 * 2) * length);
-                var point = new GeoPoint(x, y);
+                var point = new GeoPoint(x + center.X, y + center.Y);
                 corners.Add(point);
             }
 
