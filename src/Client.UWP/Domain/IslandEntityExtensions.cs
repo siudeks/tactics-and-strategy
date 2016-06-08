@@ -7,14 +7,6 @@ namespace Client.Domain
 {
     public static class IslandEntityExtensions
     {
-        public static GeoPoint[] GeneratePoints(this IslandEntity[] entries)
-        {
-            return entries
-                .Select(it => GeneratePoints(it))
-                .SelectMany(it => it)
-                .ToArray();
-        }
-
         public static GeoPoint[] GeneratePoints(this IslandEntity entries)
         {
             return FillPolygon(entries.Corners)

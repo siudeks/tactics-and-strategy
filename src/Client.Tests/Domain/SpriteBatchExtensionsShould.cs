@@ -17,7 +17,7 @@ namespace Client.Domain
                 Corners = new[] { new GeoPoint(0, 0), new GeoPoint(2, 0), new GeoPoint(2, 2), new GeoPoint(0, 2) }
             };
 
-            var actual = new[] { island }.GeneratePoints();
+            var actual = island.GeneratePoints();
 
             var expected = new List<GeoPoint>();
             for (int x = 0; x < 3; x++)
