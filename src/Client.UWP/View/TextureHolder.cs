@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Client.View
 {
+    /// <summary>
+    /// TextureHolder represents part of a texture. Because of Monogame/XNA limitations, can' create texture
+    /// in unit tests, so TextureHolder is natural replacement of Texture2D.
+    /// </summary>
     public class TextureHolder
     {
         /// <summary>
