@@ -107,6 +107,7 @@
     </Compile>
     <Compile Include="Game1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\DirectionEnum.cs" />
     <Compile Include="View\TextureHolder.cs" />
     <Compile Include="View\Window.cs" />
   </ItemGroup>

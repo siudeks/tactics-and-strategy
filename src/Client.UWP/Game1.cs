@@ -2,6 +2,7 @@
 using Client.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace Client.UWP
 {
@@ -85,9 +86,12 @@ namespace Client.UWP
 
             // display sample island
             {
+                var waterTextures = new Dictionary<DirectionEnum, TextureHolder>();
+                waterTextures.Add(DirectionEnum.Unknown, new TextureHolder(terrainSprite, new Rectangle(2 * 32, 0, 32, 32)));
+
                 var spriteSize = new Rectangle(1, 1 + 1 + 32, 32, 32);
                 var window = new Window(
-                    new TextureHolder(terrainSprite, new Rectangle(2 * 32, 0, 32, 32)),
+                    waterTextures,
                     new TextureHolder(terrainSprite, new Rectangle(0 * 32, 0, 32, 32)),
                     new TextureHolder(terrainSprite, new Rectangle(7 * 32, 9 * 32, 32, 32)));
                 window.AddIsland(island);

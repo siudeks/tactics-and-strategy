@@ -1,21 +1,20 @@
-﻿using System;
-using Client.Domain;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Client.Domain;
 using System.Collections.Generic;
 
 namespace Client.View
 {
     /// <summary>
-    /// Defines visible part of map which need to be processed to display content.
+    /// Controls logical items which exists on visible part of game 
+    /// to Textures.
     /// </summary>
     public sealed class Window
     {
         private readonly Dictionary<GeoPoint, TextureHolder> points = new Dictionary<GeoPoint, TextureHolder>();
 
-        private TextureHolder water;
+        private Dictionary<DirectionEnum, TextureHolder> water;
         private TextureHolder ground;
         private TextureHolder city;
-        public Window(TextureHolder water, TextureHolder ground, TextureHolder city)
+        public Window(Dictionary<DirectionEnum, TextureHolder> water, TextureHolder ground, TextureHolder city)
         {
             this.water = water;
             this.ground = ground;
@@ -45,7 +44,7 @@ namespace Client.View
                 if (points.ContainsKey(index))
                     return points[index];
                 else
-                    return water;
+                    return water[DirectionEnum.Unknown];
             }
         }
     }
