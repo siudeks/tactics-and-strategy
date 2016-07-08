@@ -1,4 +1,10 @@
-﻿The terrain sheets can be of any size. However, each terrain icon must be square, 
+﻿(04,00) Coast with land to the South #1
+(10,00) Coast with land to the North #1
+
+
+### Legacy doc below
+
+The terrain sheets can be of any size. However, each terrain icon must be square, 
 and they all have to have the same side length. The side length is specified when the user configures 
 the INI file for that sheet.
 
@@ -19,7 +25,6 @@ The icons must be placed be in the following order:
  Coast #2 with land to the East 
  Coast #1 with land to the North, East
  Coast #2 with land to the North, East
- Coast #1 with land to the South
  Coast #2 with land to the South
  Coast #1 with land to the North, South
  Coast #2 with land to the North, South

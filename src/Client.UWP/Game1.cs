@@ -3,6 +3,7 @@ using Client.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Client.UWP
 {
@@ -16,7 +17,7 @@ namespace Client.UWP
 
         // temporar variables to keep sample textures for demo purposes.
         private Texture2D terrainSprite;
-        private IslandEntity island = IslandEntityGenerator.Random(new GeoPoint(20,20));
+        private IslandEntity island = IslandEntityGenerator.Random(new GeoPoint(20, 20));
 
         public Game1()
         {
@@ -86,8 +87,7 @@ namespace Client.UWP
 
             // display sample island
             {
-                var waterTextures = new Dictionary<DirectionEnum, TextureHolder>();
-                waterTextures.Add(DirectionEnum.Unknown, new TextureHolder(terrainSprite, new Rectangle(2 * 32, 0, 32, 32)));
+                var waterTextures = new WaterTextures(terrainSprite);
 
                 var spriteSize = new Rectangle(1, 1 + 1 + 32, 32, 32);
                 var window = new Window(
@@ -96,15 +96,15 @@ namespace Client.UWP
                     new TextureHolder(terrainSprite, new Rectangle(7 * 32, 9 * 32, 32, 32)));
                 window.AddIsland(island);
                 window.AddCity(new CityEntity(20, 20));
-                for (int x = 0; x < 100; x++)
-                    for (int y = 0; y < 100; y++)
-                    {
-                        var position = new Vector2(x * 32, y * 32);
-                        var texture = window[x, y];
-                        spriteBatch.Draw(position, texture);
-                    }
-                {
 
+                var points = window
+                    .GetWindow(0, 0, 100, 100);
+
+                var displayHeigh = GraphicsDevice.Viewport.Height;
+                foreach (var it in points)
+                {
+                    var position = new Vector2(it.GeoPoint.X * 32, displayHeigh - it.GeoPoint.Y * 32);
+                    spriteBatch.Draw(position, it.Texture);
                 }
             }
 

@@ -25,5 +25,14 @@
             X = x;
             Y = y;
         }
+
+        public GeoPoint Top() => new GeoPoint(X, Y + 1);
+        public GeoPoint Down() => new GeoPoint(X, Y - 1);
+        public GeoPoint Left() => new GeoPoint(X - 1, Y);
+        public GeoPoint Right() => new GeoPoint(X + 1, Y);
+        public GeoPoint TopLeft() => new GeoPoint(X - 1, Y + 1);
+        public GeoPoint TopRight() => new GeoPoint(X + 1, Y + 1);
+        public GeoPoint DownLeft() => new GeoPoint(X - 1, Y - 1);
+        public GeoPoint DownRight() => new GeoPoint(X + 1, Y - 1);
     }
 }

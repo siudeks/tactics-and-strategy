@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using Assert = NUnit.Framework.Assert;
+using System.Linq;
 
 namespace Client.View
 {
@@ -14,12 +15,13 @@ namespace Client.View
         public void UseProperTextureForIsland()
         {
             var ground = new TextureHolder();
-            var window = new Window(WaterTextures(), ground, null);
+            var window = new Window(new WaterTextures(), ground, null);
 
             var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
             window.AddIsland(island);
 
-            Assert.That(window[1, 1], Is.EqualTo(ground));
+            var view = window.GetWindow(1, 1, 1, 1);
+            Assert.That(view.First().Texture, Is.EqualTo(ground));
         }
 
         [TestMethod]
@@ -33,35 +35,28 @@ namespace Client.View
             window.AddIsland(island);
             window.AddCity(new CityEntity(1, 1));
 
-            Assert.That(window[1, 1], Is.EqualTo(city));
+            var view = window.GetWindow(1, 1, 1, 1).ToArray();
+            Assert.That(view.First().Texture, Is.EqualTo(city));
         }
 
         [TestMethod]
-        public void UseProperWaterTexturesForIslandBorders()
+        public void UseProperWaterTexturesForCoastWithLandToTheNorth()
         {
-            var waterTextures = WaterTextures();
+            var waterTextures = new WaterTextures();
+
+            // small map for test:
+            // OOO
+            // OXO
+            // OOO 
+            // where O - water, X - island
             var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
             var window = new Window(waterTextures, null, null);
             window.AddIsland(island);
 
-            Assert.That(window[1, 2], Is.EqualTo(waterTextures[DirectionEnum.Top]));
-            Assert.That(window[1, 0], Is.EqualTo(waterTextures[DirectionEnum.Down]));
-            Assert.That(window[0, 1], Is.EqualTo(waterTextures[DirectionEnum.Left]));
-            Assert.That(window[2, 1], Is.EqualTo(waterTextures[DirectionEnum.Right]));
-            Assert.That(window[2, 2], Is.EqualTo(waterTextures[DirectionEnum.TopRight]));
-            Assert.That(window[0, 2], Is.EqualTo(waterTextures[DirectionEnum.TopLeft]));
-            Assert.That(window[2, 0], Is.EqualTo(waterTextures[DirectionEnum.DownRight]));
-            Assert.That(window[0, 0], Is.EqualTo(waterTextures[DirectionEnum.DownLeft]));
-        }
+            var view = window.GetWindow(0, 0, 3, 3).ToArray();
 
-        private static Dictionary<DirectionEnum, TextureHolder> WaterTextures()
-        {
-            var result = new Dictionary<DirectionEnum, TextureHolder>();
-            foreach (DirectionEnum direction in Enum.GetValues(typeof(DirectionEnum)))
-            {
-                result.Add(direction, new TextureHolder());
-            }
-            return result;
+            Assert.That(view[2 * 3 + 1].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheNorth));
+            Assert.That(view[0 * 3 + 1].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheSouth));
         }
     }
 }
