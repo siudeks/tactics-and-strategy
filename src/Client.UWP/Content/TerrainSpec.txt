@@ -1,5 +1,7 @@
 ﻿(04,00) Coast with land to the South #1
 (10,00) Coast with land to the North #1
+(06,00) Coast with land to the West #1
+(18,00) Coast with land to the East #1
 
 
 ### Legacy doc below

@@ -8,6 +8,8 @@ namespace Client.Domain
     {
         public TextureHolder CoastWithLandToTheNorth { get; private set; } = new TextureHolder();
         public TextureHolder CoastWithLandToTheSouth { get; private set; } = new TextureHolder();
+        public TextureHolder CoastWithLandToTheWest { get; private set; } = new TextureHolder();
+        public TextureHolder CoastWithLandToTheEast { get; private set; } = new TextureHolder();
         public TextureHolder Sea { get; private set; } = new TextureHolder();
 
         public WaterTextures()
@@ -19,6 +21,8 @@ namespace Client.Domain
             var spriteSize = new Point(32, 32);
             CoastWithLandToTheNorth = new TextureHolder(terrain, new Rectangle(new Point(10 * 32, 0 * 32), spriteSize));
             CoastWithLandToTheSouth = new TextureHolder(terrain, new Rectangle(new Point(4 * 32, 0 * 32), spriteSize));
+            CoastWithLandToTheWest = new TextureHolder(terrain, new Rectangle(new Point(6 * 32, 0 * 32), spriteSize));
+            CoastWithLandToTheEast = new TextureHolder(terrain, new Rectangle(new Point(18 * 32, 0 * 32), spriteSize));
             Sea = new TextureHolder(terrain, new Rectangle(new Point(2 * 32, 0 * 32), spriteSize));
         }
     }

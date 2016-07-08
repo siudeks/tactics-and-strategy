@@ -41,6 +41,8 @@ namespace Client.View
             strategies.Add(StrategyForGround);
             strategies.Add(CoastWithLandToTheNorth);
             strategies.Add(CoastWithLandToTheSouth);
+            strategies.Add(CoastWithLandToTheWest);
+            strategies.Add(CoastWithLandToTheEast);
             strategies.Add(NullStrategy);
         }
 
@@ -118,28 +120,48 @@ namespace Client.View
             return defaultValue;
         }
 
-        // Coast with land to the North #1
         private TextureHolder CoastWithLandToTheNorth(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborTop] != LocationType.Water) return defaultValue;
             if (neighbors[NeighborLeft] != LocationType.Water) return defaultValue;
             if (neighbors[NeighborRight] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborDown] != LocationType.Ground) return defaultValue;
+            if (neighbors[NeighborTop] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborDown] == LocationType.Water) return defaultValue;
             if (neighbors[NeighborCenter] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheNorth;
         }
 
-        // Coast with land to the South #1
         private TextureHolder CoastWithLandToTheSouth(LocationType[] neighbors, TextureHolder defaultValue)
         {
             if (neighbors[NeighborLeft] != LocationType.Water) return defaultValue;
             if (neighbors[NeighborRight] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborTop] == LocationType.Water) return defaultValue;
             if (neighbors[NeighborDown] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborTop] != LocationType.Ground) return defaultValue;
             if (neighbors[NeighborCenter] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheSouth;
+        }
+
+        private TextureHolder CoastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue)
+        {
+            if (neighbors[NeighborLeft] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborRight] == LocationType.Water) return defaultValue;
+            if (neighbors[NeighborTop] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborDown] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborCenter] != LocationType.Water) return defaultValue;
+
+            return water.CoastWithLandToTheWest;
+        }
+
+        private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue)
+        {
+            if (neighbors[NeighborLeft] == LocationType.Water) return defaultValue;
+            if (neighbors[NeighborRight] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborTop] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborDown] != LocationType.Water) return defaultValue;
+            if (neighbors[NeighborCenter] != LocationType.Water) return defaultValue;
+
+            return water.CoastWithLandToTheEast;
         }
 
         // should be invoked at the end of strategies

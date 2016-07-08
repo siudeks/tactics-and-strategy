@@ -40,7 +40,7 @@ namespace Client.View
         }
 
         [TestMethod]
-        public void UseProperWaterTexturesForCoastWithLandToTheNorth()
+        public void UseProperWaterTexturesForCoastWithLandToTheNorthAndSouthAndWestAndEast()
         {
             var waterTextures = new WaterTextures();
 
@@ -57,6 +57,8 @@ namespace Client.View
 
             Assert.That(view[2 * 3 + 1].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheNorth));
             Assert.That(view[0 * 3 + 1].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheSouth));
+            Assert.That(view[1 * 3 + 0].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheWest));
+            Assert.That(view[1 * 3 + 2].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheEast));
         }
     }
 }
