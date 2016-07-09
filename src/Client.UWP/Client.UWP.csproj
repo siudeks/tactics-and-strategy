@@ -18,8 +18,9 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>Client.UWP_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>Client.UWP_StoreKey.pfx</PackageCertificateKeyFile>
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
+    <PackageCertificateThumbprint>A0236240788A01446639DF90A6E7433BE77D8E13</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -114,6 +115,7 @@
   <ItemGroup>
     <Content Include="Content\Background.png" />
     <Content Include="Content\DesertRatsSprites.png" />
+    <None Include="Client.UWP_StoreKey.pfx" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +127,7 @@
   <ItemGroup>
     <Content Include="Content\Terrain.bmp" />
     <Content Include="Content\TerrainSpec.txt" />
+    <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
