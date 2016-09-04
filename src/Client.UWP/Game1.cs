@@ -1,9 +1,12 @@
 ﻿using Client.Domain;
+using Client.Runtime;
 using Client.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 
 namespace Client.UWP
 {
@@ -25,6 +28,8 @@ namespace Client.UWP
             Content.RootDirectory = "Content";
         }
 
+        private readonly CompositeDisposable instanceDisposer = new CompositeDisposable();
+
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -33,7 +38,11 @@ namespace Client.UWP
         /// </summary>
         protected override void Initialize()
         {
+            var pointerStateStream = new Subject<PointerState>();
+            instanceDisposer.Add(pointerStateStream);
+
             // TODO: Add your initialization logic here
+            Components.Add(new PointerObserver(pointerStateStream));
 
             base.Initialize();
         }
@@ -67,7 +76,6 @@ namespace Client.UWP
         protected override void Update(GameTime gameTime)
         {
             // TODO: Add your update logic here
-
             base.Update(gameTime);
         }
 
@@ -111,6 +119,13 @@ namespace Client.UWP
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            instanceDisposer.Dispose();
         }
     }
 }
