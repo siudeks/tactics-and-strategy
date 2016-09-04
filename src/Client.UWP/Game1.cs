@@ -3,10 +3,9 @@ using Client.Runtime;
 using Client.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System;
 
 namespace Client.UWP
 {
@@ -116,6 +115,9 @@ namespace Client.UWP
                 }
             }
 
+            var selection = CreateSelectorTexture(GraphicsDevice);
+            spriteBatch.Draw(selection, new Vector2(20, 20));
+
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -127,5 +129,29 @@ namespace Client.UWP
 
             instanceDisposer.Dispose();
         }
+
+        // non-testable method because Texture2D can't be created in unit tests.
+        private static Texture2D CreateSelectorTexture(GraphicsDevice device)
+        {
+            var size = Config.SpriteSize + 2;
+            var texture = device.CreateTexture(size, size);
+
+            var colors = new Color[size * size];
+            texture.GetData(colors);
+            for (int x = 0; x < size; x++)
+                for (int y = 0; y < size; y++)
+                {
+                    var color = Color.Transparent;
+                    var i = y * size + x;
+                    if (x == 0 || x == size - 1) color = Color.Red;
+                    if (y == 0 || y == size - 1) color = Color.Red;
+
+                    colors[i] = color;
+
+                }
+            texture.SetData(colors);
+            return texture;
+        }
+
     }
 }
