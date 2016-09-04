@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Client.Domain;
 
 namespace Client.Runtime
 {
@@ -40,7 +41,9 @@ namespace Client.Runtime
         public void Update(GameTime gameTime, Point mousePosition)
         {
             var state = new PointerState();
-            state.Position = new Domain.GeoPoint();
+            var x = mousePosition.X / Config.SpriteSize;
+            var y = mousePosition.Y / Config.SpriteSize;
+            state.Position = new GeoPoint { X = x, Y = y };
             pointerStateStream.OnNext(state);
         }
     }

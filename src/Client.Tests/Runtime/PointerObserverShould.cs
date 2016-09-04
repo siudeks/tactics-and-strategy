@@ -15,10 +15,12 @@ namespace Client.Runtime
         {
             var points = new ReplaySubject<PointerState>();
             var observer = new PointerObserver(points);
-            observer.Update(new GameTime(), Point.Zero);
 
-            var expected = await points.FirstAsync();
-            Assert.AreEqual(expected, new PointerState { Position = new GeoPoint() });
+            observer.Update(new GameTime(), Point.Zero);
+            Assert.AreEqual(new PointerState { Position = new GeoPoint() }, await points.FirstAsync());
+
+            observer.Update(new GameTime(), new Point(Config.SpriteSize, Config.SpriteSize));
+            Assert.AreEqual(new PointerState { Position = new GeoPoint { X = 1, Y = 1 } }, await points.Skip(1).FirstAsync());
         }
     }
 }

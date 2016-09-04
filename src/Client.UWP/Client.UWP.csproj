@@ -99,6 +99,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behaviors\SpriteDrawCommand.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Domain\CityEntity.cs" />
     <Compile Include="Domain\IslandEntityExtensions.cs" />
     <Compile Include="Domain\GeoPoint.cs" />
