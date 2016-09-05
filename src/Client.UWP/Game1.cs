@@ -28,6 +28,7 @@ namespace Client.UWP
         }
 
         private readonly CompositeDisposable instanceDisposer = new CompositeDisposable();
+        private BehaviorSubject<PointerState> pointerStateStream;
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -37,7 +38,7 @@ namespace Client.UWP
         /// </summary>
         protected override void Initialize()
         {
-            var pointerStateStream = new Subject<PointerState>();
+            pointerStateStream = new BehaviorSubject<PointerState>(new PointerState());
             instanceDisposer.Add(pointerStateStream);
 
             // TODO: Add your initialization logic here
@@ -115,8 +116,11 @@ namespace Client.UWP
                 }
             }
 
-            var selection = CreateSelectorTexture(GraphicsDevice);
-            spriteBatch.Draw(selection, new Vector2(20, 20));
+            // drawing cursor Start
+            var selectionSprite = CreateSelectorTexture(GraphicsDevice);
+            var selectionPoint = pointerStateStream.Value.Position;
+            var selectionPosition = new Vector2(selectionPoint.X * Config.SpriteSize-1, selectionPoint.Y * Config.SpriteSize-1);
+            spriteBatch.Draw(selectionSprite, selectionPosition);
 
             spriteBatch.End();
 
