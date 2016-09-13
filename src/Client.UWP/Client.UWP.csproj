@@ -124,14 +124,12 @@
   <ItemGroup>
     <Content Include="Content\Background.png" />
     <Content Include="Content\DesertRatsSprites.png" />
-    <None Include="Client.UWP_StoreKey.pfx" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="Client.UWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Terrain.bmp" />
