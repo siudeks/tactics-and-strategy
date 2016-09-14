@@ -124,6 +124,7 @@
   <ItemGroup>
     <Content Include="Content\Background.png" />
     <Content Include="Content\DesertRatsSprites.png" />
+    <None Include="Client.UWP_TemporaryKey.pfx" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
