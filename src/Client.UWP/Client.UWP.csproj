@@ -14,13 +14,13 @@
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
-    <PackageCertificateKeyFile>Client.UWP_StoreKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>Client.UWP_TemporaryKey.pfx</PackageCertificateKeyFile>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
-    <PackageCertificateThumbprint>A0236240788A01446639DF90A6E7433BE77D8E13</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>3D983A0166253D360A13631D003D188916EA0C45</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
