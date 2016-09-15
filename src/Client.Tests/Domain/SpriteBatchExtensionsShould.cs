@@ -23,7 +23,7 @@ namespace Client.Domain
                 for (int y = 0; y < 3; y++)
                     expected.Add(new GeoPoint { X = x, Y = y });
 
-            actual.Should().Equal(expected, (o1, o2) => o1.X == o2.X && o1.Y == o2.Y);
+            CollectionAssert.AreEquivalent(expected, actual);
         }
 
     }
