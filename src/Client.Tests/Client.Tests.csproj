@@ -95,7 +95,7 @@
     <SDKReference Include="TestPlatform.Universal, Version=$(UnitTestPlatformVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\SpriteBatchExtensionsShould.cs" />
+    <Compile Include="Domain\SpriteBatchShould.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\PointerDrawerShould.cs" />
     <Compile Include="Runtime\PointerObserverShould.cs" />

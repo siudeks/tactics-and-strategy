@@ -7,6 +7,11 @@ namespace Client.Domain
 {
     public static class IslandEntityExtensions
     {
+        /// <summary>
+        /// Converts list of island borders to the list of all island tiles.
+        /// </summary>
+        /// <param name="entries"></param>
+        /// <returns></returns>
         public static GeoPoint[] GeneratePoints(this IslandEntity entries)
         {
             return FillPolygon(entries.Corners)

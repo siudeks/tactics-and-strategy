@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Client.Domain
 {
     [TestClass]
-    public sealed class IslandEntityExtensionsShould
+    public sealed class IslandEntityShould
     {
         [TestMethod]
         public void GeneratePoints()

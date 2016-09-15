@@ -23,6 +23,10 @@ namespace Client.View
             view.First().Texture.Should().Be(ground);
         }
 
+        /// <summary>
+        /// when a city need to be drawn, its texture should be used instead of
+        /// terrain located behind the city.
+        /// </summary>
         [TestMethod]
         public void CityTakesPrecedenceOnTerrain()
         {
