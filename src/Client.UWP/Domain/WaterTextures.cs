@@ -4,6 +4,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Client.Domain
 {
+    /// <summary>
+    /// Extracts and holds textures for Water map
+    /// </summary>
+    /// <remarks>
+    /// All textures are hold in one big texture, so need to have separated logic which knowledge
+    /// where are located particular types of some terrain type.
+    /// In that case, <see cref="WaterTextures"/> is responsible to load water tiles located in
+    /// some known places in big texture.
+    /// </remarks>
     public sealed class WaterTextures
     {
         public TextureHolder CoastWithLandToTheNorth { get; private set; } = new TextureHolder();

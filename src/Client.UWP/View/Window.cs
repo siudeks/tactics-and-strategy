@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Client.View
 {
     /// <summary>
-    /// Contains all entities whicn need to be visible in Game window and converts them
+    /// Contains all entities which need to be visible in Game window and converts them
     /// to textures.
     /// </summary>
     public sealed class Window
@@ -225,6 +225,9 @@ namespace Client.View
             Ground
         }
 
+        /// <summary>
+        /// Holds together geopoint and texture used for that point to draw it.
+        /// </summary>
         public struct PointContext
         {
             public readonly GeoPoint GeoPoint;
