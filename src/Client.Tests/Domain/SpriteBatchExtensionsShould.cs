@@ -1,8 +1,7 @@
-﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using NUnit.Framework;
+﻿using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System;
 using System.Collections.Generic;
-using Assert = NUnit.Framework.Assert;
 
 namespace Client.Domain
 {
@@ -24,9 +23,7 @@ namespace Client.Domain
                 for (int y = 0; y < 3; y++)
                     expected.Add(new GeoPoint { X = x, Y = y });
 
-            Func<dynamic, dynamic, bool> cmp = (o1, o2) => o1.X == o2.X && o1.Y == o2.Y;
-
-            Assert.That(actual, Is.EquivalentTo(expected).Using(cmp));
+            actual.Should().Equal(expected, (o1, o2) => o1.X == o2.X && o1.Y == o2.Y);
         }
 
     }

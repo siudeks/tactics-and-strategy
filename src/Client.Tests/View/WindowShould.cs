@@ -1,9 +1,8 @@
 ﻿using Client.Domain;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using Assert = NUnit.Framework.Assert;
 using System.Linq;
 
 namespace Client.View
@@ -21,7 +20,7 @@ namespace Client.View
             window.AddIsland(island);
 
             var view = window.GetWindow(1, 1, 1, 1);
-            Assert.That(view.First().Texture, Is.EqualTo(ground));
+            view.First().Texture.Should().Be(ground);
         }
 
         [TestMethod]
@@ -36,7 +35,7 @@ namespace Client.View
             window.AddCity(new CityEntity(1, 1));
 
             var view = window.GetWindow(1, 1, 1, 1).ToArray();
-            Assert.That(view.First().Texture, Is.EqualTo(city));
+            view.First().Texture.Should().Be(city);
         }
 
         [TestMethod]
@@ -55,10 +54,10 @@ namespace Client.View
 
             var view = window.GetWindow(0, 0, 3, 3).ToArray();
 
-            Assert.That(view[2 * 3 + 1].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheNorth));
-            Assert.That(view[0 * 3 + 1].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheSouth));
-            Assert.That(view[1 * 3 + 0].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheWest));
-            Assert.That(view[1 * 3 + 2].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheEast));
+            view[2 * 3 + 1].Texture.Should().Be(waterTextures.CoastWithLandToTheNorth);
+            view[0 * 3 + 1].Texture.Should().Be(waterTextures.CoastWithLandToTheSouth);
+            view[1 * 3 + 0].Texture.Should().Be(waterTextures.CoastWithLandToTheWest);
+            view[1 * 3 + 2].Texture.Should().Be(waterTextures.CoastWithLandToTheEast);
         }
 
         [TestMethod]
@@ -78,10 +77,10 @@ namespace Client.View
 
             var view = window.GetWindow(0, 0, 3, 3).ToArray();
 
-            Assert.That(view[0 * 3 + 0].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheNorthEast));
-            Assert.That(view[0 * 3 + 2].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheNorthWest));
-            Assert.That(view[2 * 3 + 0].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheSouthEast));
-            Assert.That(view[2 * 3 + 2].Texture, Is.EqualTo(waterTextures.CoastWithLandToTheSouthWest));
+            view[0 * 3 + 0].Texture.Should().Be(waterTextures.CoastWithLandToTheNorthEast);
+            view[0 * 3 + 2].Texture.Should().Be(waterTextures.CoastWithLandToTheNorthWest);
+            view[2 * 3 + 0].Texture.Should().Be(waterTextures.CoastWithLandToTheSouthEast);
+            view[2 * 3 + 2].Texture.Should().Be(waterTextures.CoastWithLandToTheSouthWest);
         }
     }
 }
