@@ -1,3 +1,7 @@
 before_build:
   # the NuGet packages had not been restored.
   - ps: nuget restore src\TacticsAndStrategy.sln
+
+test:
+  assemblies:
+    - '**\*.tests.dll'
