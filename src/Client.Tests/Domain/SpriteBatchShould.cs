@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using System;
+﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Collections.Generic;
 
 namespace Client.Domain
@@ -8,6 +6,19 @@ namespace Client.Domain
     [TestClass]
     public sealed class IslandEntityShould
     {
+        /// <summary>
+        /// Simple test. As proof of working, we need to simple island wit corners defined as :
+        /// [ {0, 0}, {2, 0}, {2, 2}, {0, 2}], or - if you prefer - in more sexy look
+        /// xox
+        /// ooo
+        /// xox
+        /// where x is the island's corner.
+        /// expected is list of all island tiles, it means 
+        /// [ {0, 0}, {0, 1}, {0, 2}, ... {2, 2} ] or - again - more sexy presentation
+        /// xxx
+        /// xxx
+        /// xxx
+        /// </summary>
         [TestMethod]
         public void GeneratePoints()
         {

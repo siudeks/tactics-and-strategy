@@ -57,6 +57,8 @@ namespace Client.UWP
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             terrainSprite = Content.Load<Texture2D>(@"Terrain");
+
+            camera = new Camera(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height, Config.SpriteSize);
         }
 
         /// <summary>
@@ -78,6 +80,8 @@ namespace Client.UWP
             // TODO: Add your update logic here
             base.Update(gameTime);
         }
+
+        Camera camera;
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -119,7 +123,8 @@ namespace Client.UWP
             // drawing cursor Start
             var selectionSprite = CreateSelectorTexture(GraphicsDevice);
             var selectionPoint = pointerStateStream.Value.Position;
-            var selectionPosition = new Vector2(selectionPoint.X * Config.SpriteSize-1, selectionPoint.Y * Config.SpriteSize-1);
+            var cameraSelectionPoint = camera.View(new Point(selectionPoint.X * Config.SpriteSize, selectionPoint.Y * Config.SpriteSize));
+            var selectionPosition = new Vector2(cameraSelectionPoint.X - 1, cameraSelectionPoint.Y - 1);
             spriteBatch.Draw(selectionSprite, selectionPosition);
 
             spriteBatch.End();

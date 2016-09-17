@@ -72,6 +72,7 @@
     <Compile Include="Runtime\PointerDrawer.cs" />
     <Compile Include="Runtime\PointerObserver.cs" />
     <Compile Include="Runtime\PointerState.cs" />
+    <Compile Include="View\Camera.cs" />
     <Compile Include="View\TextureHolder.cs" />
     <Compile Include="View\Window.cs" />
   </ItemGroup>

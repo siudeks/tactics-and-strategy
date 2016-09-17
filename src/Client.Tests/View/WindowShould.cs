@@ -1,8 +1,6 @@
 ﻿using Client.Domain;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Client.View
