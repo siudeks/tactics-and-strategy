@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Client.Domain;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Client.Domain;
+using System;
 
 namespace Client.Runtime
 {
@@ -18,6 +18,7 @@ namespace Client.Runtime
         public event EventHandler<EventArgs> UpdateOrderChanged;
 
         private IObserver<PointerState> pointerStateStream;
+
         public PointerObserver(IObserver<PointerState> pointerStateStream)
         {
             this.pointerStateStream = pointerStateStream;

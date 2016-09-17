@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
-using System;
 
 namespace Client.UWP
 {
@@ -57,8 +56,6 @@ namespace Client.UWP
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             terrainSprite = Content.Load<Texture2D>(@"Terrain");
-
-            camera = new Camera(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height, Config.SpriteSize);
         }
 
         /// <summary>
@@ -81,8 +78,6 @@ namespace Client.UWP
             base.Update(gameTime);
         }
 
-        Camera camera;
-
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -101,11 +96,11 @@ namespace Client.UWP
             {
                 var waterTextures = new WaterTextures(terrainSprite);
 
-                var spriteSize = new Rectangle(1, 1 + 1 + 32, 32, 32);
+                var spriteSize = new Rectangle(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
                 var window = new Window(
                     waterTextures,
-                    new TextureHolder(terrainSprite, new Rectangle(0 * 32, 0, 32, 32)),
-                    new TextureHolder(terrainSprite, new Rectangle(7 * 32, 9 * 32, 32, 32)));
+                    new TextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize)),
+                    new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize)));
                 window.AddIsland(island);
                 window.AddCity(new CityEntity(20, 20));
 
@@ -115,7 +110,7 @@ namespace Client.UWP
                 var displayHeigh = GraphicsDevice.Viewport.Height;
                 foreach (var it in points)
                 {
-                    var position = new Vector2(it.GeoPoint.X * 32, displayHeigh - it.GeoPoint.Y * 32);
+                    var position = new Vector2(it.GeoPoint.X * Config.SpriteSize, displayHeigh - it.GeoPoint.Y * Config.SpriteSize);
                     spriteBatch.Draw(position, it.Texture);
                 }
             }
@@ -123,7 +118,7 @@ namespace Client.UWP
             // drawing cursor Start
             var selectionSprite = CreateSelectorTexture(GraphicsDevice);
             var selectionPoint = pointerStateStream.Value.Position;
-            var cameraSelectionPoint = camera.View(new Point(selectionPoint.X * Config.SpriteSize, selectionPoint.Y * Config.SpriteSize));
+            var cameraSelectionPoint = new Point(selectionPoint.X * Config.SpriteSize, selectionPoint.Y * Config.SpriteSize);
             var selectionPosition = new Vector2(cameraSelectionPoint.X - 1, cameraSelectionPoint.Y - 1);
             spriteBatch.Draw(selectionSprite, selectionPosition);
 
