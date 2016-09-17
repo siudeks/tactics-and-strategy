@@ -107,10 +107,9 @@ namespace Client.UWP
                 var points = window
                     .GetWindow(0, 0, 100, 100);
 
-                var displayHeigh = GraphicsDevice.Viewport.Height;
                 foreach (var it in points)
                 {
-                    var position = new Vector2(it.GeoPoint.X * Config.SpriteSize, displayHeigh - it.GeoPoint.Y * Config.SpriteSize);
+                    var position = new Vector2(it.GeoPoint.X * Config.SpriteSize, it.GeoPoint.Y * Config.SpriteSize);
                     spriteBatch.Draw(position, it.Texture);
                 }
             }
