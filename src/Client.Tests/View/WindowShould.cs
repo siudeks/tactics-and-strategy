@@ -22,7 +22,7 @@ namespace Client.View
         }
 
         /// <summary>
-        /// when a city need to be drawn, its texture should be used instead of
+        /// When a city need to be drawn, its texture should be used instead of
         /// terrain located behind the city.
         /// </summary>
         [TestMethod]
@@ -38,6 +38,26 @@ namespace Client.View
 
             var view = window.GetWindow(1, 1, 1, 1).ToArray();
             view.First().Texture.Should().Be(city);
+        }
+
+        /// <summary>
+        /// When a land unit need to be drawn, its texture should be used instead of
+        /// terrain / city located behind the unit.
+        /// </summary>
+        [TestMethod]
+        public void LandUnitTakesPrecedenceOnTerrain()
+        {
+            var ground = new TextureHolder();
+            var city = new TextureHolder();
+            var landUnit = new TextureHolder();
+            var window = new Window(null, ground, city);
+
+            var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
+            window.AddCity(new CityEntity(1, 1));
+            window.Include(new LandUnitEntity());
+
+            var view = window.GetWindow(1, 1, 1, 1).ToArray();
+            view.First().Texture.Should().Be(landUnit);
         }
 
         [TestMethod]

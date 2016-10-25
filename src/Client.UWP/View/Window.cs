@@ -59,10 +59,22 @@ namespace Client.View
             }
         }
 
+        /// <summary>
+        /// Defines a city on the map.
+        /// 
+        /// Needs to be invoked later then <see cref="AddIsland(IslandEntity)"/>
+        /// </summary>
+        /// <param name="entity"></param>
         public void AddCity(CityEntity entity)
         {
             var point = new GeoPoint(entity.X, entity.Y);
             points[point] = LocationType.City;
+        }
+
+        public void Include(LandUnitEntity entity)
+        {
+            var point = new GeoPoint(entity.X, entity.Y);
+            points[point] = LocationType.LandUnit;
         }
 
         /// <summary>
@@ -222,7 +234,8 @@ namespace Client.View
         {
             Water,
             City,
-            Ground
+            Ground,
+            LandUnit
         }
 
         /// <summary>

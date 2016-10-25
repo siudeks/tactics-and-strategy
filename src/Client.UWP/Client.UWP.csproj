@@ -59,6 +59,7 @@
     <Compile Include="Domain\GeoPoint.cs" />
     <Compile Include="Domain\IslandEntity.cs" />
     <Compile Include="Domain\IslandEntityGenerator.cs" />
+    <Compile Include="Domain\LandUnitEntity.cs" />
     <Compile Include="Domain\TerrainCategory.cs" />
     <Compile Include="Domain\WaterTextures.cs" />
     <Compile Include="Extensions\GraphicDeviceExtensions.cs" />
