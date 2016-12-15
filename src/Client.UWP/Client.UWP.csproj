@@ -12,7 +12,7 @@
     <AssemblyName>Client.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <PackageCertificateKeyFile>Client.UWP_TemporaryKey.pfx</PackageCertificateKeyFile>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
