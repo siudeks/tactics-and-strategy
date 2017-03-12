@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="Respekto.TacticAndStrategy" Publisher="CN=siudeks" Version="1.1.21.0" />
+  <Identity Name="33250Respekto.TacticAndStrategy" Publisher="CN=9AB0128E-EE73-4C0C-8D83-7E291D7F8E02" Version="1.1.0.0" />
   <mp:PhoneIdentity PhoneProductId="b2c1b584-68b7-424a-8e38-4ff46f561223" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>TacticAndStrategy</DisplayName>
