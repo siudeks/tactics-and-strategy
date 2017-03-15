@@ -46,16 +46,18 @@ namespace Client.UWP
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
+        // sprite used to mark a GeoPoint as selected.
+        private Texture2D selectionSprite;
+
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             terrainSprite = Content.Load<Texture2D>(@"Terrain");
+
+            selectionSprite = CreateSelectorTexture(GraphicsDevice);
+
         }
 
         /// <summary>
@@ -78,10 +80,6 @@ namespace Client.UWP
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.White);
@@ -115,7 +113,6 @@ namespace Client.UWP
             }
 
             // drawing cursor Start
-            var selectionSprite = CreateSelectorTexture(GraphicsDevice);
             var selectionPoint = pointerStateStream.Value.Position;
             var cameraSelectionPoint = new Point(selectionPoint.X * Config.SpriteSize, selectionPoint.Y * Config.SpriteSize);
             var selectionPosition = new Vector2(cameraSelectionPoint.X - 1, cameraSelectionPoint.Y - 1);
