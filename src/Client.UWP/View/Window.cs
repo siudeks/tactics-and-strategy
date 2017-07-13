@@ -31,7 +31,6 @@ namespace Client.View
             this.ground = ground;
             this.city = city;
 
-            functionStrategies.Add(StrategyForCity);
             functionStrategies.Add(StrategyForGround);
             functionStrategies.Add(CoastWithLandToTheNorth);
             functionStrategies.Add(CoastWithLandToTheSouth);
@@ -132,13 +131,6 @@ namespace Client.View
 
                     yield return new PointContext(centerOfArea, centerTexture);
                 }
-        }
-
-        private TextureHolder StrategyForCity(LocationType[] neighbors, TextureHolder defaultValue)
-        {
-            if (neighbors[Directions.NeighborThis] == LocationType.City) return city;
-
-            return defaultValue;
         }
 
         private TextureHolder StrategyForGround(LocationType[] neighbors, TextureHolder defaultValue)

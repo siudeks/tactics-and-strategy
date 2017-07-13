@@ -50,7 +50,7 @@ namespace Client.View
             var ground = new TextureHolder();
             var city = new TextureHolder();
             var landUnit = new TextureHolder();
-            var window = new Window(null, ground, city, new LandUnitStrategy(landUnit), new DefaultStrategy(null));
+            var window = new Window(null, ground, city, new DefaultStrategy(null), new LandUnitStrategy(landUnit));
 
             var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
             window.AddCity(new CityEntity(1, 1));

@@ -73,6 +73,7 @@
     <Compile Include="Runtime\PointerDrawer.cs" />
     <Compile Include="Runtime\PointerObserver.cs" />
     <Compile Include="Runtime\PointerState.cs" />
+    <Compile Include="View\CityStrategy.cs" />
     <Compile Include="View\DefaultStrategy.cs" />
     <Compile Include="View\Directions.cs" />
     <Compile Include="View\ITileStrategy.cs" />

@@ -93,13 +93,15 @@ namespace Client.UWP
             // display sample island
             {
                 var waterTextures = new WaterTextures(terrainSprite);
+                var cityTexture = new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
 
                 var spriteSize = new Rectangle(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
                 var window = new Window(
                     waterTextures,
                     new TextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize)),
-                    new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize)),
-                    new DefaultStrategy(waterTextures.Sea)
+                    cityTexture,
+                    new DefaultStrategy(waterTextures.Sea),
+                    new CityStrategy(cityTexture)                    
                     );
                 window.AddIsland(island);
                 window.AddCity(new CityEntity(20, 20));
