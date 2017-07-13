@@ -1,5 +1,6 @@
 ﻿using Client.Domain;
 using System.Collections.Generic;
+using System;
 
 namespace Client.View
 {
@@ -11,15 +12,6 @@ namespace Client.View
     {
         private readonly Dictionary<GeoPoint, LocationType> points = new Dictionary<GeoPoint, LocationType>();
 
-        private const int NeighborTopLeft = 0;
-        private const int NeighborNorth = 1;
-        private const int NeighborTopRight = 2;
-        private const int NeighborWest = 3;
-        private const int NeighborThis = 4;
-        private const int NeighborEast = 5;
-        private const int NeighborDownLeft = 6;
-        private const int NeighborSouth = 7;
-        private const int NeighborDownRight = 8;
         // defines single texture generator strategy
         // area: small array 3*3, where central point defines the point which need th have
         // generated texture, and the rest of array items defines neighbers with indexes as constatns above.
@@ -29,25 +21,29 @@ namespace Client.View
         private WaterTextures water;
         private TextureHolder ground;
         private TextureHolder city;
-        private List<Generator> strategies = new List<Generator>();
+        private List<Generator> functionStrategies = new List<Generator>();
+        private ITileStrategy[] strategies = new ITileStrategy[0];
+        private ITileStrategy fallbackStrategy;
 
-        public Window(WaterTextures water, TextureHolder ground, TextureHolder city)
+        public Window(WaterTextures water, TextureHolder ground, TextureHolder city, ITileStrategy fallbackStrategy, params ITileStrategy[] strategies)
         {
             this.water = water;
             this.ground = ground;
             this.city = city;
 
-            strategies.Add(StrategyForCity);
-            strategies.Add(StrategyForGround);
-            strategies.Add(CoastWithLandToTheNorth);
-            strategies.Add(CoastWithLandToTheSouth);
-            strategies.Add(CoastWithLandToTheWest);
-            strategies.Add(CoastWithLandToTheEast);
-            strategies.Add(CoastWithLandToTheNorthEast);
-            strategies.Add(CoastWithLandToTheNorthWest);
-            strategies.Add(CoastWithLandToTheSouthEast);
-            strategies.Add(CoastWithLandToTheSouthWest);
-            strategies.Add(NullStrategy);
+            functionStrategies.Add(StrategyForCity);
+            functionStrategies.Add(StrategyForGround);
+            functionStrategies.Add(CoastWithLandToTheNorth);
+            functionStrategies.Add(CoastWithLandToTheSouth);
+            functionStrategies.Add(CoastWithLandToTheWest);
+            functionStrategies.Add(CoastWithLandToTheEast);
+            functionStrategies.Add(CoastWithLandToTheNorthEast);
+            functionStrategies.Add(CoastWithLandToTheNorthWest);
+            functionStrategies.Add(CoastWithLandToTheSouthEast);
+            functionStrategies.Add(CoastWithLandToTheSouthWest);
+
+            this.strategies = strategies;
+            this.fallbackStrategy = fallbackStrategy;
         }
 
         public void AddIsland(IslandEntity island)
@@ -98,25 +94,41 @@ namespace Client.View
 
                     for (int i = 0; i < 9; i++) area[i] = LocationType.Water;
 
-                    area[NeighborTopLeft] = points.ContainsKey(centerOfArea.TopLeft()) ? points[centerOfArea.TopLeft()] : LocationType.Water;
-                    area[NeighborNorth] = points.ContainsKey(centerOfArea.Top()) ? points[centerOfArea.Top()] : LocationType.Water;
-                    area[NeighborTopRight] = points.ContainsKey(centerOfArea.TopRight()) ? points[centerOfArea.TopRight()] : LocationType.Water;
-                    area[NeighborWest] = points.ContainsKey(centerOfArea.Left()) ? points[centerOfArea.Left()] : LocationType.Water;
-                    area[NeighborThis] = points.ContainsKey(centerOfArea) ? points[centerOfArea] : LocationType.Water;
-                    area[NeighborEast] = points.ContainsKey(centerOfArea.Right()) ? points[centerOfArea.Right()] : LocationType.Water;
-                    area[NeighborDownLeft] = points.ContainsKey(centerOfArea.DownLeft()) ? points[centerOfArea.DownLeft()] : LocationType.Water;
-                    area[NeighborSouth] = points.ContainsKey(centerOfArea.Down()) ? points[centerOfArea.Down()] : LocationType.Water;
-                    area[NeighborDownRight] = points.ContainsKey(centerOfArea.DownRight()) ? points[centerOfArea.DownRight()] : LocationType.Water;
+                    area[Directions.NeighborTopLeft] = points.ContainsKey(centerOfArea.TopLeft()) ? points[centerOfArea.TopLeft()] : LocationType.Water;
+                    area[Directions.NeighborNorth] = points.ContainsKey(centerOfArea.Top()) ? points[centerOfArea.Top()] : LocationType.Water;
+                    area[Directions.NeighborTopRight] = points.ContainsKey(centerOfArea.TopRight()) ? points[centerOfArea.TopRight()] : LocationType.Water;
+                    area[Directions.NeighborWest] = points.ContainsKey(centerOfArea.Left()) ? points[centerOfArea.Left()] : LocationType.Water;
+                    area[Directions.NeighborThis] = points.ContainsKey(centerOfArea) ? points[centerOfArea] : LocationType.Water;
+                    area[Directions.NeighborEast] = points.ContainsKey(centerOfArea.Right()) ? points[centerOfArea.Right()] : LocationType.Water;
+                    area[Directions.NeighborDownLeft] = points.ContainsKey(centerOfArea.DownLeft()) ? points[centerOfArea.DownLeft()] : LocationType.Water;
+                    area[Directions.NeighborSouth] = points.ContainsKey(centerOfArea.Down()) ? points[centerOfArea.Down()] : LocationType.Water;
+                    area[Directions.NeighborDownRight] = points.ContainsKey(centerOfArea.DownRight()) ? points[centerOfArea.DownRight()] : LocationType.Water;
 
                     var centerTexture = new TextureHolder();
-                    foreach (var strategy in strategies)
+                    var handled = false;
+                    foreach (var strategy in functionStrategies)
                     {
                         var texture = strategy(area, centerTexture);
                         if (texture == centerTexture) continue;
 
                         centerTexture = texture;
+                        handled = true;
                         break;
                     }
+
+                    if (!handled)
+                    {
+                        foreach (var strategy in strategies)
+                        {
+                            if (!strategy.CanExecute(area)) continue;
+
+                            centerTexture = strategy.Execute(area);
+                            handled = true;
+                            break;
+                        }
+                    }
+
+                    if (!handled) centerTexture = fallbackStrategy.Execute(area);
 
                     yield return new PointContext(centerOfArea, centerTexture);
                 }
@@ -124,118 +136,104 @@ namespace Client.View
 
         private TextureHolder StrategyForCity(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborThis] == LocationType.City) return city;
+            if (neighbors[Directions.NeighborThis] == LocationType.City) return city;
 
             return defaultValue;
         }
 
         private TextureHolder StrategyForGround(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborThis] == LocationType.Ground) return ground;
+            if (neighbors[Directions.NeighborThis] == LocationType.Ground) return ground;
 
             return defaultValue;
         }
 
         private TextureHolder CoastWithLandToTheNorth(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheNorth;
         }
 
         private TextureHolder CoastWithLandToTheSouth(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheSouth;
         }
 
         private TextureHolder CoastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheWest;
         }
 
         private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheEast;
         }
 
         private TextureHolder CoastWithLandToTheNorthEast(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheNorthEast;
         }
 
         private TextureHolder CoastWithLandToTheNorthWest(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheNorthWest;
         }
 
         private TextureHolder CoastWithLandToTheSouthEast(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheSouthEast;
         }
 
         private TextureHolder CoastWithLandToTheSouthWest(LocationType[] neighbors, TextureHolder defaultValue)
         {
-            if (neighbors[NeighborWest] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborEast] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborNorth] != LocationType.Water) return defaultValue;
-            if (neighbors[NeighborSouth] == LocationType.Water) return defaultValue;
-            if (neighbors[NeighborThis] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
+            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
             return water.CoastWithLandToTheSouthWest;
-        }
-
-        // should be invoked at the end of strategies
-        private TextureHolder NullStrategy(LocationType[] neighbors, TextureHolder defaultValue)
-        {
-            return water.Sea;
-        }
-
-        private enum LocationType
-        {
-            Water,
-            City,
-            Ground,
-            LandUnit
         }
 
         /// <summary>

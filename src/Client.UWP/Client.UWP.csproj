@@ -73,6 +73,11 @@
     <Compile Include="Runtime\PointerDrawer.cs" />
     <Compile Include="Runtime\PointerObserver.cs" />
     <Compile Include="Runtime\PointerState.cs" />
+    <Compile Include="View\DefaultStrategy.cs" />
+    <Compile Include="View\Directions.cs" />
+    <Compile Include="View\ITileStrategy.cs" />
+    <Compile Include="View\LandUnitStrategy.cs" />
+    <Compile Include="View\LocationType.cs" />
     <Compile Include="View\TextureHolder.cs" />
     <Compile Include="View\Window.cs" />
   </ItemGroup>

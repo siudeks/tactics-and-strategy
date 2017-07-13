@@ -98,7 +98,9 @@ namespace Client.UWP
                 var window = new Window(
                     waterTextures,
                     new TextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize)),
-                    new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize)));
+                    new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize)),
+                    new DefaultStrategy(waterTextures.Sea)
+                    );
                 window.AddIsland(island);
                 window.AddCity(new CityEntity(20, 20));
 
