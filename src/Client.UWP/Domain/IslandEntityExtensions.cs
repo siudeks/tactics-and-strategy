@@ -124,13 +124,16 @@ namespace Client.Domain
             return line.ToArray();
         }
 
+        /// <summary>
+        /// Compare points where the lower one is with lower y and lower y
+        /// </summary>
         class GeoPointComparer : IComparer<GeoPoint>
         {
-            public int Compare(GeoPoint x, GeoPoint y)
+            public int Compare(GeoPoint first, GeoPoint second)
             {
-                var deltay = x.Y - y.Y;
+                var deltay = first.Y - second.Y;
                 if (deltay != 0) return deltay;
-                return y.X - x.X;
+                return second.X - first.X;
             }
         }
     }

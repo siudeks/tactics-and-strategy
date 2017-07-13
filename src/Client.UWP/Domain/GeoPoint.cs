@@ -1,8 +1,11 @@
-﻿namespace Client.Domain
+﻿using System.Diagnostics;
+
+namespace Client.Domain
 {
     /// <summary>
     /// Represents a square on 2D map.
     /// </summary>
+    [DebuggerDisplay("{X}:{Y}")]
     public struct GeoPoint
     {
         /// <summary>
