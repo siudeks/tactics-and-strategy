@@ -19,19 +19,16 @@ namespace Client.View
         private delegate TextureHolder Generator(LocationType[] area, TextureHolder defaultTexture);
 
         private WaterTextures water;
-        private TextureHolder ground;
         private TextureHolder city;
         private List<Generator> functionStrategies = new List<Generator>();
         private ITileStrategy[] strategies = new ITileStrategy[0];
         private ITileStrategy fallbackStrategy;
 
-        public Window(WaterTextures water, TextureHolder ground, TextureHolder city, ITileStrategy fallbackStrategy, params ITileStrategy[] strategies)
+        public Window(WaterTextures water, TextureHolder city, ITileStrategy fallbackStrategy, params ITileStrategy[] strategies)
         {
             this.water = water;
-            this.ground = ground;
             this.city = city;
 
-            functionStrategies.Add(StrategyForGround);
             functionStrategies.Add(CoastWithLandToTheNorth);
             functionStrategies.Add(CoastWithLandToTheSouth);
             functionStrategies.Add(CoastWithLandToTheWest);
@@ -131,13 +128,6 @@ namespace Client.View
 
                     yield return new PointContext(centerOfArea, centerTexture);
                 }
-        }
-
-        private TextureHolder StrategyForGround(LocationType[] neighbors, TextureHolder defaultValue)
-        {
-            if (neighbors[Directions.NeighborThis] == LocationType.Ground) return ground;
-
-            return defaultValue;
         }
 
         private TextureHolder CoastWithLandToTheNorth(LocationType[] neighbors, TextureHolder defaultValue)

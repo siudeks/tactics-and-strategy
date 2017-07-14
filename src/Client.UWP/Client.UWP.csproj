@@ -76,6 +76,7 @@
     <Compile Include="View\CityStrategy.cs" />
     <Compile Include="View\DefaultStrategy.cs" />
     <Compile Include="View\Directions.cs" />
+    <Compile Include="View\GroundStrategy.cs" />
     <Compile Include="View\ITileStrategy.cs" />
     <Compile Include="View\LandUnitStrategy.cs" />
     <Compile Include="View\LocationType.cs" />

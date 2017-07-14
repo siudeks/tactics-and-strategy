@@ -1,18 +1,16 @@
 ﻿namespace Client.View
 {
-    public sealed class CityStrategy : ITileStrategy
+    public sealed class GroundStrategy : ITileStrategy
     {
         private readonly TextureHolder texture;
 
-        public CityStrategy(TextureHolder texture)
+        public GroundStrategy(TextureHolder texture)
         {
             this.texture = texture;
         }
-
         public bool CanExecute(LocationType[] neighbors)
         {
-            return neighbors[Directions.NeighborThis] == LocationType.City;
-
+            return neighbors[Directions.NeighborThis] == LocationType.Ground;
         }
 
         public TextureHolder Execute(LocationType[] neighbors)

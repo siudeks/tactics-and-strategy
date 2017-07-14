@@ -12,7 +12,7 @@ namespace Client.View
         public void UseProperTextureForIsland()
         {
             var ground = new TextureHolder();
-            var window = new Window(new WaterTextures(), ground, null, null);
+            var window = new Window(new WaterTextures(), ground, null, new GroundStrategy(ground));
 
             var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
             window.AddIsland(island);
@@ -30,7 +30,7 @@ namespace Client.View
         {
             var ground = new TextureHolder();
             var city = new TextureHolder();
-            var window = new Window(null, ground, city, null);
+            var window = new Window(null, city, null, new GroundStrategy(ground), new CityStrategy(city));
 
             var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
             window.AddIsland(island);
@@ -50,11 +50,11 @@ namespace Client.View
             var ground = new TextureHolder();
             var city = new TextureHolder();
             var landUnit = new TextureHolder();
-            var window = new Window(null, ground, city, new DefaultStrategy(null), new LandUnitStrategy(landUnit));
+            var window = new Window(null, city, new DefaultStrategy(null), new LandUnitStrategy(landUnit));
 
             var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
             window.AddCity(new CityEntity(1, 1));
-            window.Include(new LandUnitEntity());
+            window.Include(new LandUnitEntity(1, 1));
 
             var view = window.GetWindow(1, 1, 1, 1).ToArray();
             view.First().Texture.Should().Be(landUnit);
@@ -92,7 +92,7 @@ namespace Client.View
             // XXX
             // ?X? 
             // where O - water, X - island, ? - water where we test textures.
-            var window = new Window(waterTextures, null, null, null);
+            var window = new Window(waterTextures, null, new DefaultStrategy(waterTextures.Sea));
             window.AddIsland(new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 2 } } });
             window.AddIsland(new IslandEntity { Corners = new[] { new GeoPoint { X = 0, Y = 1 }, new GeoPoint { X = 2, Y = 1 } } });
             window.AddIsland(new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 0 } } });
