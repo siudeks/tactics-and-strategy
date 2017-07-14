@@ -29,7 +29,6 @@ namespace Client.View
             this.water = water;
             this.city = city;
 
-            functionStrategies.Add(CoastWithLandToTheNorth);
             functionStrategies.Add(CoastWithLandToTheSouth);
             functionStrategies.Add(CoastWithLandToTheWest);
             functionStrategies.Add(CoastWithLandToTheEast);
@@ -128,17 +127,6 @@ namespace Client.View
 
                     yield return new PointContext(centerOfArea, centerTexture);
                 }
-        }
-
-        private TextureHolder CoastWithLandToTheNorth(LocationType[] neighbors, TextureHolder defaultValue)
-        {
-            if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
-            if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
-            if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
-            if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
-            if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-
-            return water.CoastWithLandToTheNorth;
         }
 
         private TextureHolder CoastWithLandToTheSouth(LocationType[] neighbors, TextureHolder defaultValue)

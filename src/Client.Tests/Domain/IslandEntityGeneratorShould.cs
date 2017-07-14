@@ -15,7 +15,8 @@ namespace Client.Domain
             var island = IslandEntityGenerator.Random(new GeoPoint(10, 10));
 
             // The centre of the island need to be covered by island.
-            Assert.IsTrue(island.GeneratePoints().Contains(new GeoPoint(10, 10)));
+            var points = island.GeneratePoints().ToArray();
+            Assert.IsTrue(points.Contains(new GeoPoint(10, 10)));
         }
 
         /// <summary>

@@ -101,6 +101,7 @@ namespace Client.UWP
                     waterTextures,
                     cityTexture,
                     new DefaultStrategy(waterTextures.Sea),
+                    new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth),
                     new GroundStrategy(groundTexture),
                     new CityStrategy(cityTexture)                    
                     );
