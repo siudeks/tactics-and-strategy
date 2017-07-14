@@ -19,6 +19,28 @@ namespace Client.Domain
             Assert.IsTrue(points.Contains(new GeoPoint(10, 10)));
         }
 
+        [TestMethod]
+        public void GenerateIslandForGivenCorners()
+        {
+            var island = new IslandEntity
+            {
+                Corners = new[]
+                {
+                    new GeoPoint(18,16),
+                    new GeoPoint(11,20),
+                    new GeoPoint(8,14),
+                    new GeoPoint(-2,14),
+                    new GeoPoint(3,6),
+                    new GeoPoint(9,2),
+                    new GeoPoint(14,2),
+                    new GeoPoint(14,8)
+                }
+            };
+
+            var points = island.GeneratePoints().ToArray();
+            Assert.IsTrue(points.Contains(new GeoPoint(10, 10)));
+        }
+
         /// <summary>
         /// Generateds random island where group of points is included in generated model.
         /// </summary>
