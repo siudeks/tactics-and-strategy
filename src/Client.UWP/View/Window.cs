@@ -1,6 +1,8 @@
 ﻿using Client.Domain;
 using System.Collections.Generic;
 using System;
+using System.Linq;
+using System.Diagnostics;
 
 namespace Client.View
 {
@@ -43,7 +45,10 @@ namespace Client.View
 
         public void AddIsland(IslandEntity island)
         {
-            foreach (var item in island.GeneratePoints())
+            var generated = island.GeneratePoints().ToArray();
+            Debug.Assert(generated.Length > 5);
+
+            foreach (var item in generated)
             {
                 var point = new GeoPoint(item.X, item.Y);
                 points.Add(point, LocationType.Ground);
