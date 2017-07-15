@@ -36,7 +36,7 @@ namespace Client.Domain
             // prepare all points of edges for horizontal linescan
             var sortedEdges = edges
                 .SelectMany(it => it)
-                .OrderByDescending(it => it, new GeoPointComparer())
+                .OrderBy(it => it, new GeoPointComparer())
                 .ToArray();
 
             // convert edges to horizontal lines which fill the shape.
@@ -125,7 +125,16 @@ namespace Client.Domain
         }
 
         /// <summary>
-        /// Compare points where the lower one is with lower y and lower y
+        /// Allows to sort points from left top corner to right down row by row.
+        /// 
+        /// Rember in XNA axis are directed as above:
+        /// +---> X
+        /// | 1   2
+        /// |  3
+        /// |     4
+        /// v Y
+        /// 
+        /// So points 1 to 4 will be returned as 1,2,3,4
         /// </summary>
         class GeoPointComparer : IComparer<GeoPoint>
         {
@@ -133,7 +142,7 @@ namespace Client.Domain
             {
                 var deltay = first.Y - second.Y;
                 if (deltay != 0) return deltay;
-                return second.X - first.X;
+                return first.X - second.X;
             }
         }
     }
