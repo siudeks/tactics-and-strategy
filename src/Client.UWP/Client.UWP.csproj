@@ -55,10 +55,6 @@
     <Compile Include="Behaviors\SpriteDrawCommand.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Domain\CityEntity.cs" />
-    <Compile Include="Domain\IslandEntityExtensions.cs" />
-    <Compile Include="Domain\GeoPoint.cs" />
-    <Compile Include="Domain\IslandEntity.cs" />
-    <Compile Include="Domain\IslandEntityGenerator.cs" />
     <Compile Include="Domain\LandUnitEntity.cs" />
     <Compile Include="Domain\TerrainCategory.cs" />
     <Compile Include="Domain\WaterTextures.cs" />

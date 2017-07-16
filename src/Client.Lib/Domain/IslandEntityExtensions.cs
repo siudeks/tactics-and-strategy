@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -15,12 +14,12 @@ namespace Client.Domain
         public static GeoPoint[] GeneratePoints(this IslandEntity entries)
         {
             return FillPolygon(entries.Corners)
-                .Select(o => new GeoPoint((int)o.X, (int)o.Y))
+                .Select(o => new GeoPoint(o.X, o.Y))
                 .ToArray();
         }
 
         // http://alienryderflex.com/polygon_fill/
-        private static Vector2[] FillPolygon(GeoPoint[] corners)
+        private static (int X, int Y)[] FillPolygon(GeoPoint[] corners)
         {
             // convert all verticles to edges.
             var edges = new Queue<GeoPoint[]>();
@@ -60,21 +59,21 @@ namespace Client.Domain
             lines.Enqueue(Tuple.Create(lineStart, lineEnd));
 
             // now in lines we have all horizonta lines, so let's fill the polygon
-            var points = new Queue<Vector2>();
+            var points = new Queue<(int x, int y)>();
             foreach (var item in lines)
             {
                 var liney = item.Item1.Y;
 
                 //horizontal line contains at least initial point
-                points.Enqueue(new Vector2(item.Item1.X, liney));
+                points.Enqueue((item.Item1.X, liney));
 
                 // if initial point is the same as end point, need to go to the next line.
                 if (item.Item1.X == item.Item2.X) continue;
 
                 for (int x = item.Item1.X + 1; x < item.Item2.X; x++)
-                    points.Enqueue(new Vector2(x, liney));
+                    points.Enqueue((x, liney));
 
-                points.Enqueue(new Vector2(item.Item2.X, liney));
+                points.Enqueue((item.Item2.X, liney));
             }
 
             return points.ToArray();
