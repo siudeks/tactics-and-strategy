@@ -4,8 +4,10 @@ namespace Client.Runtime
 {
     /// <summary>
     /// Contains data related to pointer (e.g. mouse pointer) known location and 
-    /// pointer command. It is possible by by definition all pointer commands 
-    /// are unified independently of platform (touch has same abilities as mouse or pad)
+    /// pointer command. 
+    /// 
+    /// To implement that abstract Pointer state we need to translate every platform-dependatn 
+    /// input operation as well-known pointer command like 'select', 'zoom' etc.
     /// </summary>
     public struct PointerState
     {
