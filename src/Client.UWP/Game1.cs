@@ -3,6 +3,7 @@ using Client.Runtime;
 using Client.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 
@@ -57,12 +58,14 @@ namespace Client.UWP
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             terrainSprite = Content.Load<Texture2D>(@"Terrain");
+            var appSprites = Content.Load<Texture2D>("DesertRatsSprites");
 
             selectionSprite = CreateSelectorTexture(GraphicsDevice);
 
             var waterTextures = new WaterTextures(terrainSprite);
             var cityTexture = new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
             var groundTexture = new TextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
+            var landUnitTexture = new TextureHolder(appSprites, new Rectangle(1+ 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
 
             var spriteSize = new Rectangle(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
             window = new Window(
@@ -72,10 +75,12 @@ namespace Client.UWP
                 new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth),
                 new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth),
                 new GroundStrategy(groundTexture),
+                new LandUnitStrategy(landUnitTexture),
                 new CityStrategy(cityTexture)
                 );
             window.AddIsland(island);
             window.AddCity(new CityEntity(20, 20));
+            window.Include(new LandUnitEntity(21, 20));
 
         }
 

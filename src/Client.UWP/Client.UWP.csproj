@@ -81,7 +81,6 @@
     <Compile Include="View\GroundStrategy.cs" />
     <Compile Include="View\ITileStrategy.cs" />
     <Compile Include="View\LandUnitStrategy.cs" />
-    <Compile Include="View\LocationType.cs" />
     <Compile Include="View\TextureHolder.cs" />
     <Compile Include="View\Window.cs" />
   </ItemGroup>
@@ -123,7 +122,12 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Client.Lib\Client.Lib.csproj">
+      <Project>{44911481-e7f9-4b73-ae24-591a9d3b83d3}</Project>
+      <Name>Client.Lib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
