@@ -45,10 +45,7 @@ namespace Client.View
 
         public void AddIsland(IslandEntity island)
         {
-            var generated = island.GeneratePoints().ToArray();
-            Debug.Assert(generated.Length > 5);
-
-            foreach (var item in generated)
+            foreach (var item in island.GeneratePoints().ToArray())
             {
                 var point = new GeoPoint(item.X, item.Y);
                 points.Add(point, LocationType.Ground);

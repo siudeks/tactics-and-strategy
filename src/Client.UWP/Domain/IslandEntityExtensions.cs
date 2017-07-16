@@ -69,7 +69,7 @@ namespace Client.Domain
                 points.Enqueue(new Vector2(item.Item1.X, liney));
 
                 // if initial point is the same as end point, need to go to the next line.
-                if (item.Item1.X == item.Item2.X) break;
+                if (item.Item1.X == item.Item2.X) continue;
 
                 for (int x = item.Item1.X + 1; x < item.Item2.X; x++)
                     points.Enqueue(new Vector2(x, liney));
