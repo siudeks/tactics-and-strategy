@@ -75,6 +75,7 @@
     <Compile Include="Runtime\PointerState.cs" />
     <Compile Include="View\CityStrategy.cs" />
     <Compile Include="View\CoastWithLandToTheNorthStrategy.cs" />
+    <Compile Include="View\CoastWithLandToTheSouthStrategy.cs" />
     <Compile Include="View\DefaultStrategy.cs" />
     <Compile Include="View\Directions.cs" />
     <Compile Include="View\GroundStrategy.cs" />
