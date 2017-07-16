@@ -6,7 +6,8 @@ using System;
 namespace Client.Runtime
 {
     /// <summary>
-    /// Observes currently selected GeoPoint and informs when and what is selected.
+    /// Observes which GeoPoint is currently selected 
+    /// and streams events about the selection.
     /// </summary>
     public sealed class PointerObserver : IUpdateable, IGameComponent
     {
@@ -19,11 +20,20 @@ namespace Client.Runtime
 
         private IObserver<PointerState> pointerStateStream;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="PointerObserver"/>.
+        /// </summary>
+        /// <param name="pointerStateStream">Shared application listener about current pointer state.</param>
         public PointerObserver(IObserver<PointerState> pointerStateStream)
         {
-            this.pointerStateStream = pointerStateStream;
+            this.pointerStateStream = pointerStateStream ;
         }
 
+        /// <summary>
+        /// Post-construction method.
+        /// 
+        /// Currentluy not used, but required by implemented interface.
+        /// </summary>
         public void Initialize()
         {
         }
@@ -41,10 +51,14 @@ namespace Client.Runtime
 
         public void Update(GameTime gameTime, Point mousePosition)
         {
-            var state = new PointerState();
             var x = mousePosition.X / Config.SpriteSize;
             var y = mousePosition.Y / Config.SpriteSize;
-            state.Position = new GeoPoint { X = x, Y = y };
+
+            var state = new PointerState()
+            {
+                Position = new GeoPoint { X = x, Y = y }
+            };
+
             pointerStateStream.OnNext(state);
         }
     }

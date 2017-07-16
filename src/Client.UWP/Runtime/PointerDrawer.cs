@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 
 namespace Client.Runtime
 {
     /// <summary>
     /// Allows to mark a GeoPoint as selected.
+    /// 
+    /// TODO Move to this class logic about marking GeoPoint 'selected' on UI.
     /// </summary>
     public sealed class PointerDrawer
     {
