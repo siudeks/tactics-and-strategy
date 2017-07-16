@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace Client.Domain
 {
-    [TestClass]
     public sealed class IslandEntityShould
     {
         /// <summary>
@@ -19,7 +19,7 @@ namespace Client.Domain
         /// xxx
         /// xxx
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void GeneratePoints()
         {
             var island = new IslandEntity
@@ -34,7 +34,7 @@ namespace Client.Domain
                 for (int y = 0; y < 3; y++)
                     expected.Add(new GeoPoint { X = x, Y = y });
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.True(expected.SequenceEqual(actual));
         }
 
     }
