@@ -5,6 +5,12 @@ namespace Client.Domain
     /// <summary>
     /// Represents a square on 2D map.
     /// </summary>
+    /// <remarks>
+    /// GeoPoint is the smallest unit of splitting map to single places.
+    /// All GeoPoints in sum are the whole map.
+    /// Every unit can be located only on a single GeoPoint.
+    /// YOu could imagine GeoPoints as a squares on chess board.
+    /// </remarks>
     [DebuggerDisplay("{X}:{Y}")]
     public struct GeoPoint
     {
