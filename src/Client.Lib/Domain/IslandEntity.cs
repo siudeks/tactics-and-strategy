@@ -4,7 +4,7 @@
     /// Represents an island definition.
     /// </summary>
     /// <remarks>
-    /// Corners field represents ordered collection of corners of the island.
+    /// Corners field represents ordered in clock-wise order collection of corners of the island.
     /// </remarks>
     public struct IslandEntity
     {
