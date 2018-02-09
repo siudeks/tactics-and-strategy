@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\Microsoft.Net.UWPCoreRuntimeSdk.props" Condition="Exists('..\packages\Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\Microsoft.Net.UWPCoreRuntimeSdk.props')" />
+  <Import Project="..\packages\runtime.win10-x86.Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\runtime.win10-x86.Microsoft.Net.UWPCoreRuntimeSdk.props" Condition="Exists('..\packages\runtime.win10-x86.Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\runtime.win10-x86.Microsoft.Net.UWPCoreRuntimeSdk.props')" />
+  <Import Project="..\packages\runtime.win10-x64.Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\runtime.win10-x64.Microsoft.Net.UWPCoreRuntimeSdk.props" Condition="Exists('..\packages\runtime.win10-x64.Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\runtime.win10-x64.Microsoft.Net.UWPCoreRuntimeSdk.props')" />
+  <Import Project="..\packages\runtime.win10-arm.Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\runtime.win10-arm.Microsoft.Net.UWPCoreRuntimeSdk.props" Condition="Exists('..\packages\runtime.win10-arm.Microsoft.Net.UWPCoreRuntimeSdk.2.1.1\build\runtime.win10-arm.Microsoft.Net.UWPCoreRuntimeSdk.props')" />
+  <Import Project="..\packages\Microsoft.Net.Native.Compiler.2.0.2\build\Microsoft.Net.Native.Compiler.props" Condition="Exists('..\packages\Microsoft.Net.Native.Compiler.2.0.2\build\Microsoft.Net.Native.Compiler.props')" />
+  <Import Project="..\packages\Microsoft.Net.Native.SharedLibrary-x86.2.0.0\build\Microsoft.Net.Native.SharedLibrary-x86.props" Condition="Exists('..\packages\Microsoft.Net.Native.SharedLibrary-x86.2.0.0\build\Microsoft.Net.Native.SharedLibrary-x86.props')" />
+  <Import Project="..\packages\Microsoft.Net.Native.SharedLibrary-x64.2.0.0\build\Microsoft.Net.Native.SharedLibrary-x64.props" Condition="Exists('..\packages\Microsoft.Net.Native.SharedLibrary-x64.2.0.0\build\Microsoft.Net.Native.SharedLibrary-x64.props')" />
+  <Import Project="..\packages\Microsoft.Net.Native.SharedLibrary-arm.2.0.0\build\Microsoft.Net.Native.SharedLibrary-arm.props" Condition="Exists('..\packages\Microsoft.Net.Native.SharedLibrary-arm.2.0.0\build\Microsoft.Net.Native.SharedLibrary-arm.props')" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -12,18 +20,16 @@
     <AssemblyName>Client.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <PackageCertificateKeyFile>Client.UWP_StoreKey.pfx</PackageCertificateKeyFile>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
-    <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
-    <PackageCertificateThumbprint>D77D9C60E520CABF70D401860A93B06B2F5BE45E</PackageCertificateThumbprint>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-    <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x86</AppxBundlePlatforms>
+    <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +41,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\WindowsUniversal\$(Platform)\$(Configuration)\</OutputPath>
@@ -83,7 +90,7 @@
     <Content Include="Content\DesertRatsSprites.png" />
     <None Include="Client.UWP_StoreKey.pfx" />
     <None Include="Client.UWP_TemporaryKey.pfx" />
-    <None Include="project.json" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -116,6 +123,25 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\')" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
+      <Version>6.0.6</Version>
+    </PackageReference>
+    <PackageReference Include="MonoGame.Framework.WindowsUniversal">
+      <Version>3.6.0.1625</Version>
+    </PackageReference>
+    <PackageReference Include="System.Reactive.PlatformServices">
+      <Version>3.1.1</Version>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Client.Lib\Client.Lib.csproj">
       <Project>{44911481-e7f9-4b73-ae24-591a9d3b83d3}</Project>
@@ -125,16 +151,5 @@
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
