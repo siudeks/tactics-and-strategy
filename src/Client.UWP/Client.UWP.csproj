@@ -60,10 +60,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behaviors\SpriteDrawCommand.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="Domain\CityEntity.cs" />
     <Compile Include="Domain\TerrainCategory.cs" />
-    <Compile Include="Domain\WaterTextures.cs" />
     <Compile Include="Extensions\GraphicDeviceExtensions.cs" />
     <Compile Include="Extensions\SpriteBatchExtensions.cs" />
     <Compile Include="GamePage.xaml.cs">
@@ -73,16 +70,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\PointerDrawer.cs" />
     <Compile Include="Runtime\PointerObserver.cs" />
-    <Compile Include="View\CityStrategy.cs" />
-    <Compile Include="View\CoastWithLandToTheNorthStrategy.cs" />
-    <Compile Include="View\CoastWithLandToTheSouthStrategy.cs" />
-    <Compile Include="View\DefaultStrategy.cs" />
-    <Compile Include="View\Directions.cs" />
-    <Compile Include="View\GroundStrategy.cs" />
-    <Compile Include="View\ITileStrategy.cs" />
-    <Compile Include="View\LandUnitStrategy.cs" />
-    <Compile Include="View\TextureHolder.cs" />
-    <Compile Include="View\Window.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Background.png" />
@@ -146,6 +133,9 @@
       <Project>{44911481-e7f9-4b73-ae24-591a9d3b83d3}</Project>
       <Name>Client.Lib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="View\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

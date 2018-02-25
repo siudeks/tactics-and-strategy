@@ -1,14 +1,13 @@
 ﻿using Client.Domain;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Linq;
+using Xunit;
+using Xunit.Should;
 
 namespace Client.View
 {
-    [TestClass]
     public sealed class WindowShould
     {
-        [TestMethod]
+        [Fact]
         public void UseProperTextureForIsland()
         {
             var ground = new TextureHolder();
@@ -18,14 +17,14 @@ namespace Client.View
             window.AddIsland(island);
 
             var view = window.GetWindow(1, 1, 1, 1);
-            view.First().Texture.Should().Be(ground);
+            view.First().Texture.ShouldBe(ground);
         }
 
         /// <summary>
         /// When a city need to be drawn, its texture should be used instead of
         /// terrain located behind the city.
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void CityTakesPrecedenceOnTerrain()
         {
             var ground = new TextureHolder();
@@ -37,14 +36,14 @@ namespace Client.View
             window.AddCity(new CityEntity(1, 1));
 
             var view = window.GetWindow(1, 1, 1, 1).ToArray();
-            view.First().Texture.Should().Be(city);
+            view.First().Texture.ShouldBe(city);
         }
 
         /// <summary>
         /// When a land unit need to be drawn, its texture should be used instead of
         /// terrain / city located behind the unit.
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void LandUnitTakesPrecedenceOnTerrain()
         {
             var ground = new TextureHolder();
@@ -57,10 +56,10 @@ namespace Client.View
             window.Include(new LandUnitEntity(1, 1));
 
             var view = window.GetWindow(1, 1, 1, 1).ToArray();
-            view.First().Texture.Should().Be(landUnit);
+            view.First().Texture.ShouldBe(landUnit);
         }
 
-        [TestMethod]
+        [Fact]
         public void UseProperWaterTexturesForCoastWithLandToTheNorthAndSouthAndWestAndEast()
         {
             var waterTextures = new WaterTextures();
@@ -78,13 +77,13 @@ namespace Client.View
 
             var view = window.GetWindow(0, 0, 3, 3).ToArray();
 
-            view[2 * 3 + 1].Texture.Should().Be(waterTextures.CoastWithLandToTheNorth);
-            view[0 * 3 + 1].Texture.Should().Be(waterTextures.CoastWithLandToTheSouth);
-            view[1 * 3 + 0].Texture.Should().Be(waterTextures.CoastWithLandToTheWest);
-            view[1 * 3 + 2].Texture.Should().Be(waterTextures.CoastWithLandToTheEast);
+            view[2 * 3 + 1].Texture.ShouldBe(waterTextures.CoastWithLandToTheNorth);
+            view[0 * 3 + 1].Texture.ShouldBe(waterTextures.CoastWithLandToTheSouth);
+            view[1 * 3 + 0].Texture.ShouldBe(waterTextures.CoastWithLandToTheWest);
+            view[1 * 3 + 2].Texture.ShouldBe(waterTextures.CoastWithLandToTheEast);
         }
 
-        [TestMethod]
+        [Fact]
         public void UseProperWaterTexturesForCoastWithLandToTheNorthEastAndNorthWestAndSouthEastAndSouthWest()
         {
             var waterTextures = new WaterTextures();
@@ -101,10 +100,10 @@ namespace Client.View
 
             var view = window.GetWindow(0, 0, 3, 3).ToArray();
 
-            view[0 * 3 + 0].Texture.Should().Be(waterTextures.CoastWithLandToTheNorthEast);
-            view[0 * 3 + 2].Texture.Should().Be(waterTextures.CoastWithLandToTheNorthWest);
-            view[2 * 3 + 0].Texture.Should().Be(waterTextures.CoastWithLandToTheSouthEast);
-            view[2 * 3 + 2].Texture.Should().Be(waterTextures.CoastWithLandToTheSouthWest);
+            view[0 * 3 + 0].Texture.ShouldBe(waterTextures.CoastWithLandToTheNorthEast);
+            view[0 * 3 + 2].Texture.ShouldBe(waterTextures.CoastWithLandToTheNorthWest);
+            view[2 * 3 + 0].Texture.ShouldBe(waterTextures.CoastWithLandToTheSouthEast);
+            view[2 * 3 + 2].Texture.ShouldBe(waterTextures.CoastWithLandToTheSouthWest);
         }
     }
 }
