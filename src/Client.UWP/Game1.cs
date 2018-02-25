@@ -62,10 +62,10 @@ namespace Client.UWP
 
             selectionSprite = CreateSelectorTexture(GraphicsDevice);
 
-            var waterTextures = new WaterTextures(terrainSprite);
-            var cityTexture = new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
-            var groundTexture = new TextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
-            var landUnitTexture = new TextureHolder(appSprites, new Rectangle(1+ 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
+            var waterTextures = new XnaWaterTextures(terrainSprite);
+            var cityTexture = new XnaTextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
+            var groundTexture = new XnaTextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
+            var landUnitTexture = new XnaTextureHolder(appSprites, new Rectangle(1+ 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
 
             var spriteSize = new Rectangle(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
             window = new Window(

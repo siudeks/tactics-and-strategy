@@ -6,7 +6,16 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public static void Draw(this SpriteBatch spriteBatch, Vector2 position, TextureHolder texture)
         {
-            spriteBatch.Draw(texture.Texture2D, position, texture.Source, Color.White);
+            // we need to draw only real XnaTextureHolder implementation.
+            switch (texture)
+            {
+                case XnaTextureHolder t:
+                    spriteBatch.Draw(t.Texture2D, position, t.Source, Color.White);
+                    break;
+                default:
+                    break;
+            }
+            
         }
     }
 }
