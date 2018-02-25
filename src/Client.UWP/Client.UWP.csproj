@@ -62,7 +62,6 @@
     <Compile Include="Behaviors\SpriteDrawCommand.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Domain\CityEntity.cs" />
-    <Compile Include="Domain\LandUnitEntity.cs" />
     <Compile Include="Domain\TerrainCategory.cs" />
     <Compile Include="Domain\WaterTextures.cs" />
     <Compile Include="Extensions\GraphicDeviceExtensions.cs" />

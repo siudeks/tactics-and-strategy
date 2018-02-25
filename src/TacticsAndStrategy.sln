@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.UWP", "Client.UWP\Client.UWP.csproj", "{485DDAC8-1422-46D2-805B-CB9F7E6C57F8}"
 EndProject
@@ -44,6 +44,7 @@ Global
 		{485DDAC8-1422-46D2-805B-CB9F7E6C57F8}.Release|x86.Build.0 = Release|x86
 		{485DDAC8-1422-46D2-805B-CB9F7E6C57F8}.Release|x86.Deploy.0 = Release|x86
 		{864283A8-7212-4ABD-A972-6817F81E7932}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{864283A8-7212-4ABD-A972-6817F81E7932}.Debug|Any CPU.Build.0 = Debug|x86
 		{864283A8-7212-4ABD-A972-6817F81E7932}.Debug|ARM.ActiveCfg = Debug|ARM
 		{864283A8-7212-4ABD-A972-6817F81E7932}.Debug|ARM.Build.0 = Debug|ARM
 		{864283A8-7212-4ABD-A972-6817F81E7932}.Debug|ARM.Deploy.0 = Debug|ARM
