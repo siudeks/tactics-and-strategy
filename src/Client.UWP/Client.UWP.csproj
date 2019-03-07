@@ -65,10 +65,8 @@
     </Compile>
     <Compile Include="Game1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime\IMouseState.cs" />
     <Compile Include="Runtime\PointerDrawer.cs" />
     <Compile Include="Runtime\PointerObserver.cs" />
-    <Compile Include="Runtime\PointerState.cs" />
     <Compile Include="View\CityStrategy.cs" />
     <Compile Include="View\CoastWithLandToTheNorthStrategy.cs" />
     <Compile Include="View\CoastWithLandToTheSouthStrategy.cs" />

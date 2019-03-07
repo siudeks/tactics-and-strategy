@@ -1,25 +1,25 @@
-﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace Client.Domain
 {
-    [TestClass]
     public sealed class IslandEntityShould
     {
         /// <summary>
-        /// Simple test. As proof of working, we need to simple island wit corners defined as :
-        /// [ {0, 0}, {2, 0}, {2, 2}, {0, 2}], or - if you prefer - in more sexy look
+        /// Simple test. As the proof of working, we need to simple island wit corners defined as :
+        /// [ {0, 0}, {2, 0}, {2, 2}, {0, 2}], or - if you prefer - the same data in more sexy look
         /// xox
         /// ooo
         /// xox
         /// where x is the island's corner.
-        /// expected is list of all island tiles, it means 
-        /// [ {0, 0}, {0, 1}, {0, 2}, ... {2, 2} ] or - again - more sexy presentation
+        /// expected is the list of all island tiles, it means 
+        /// [ {0, 0}, {0, 1}, {0, 2}, ... {2, 2} ] or - again - in the more sexy presentation
         /// xxx
         /// xxx
         /// xxx
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void GeneratePoints()
         {
             var island = new IslandEntity
@@ -34,7 +34,7 @@ namespace Client.Domain
                 for (int y = 0; y < 3; y++)
                     expected.Add(new GeoPoint { X = x, Y = y });
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.True(actual.All(it =>  expected.Contains(it)));
         }
 
     }
