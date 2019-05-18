@@ -1,0 +1,1 @@
+﻿# All elements use directlu Monogame framework.

@@ -1,6 +1,9 @@
 ﻿namespace Client.View
 {
 
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ITileStrategy
     {
         bool CanExecute(LocationType[] neighbors);

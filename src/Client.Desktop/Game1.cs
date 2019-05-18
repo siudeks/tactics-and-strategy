@@ -1,4 +1,5 @@
-﻿using Client.Domain;
+﻿using Client.Desktop.Native;
+using Client.Domain;
 using Client.Runtime;
 using Client.View;
 using Microsoft.Xna.Framework;
@@ -51,15 +52,17 @@ namespace Client.Desktop
 
         Window window;
 
+        SpriteFactory spriteFactory;
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteFactory = new SpriteFactory(GraphicsDevice);
 
-            terrainSprite = Content.Load<Texture2D>(@"Terrain");
+            terrainSprite = Content.Load<Texture2D>("Terrain");
             var appSprites = Content.Load<Texture2D>("DesertRatsSprites");
 
-            selectionSprite = CreateSelectorTexture(GraphicsDevice);
+            selectionSprite = spriteFactory.CreateSelectorTexture().Texture2D;
 
             var waterTextures = new WaterTextures(terrainSprite);
             var cityTexture = new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
@@ -144,27 +147,7 @@ namespace Client.Desktop
         }
 
         // non-testable method because Texture2D can't be created in unit tests.
-        private static Texture2D CreateSelectorTexture(GraphicsDevice device)
-        {
-            var size = Config.SpriteSize + 2;
-            var texture = device.CreateTexture(size, size);
-
-            var colors = new Color[size * size];
-            texture.GetData(colors);
-            for (int x = 0; x < size; x++)
-                for (int y = 0; y < size; y++)
-                {
-                    var color = Color.Transparent;
-                    var i = y * size + x;
-                    if (x == 0 || x == size - 1) color = Color.Red;
-                    if (y == 0 || y == size - 1) color = Color.Red;
-
-                    colors[i] = color;
-
-                }
-            texture.SetData(colors);
-            return texture;
-        }
+        
 
     }
 }
