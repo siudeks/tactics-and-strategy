@@ -7,17 +7,10 @@ namespace Client.Runtime
 {
     /// <summary>
     /// Observes which GeoPoint is currently selected 
-    /// and streams events about the selection.
+    /// and streams events about initial selection and when selection changes.
     /// </summary>
     public sealed class PointerObserver : IUpdateable, IGameComponent
     {
-        public bool Enabled { get; } = true;
-        public int UpdateOrder { get; } = 0;
-
-
-        public event EventHandler<EventArgs> EnabledChanged;
-        public event EventHandler<EventArgs> UpdateOrderChanged;
-
         private IObserver<PointerState> pointerStateStream;
 
         /// <summary>
@@ -26,13 +19,21 @@ namespace Client.Runtime
         /// <param name="pointerStateStream">Shared application listener about current pointer state.</param>
         public PointerObserver(IObserver<PointerState> pointerStateStream)
         {
-            this.pointerStateStream = pointerStateStream ;
+            this.pointerStateStream = pointerStateStream;
         }
+
+        public bool Enabled { get; set; }
+
+        public int UpdateOrder { get; set; }
+
+        public event EventHandler<EventArgs> EnabledChanged;
+        public event EventHandler<EventArgs> UpdateOrderChanged;
+
 
         /// <summary>
         /// Post-construction method.
         /// 
-        /// Currentluy not used, but required by implemented interface.
+        /// Currently not used, but required by implemented interface.
         /// </summary>
         public void Initialize()
         {
@@ -44,7 +45,7 @@ namespace Client.Runtime
         /// For test use <see cref="PointerObserver.Update"/> Update method with more parameters.
         /// </summary>
         /// <param name="gameTime"></param>
-        void IUpdateable.Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             Update(gameTime, Mouse.GetState().Position);
         }

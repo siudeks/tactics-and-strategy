@@ -1,1 +1,2 @@
 ![Build status](https://build.mobile.azure.com/v0.1/apps/ff25f2c6-854a-49ec-bc6f-cbc1606fffbc/branches/master/badge)
+[![Build status](https://build.appcenter.ms/v0.1/apps/afb8c0f8-a2f7-470f-a969-a7e4d46e24f0/branches/master/badge)](https://appcenter.ms)

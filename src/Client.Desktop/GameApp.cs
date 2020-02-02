@@ -12,7 +12,7 @@ namespace Client.Desktop
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class GameApp : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -21,7 +21,7 @@ namespace Client.Desktop
         private Texture2D terrainSprite;
         private IslandEntity island = IslandEntityGenerator.Random(new GeoPoint(20, 20));
 
-        public Game1()
+        public GameApp()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -67,7 +67,7 @@ namespace Client.Desktop
             var waterTextures = new WaterTextures(terrainSprite);
             var cityTexture = new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
             var groundTexture = new TextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
-            var landUnitTexture = new TextureHolder(appSprites, new Rectangle(1+ 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
+            var landUnitTexture = new TextureHolder(appSprites, new Rectangle(1 + 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
 
             var spriteSize = new Rectangle(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
             window = new Window(
@@ -147,7 +147,7 @@ namespace Client.Desktop
         }
 
         // non-testable method because Texture2D can't be created in unit tests.
-        
+
 
     }
 }

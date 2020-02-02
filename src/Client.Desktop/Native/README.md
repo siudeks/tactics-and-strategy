@@ -1,1 +1,1 @@
-﻿# All elements use directlu Monogame framework.
+﻿# All elements depends on non-testable Monogame framework.
