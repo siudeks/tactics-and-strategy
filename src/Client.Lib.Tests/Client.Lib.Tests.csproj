@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>    
-    <TargetFramework>netcoreapp2.2</TargetFramework>    
+    <TargetFramework>netcoreapp3.1</TargetFramework>    
     <RootNamespace>Client</RootNamespace>
   </PropertyGroup>
 
@@ -19,16 +19,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client.Desktop\Client.Desktop.csproj" />
-    <ProjectReference Include="..\Client.Lib\Client.Lib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="View\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Game1\Game1.csproj" />
   </ItemGroup>
 
 </Project>

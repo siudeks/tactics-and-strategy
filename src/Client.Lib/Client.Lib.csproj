@@ -9,4 +9,10 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\" />
+    <Folder Include="Runtime\" />
+    <Folder Include="View\" />
+  </ItemGroup>
+
 </Project>

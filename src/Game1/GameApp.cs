@@ -132,7 +132,7 @@ namespace Client.Desktop
             var selectionPoint = pointerStateStream.Value.Position;
             var cameraSelectionPoint = new Point(selectionPoint.X * Config.SpriteSize, selectionPoint.Y * Config.SpriteSize);
             var selectionPosition = new Vector2(cameraSelectionPoint.X - 1, cameraSelectionPoint.Y - 1);
-            spriteBatch.Draw(selectionSprite, selectionPosition);
+            spriteBatch.Draw(selectionSprite, selectionPosition, Color.Transparent);
 
             spriteBatch.End();
 

@@ -10,8 +10,19 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Content\Background.png" />
+    <None Remove="Content\Content.mgcb" />
+    <None Remove="Content\DesertRatsSprites.png" />
+    <None Remove="Content\Terrain.bmp" />
+    <None Remove="Content\TerrainSpec.txt" />
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Background.png" />
+    <Content Include="Content\DesertRatsSprites.png" />
+    <Content Include="Content\Terrain.bmp" />
+    <Content Include="Content\TerrainSpec.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
@@ -26,5 +37,6 @@
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+    <PackageReference Include="System.Reactive.PlatformServices" Version="5.0.0" />
   </ItemGroup>
 </Project>
