@@ -1,14 +1,13 @@
 ﻿using Client.Domain;
 using System.Collections.Generic;
-using System;
 using System.Linq;
-using System.Diagnostics;
 
 namespace Client.View
 {
     /// <summary>
-    /// Contains all entities which need to be visible in Game window and converts them
-    /// to textures.
+    /// Uses full list of game's entities which need to be (at some point) visible in Game window has ability
+    /// and converts them to textures.
+    /// Is also the observer on input devices and allow to convert them to commands.
     /// </summary>
     public sealed class Window
     {
