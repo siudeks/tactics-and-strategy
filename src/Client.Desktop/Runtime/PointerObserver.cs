@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Diagnostics;
 
 namespace Client.Runtime
 {
@@ -23,9 +24,7 @@ namespace Client.Runtime
         }
 
         public bool Enabled { get; set; }
-
         public int UpdateOrder { get; set; }
-
         public event EventHandler<EventArgs> EnabledChanged;
         public event EventHandler<EventArgs> UpdateOrderChanged;
 
@@ -60,6 +59,7 @@ namespace Client.Runtime
                 Position = new GeoPoint { X = x, Y = y }
             };
 
+            Debug.WriteLine(mousePosition);
             pointerStateStream.OnNext(state);
         }
     }

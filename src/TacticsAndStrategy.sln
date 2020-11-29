@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Lib.Tests", "Client.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Desktop", "Client.Desktop\Client.Desktop.csproj", "{47A2E703-36C5-4208-81CA-0244C0ECD69E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game1", "Game1\Game1.csproj", "{946123F7-AF36-42D9-B364-F62D3499EDDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,9 +49,20 @@ Global
 		{47A2E703-36C5-4208-81CA-0244C0ECD69E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{47A2E703-36C5-4208-81CA-0244C0ECD69E}.Release|x86.ActiveCfg = Release|Any CPU
 		{47A2E703-36C5-4208-81CA-0244C0ECD69E}.Release|x86.Build.0 = Release|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Debug|x86.Build.0 = Debug|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Release|x86.ActiveCfg = Release|Any CPU
+		{946123F7-AF36-42D9-B364-F62D3499EDDA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{946123F7-AF36-42D9-B364-F62D3499EDDA} = {5FFD66BC-5812-4E35-AFB7-895BD4B782A4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DD36DCE6-0927-48D4-9452-75E32E9DBAFF}
