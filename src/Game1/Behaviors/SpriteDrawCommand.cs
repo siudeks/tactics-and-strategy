@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 
-namespace Client.Behaviors
+namespace Game.Behaviors
 {
     /// <summary>
     /// Declares operation context to draw a sprite.

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Client.View
+namespace Game.View
 {
     /// <summary>
     /// TextureHolder represents part of a texture. Because of Monogame/XNA limitations, can' create texture

@@ -1,4 +1,4 @@
-﻿namespace Client.Domain
+﻿namespace Game.Domain
 {
     /// <summary>
     /// Represents an island definition.

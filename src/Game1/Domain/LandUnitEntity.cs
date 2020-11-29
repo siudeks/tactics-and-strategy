@@ -1,4 +1,4 @@
-﻿namespace Client.Domain
+﻿namespace Game.Domain
 {
     public struct LandUnitEntity
     {

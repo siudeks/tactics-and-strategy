@@ -1,8 +1,8 @@
-﻿using Client.View;
+﻿using Game.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Client.Domain
+namespace Game.Domain
 {
     /// <summary>
     /// Extracts and holds textures for Water map

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Client.Desktop
+namespace Game.Desktop
 {
     public static class Program
     {

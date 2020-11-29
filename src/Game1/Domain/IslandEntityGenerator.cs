@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Client.Domain
+namespace Game.Domain
 {
     /// <summary>
     /// Holds methods related to generating an island.

@@ -1,10 +1,10 @@
-﻿using Client.Domain;
+﻿using Game.Domain;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
 
-namespace Client.Runtime
+namespace Game.Runtime
 {
     /// <summary>
     /// Observes which GeoPoint is currently selected 

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Client.Domain
+namespace Game.Domain
 {
     /// <summary>
     /// Represents a square on 2D map.

@@ -1,4 +1,4 @@
-﻿namespace Client.View
+﻿namespace Game.View
 {
     // should be invoked at the end of strategies
     public class DefaultStrategy : ITileStrategy

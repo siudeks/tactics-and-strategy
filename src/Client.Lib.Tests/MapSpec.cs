@@ -1,8 +1,8 @@
-﻿using Client.Domain;
-using Client.View;
+﻿using Game.Domain;
+using Game.View;
 using Xunit;
 
-namespace Client
+namespace Game
 {
     /// <summary>
     /// UnitSelector allows to select provided Unit

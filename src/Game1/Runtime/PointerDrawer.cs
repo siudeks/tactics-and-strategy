@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Client.Runtime
+namespace Game.Runtime
 {
     /// <summary>
     /// Allows to mark a GeoPoint as selected.

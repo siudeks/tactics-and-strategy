@@ -1,4 +1,4 @@
-﻿namespace Client.View
+﻿namespace Game.View
 {
 
     /// <summary>

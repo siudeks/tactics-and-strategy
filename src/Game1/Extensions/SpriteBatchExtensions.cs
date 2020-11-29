@@ -1,4 +1,4 @@
-﻿using Client.View;
+﻿using Game.View;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

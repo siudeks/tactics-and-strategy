@@ -2,7 +2,7 @@
 using System.Linq;
 using Xunit;
 
-namespace Client.Domain
+namespace Game.Domain
 {
     public sealed class IslandEntityShould
     {

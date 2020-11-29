@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Client.Domain
+namespace Game.Domain
 {
     public static class IslandEntityExtensions
     {

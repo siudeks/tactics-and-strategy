@@ -12,6 +12,7 @@ namespace Game.View
             [Fact]
             public void shouldFocusOnAnyDivision()
             {
+                //var sut = new Window();
             }
 
             /// <summary>

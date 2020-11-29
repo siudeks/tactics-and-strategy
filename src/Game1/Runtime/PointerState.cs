@@ -1,6 +1,6 @@
-﻿using Client.Domain;
+﻿using Game.Domain;
 
-namespace Client.Runtime
+namespace Game.Runtime
 {
     /// <summary>
     /// Contains data related to pointer (e.g. mouse pointer on PC): 

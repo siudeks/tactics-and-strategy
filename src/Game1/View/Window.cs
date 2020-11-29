@@ -1,8 +1,8 @@
-﻿using Client.Domain;
+﻿using Game.Domain;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Client.View
+namespace Game.View
 {
     /// <summary>
     /// Uses full list of game's entities which need to be (at some point) visible in Game window has ability

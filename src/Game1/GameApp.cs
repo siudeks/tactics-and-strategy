@@ -1,18 +1,18 @@
-﻿using Client.Desktop.Native;
-using Client.Domain;
-using Client.Runtime;
-using Client.View;
+﻿using Game.Desktop.Native;
+using Game.Domain;
+using Game.Runtime;
+using Game.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 
-namespace Client.Desktop
+namespace Game.Desktop
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class GameApp : Game
+    public class GameApp : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;

@@ -1,7 +1,7 @@
 ﻿using System;
-using Client.Domain;
+using Game.Domain;
 
-namespace Client
+namespace Game
 {
     /// <summary>
     /// Represents whole definition of game territory.
