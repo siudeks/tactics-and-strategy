@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Game.Domain
 {
     /// <summary>
-    /// Extracts and holds textures for Water map
+    /// Extracts from resources and holds textures for Water-related maps
     /// </summary>
     /// <remarks>
     /// All textures are hold in one big texture, so need to have separated logic which knowledge

@@ -42,7 +42,8 @@ namespace Game.Desktop
             instanceDisposer.Add(pointerStateStream);
 
             // TODO: Add your initialization logic here
-            Components.Add(new PointerObserver(pointerStateStream));
+            Components.Add(new PointerObserver(pointerStateStream) { Enabled = true });
+
 
             base.Initialize();
         }
@@ -73,7 +74,7 @@ namespace Game.Desktop
             window = new Window(
                 waterTextures,
                 cityTexture,
-                new DefaultStrategy(waterTextures.Sea),
+                new NoOpStrategy(waterTextures.Sea),
                 new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth),
                 new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth),
                 new GroundStrategy(groundTexture),

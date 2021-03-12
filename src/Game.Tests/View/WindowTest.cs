@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Game.Domain;
+using Xunit;
 
 namespace Game.View
 {
@@ -12,7 +13,7 @@ namespace Game.View
             [Fact]
             public void shouldFocusOnAnyDivision()
             {
-                //var sut = new Window();
+                var sut = new Window(new WaterTextures(), new TextureHolder(), new NoOpStrategy(new TextureHolder()));
             }
 
             /// <summary>

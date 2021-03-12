@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Game.Runtime
 {
@@ -13,6 +14,7 @@ namespace Game.Runtime
         public PointerDrawer(IObservable<PointerState> pointerStream)
         {
             this.pointerStream = pointerStream;
+            Debug.Print("aaaaaaaaaaaaaaaa");
         }
     }
 }

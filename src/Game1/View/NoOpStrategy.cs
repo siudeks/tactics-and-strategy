@@ -1,12 +1,11 @@
 ﻿namespace Game.View
 {
     // should be invoked at the end of strategies
-    public class DefaultStrategy : ITileStrategy
+    public class NoOpStrategy : ITileStrategy
     {
         private readonly TextureHolder texture;
-        private object p;
 
-        public DefaultStrategy(TextureHolder texture)
+        public NoOpStrategy(TextureHolder texture)
         {
             this.texture = texture;
         }
