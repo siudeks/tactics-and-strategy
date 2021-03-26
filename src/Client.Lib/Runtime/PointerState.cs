@@ -3,7 +3,7 @@
 namespace Client.Runtime
 {
     /// <summary>
-    /// Contains data related to pointer (e.g. mouse pointer) known location and 
+    /// Contains data related to pointer (e.g. mouse pointer on desktop app) known location and 
     /// pointer command. 
     /// 
     /// To implement that abstract Pointer state we need to translate every platform-dependatn 

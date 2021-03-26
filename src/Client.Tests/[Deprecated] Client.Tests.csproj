@@ -123,10 +123,6 @@
       <Project>{44911481-e7f9-4b73-ae24-591a9d3b83d3}</Project>
       <Name>Client.Lib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Client.UWP\Client.UWP.csproj">
-      <Project>{485ddac8-1422-46d2-805b-cb9f7e6c57f8}</Project>
-      <Name>Client.UWP</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
