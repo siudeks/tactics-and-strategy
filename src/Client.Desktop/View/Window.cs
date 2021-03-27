@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using System.Diagnostics;
+using Microsoft.Xna.Framework;
+using Client.Resources;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Client.View
 {
@@ -10,7 +12,8 @@ namespace Client.View
     /// Contains all entities which need to be visible in Game window and converts them
     /// to textures.
     /// </summary>
-    public sealed class Window
+    public sealed class Window : IGameComponent,
+                                 ITextureConsumer
     {
         private readonly Dictionary<GeoPoint, LocationType> points = new Dictionary<GeoPoint, LocationType>();
 
@@ -26,7 +29,14 @@ namespace Client.View
         private ITileStrategy[] strategies = new ITileStrategy[0];
         private ITileStrategy fallbackStrategy;
 
-        public Window(WaterTextures water, TextureHolder city, ITileStrategy fallbackStrategy, params ITileStrategy[] strategies)
+        public event EventHandler<EventArgs> DrawOrderChanged;
+        public event EventHandler<EventArgs> VisibleChanged;
+
+        public int DrawOrder => 0;
+
+        public bool Visible => true;
+
+        public void Initialize(WaterTextures water, TextureHolder city, ITileStrategy fallbackStrategy, params ITileStrategy[] strategies)
         {
             this.water = water;
             this.city = city;
@@ -195,6 +205,42 @@ namespace Client.View
 
             return water.CoastWithLandToTheSouthWest;
         }
+
+        public void Initialize()
+        {
+            // temporar variables to keep sample textures for demo purposes.
+            var island = IslandEntityGenerator.Random(new GeoPoint(20, 20));
+
+            this.AddIsland(island);
+            this.AddCity(new CityEntity(20, 20));
+            this.Include(new LandUnitEntity(21, 20));
+        }
+
+        Texture2D terrainTexture;
+        Texture2D desertRatsTextures;
+
+        public void OnLoaded(Texture2D texture, TextureItem item)
+        {
+            if (item == TextureItem.TERRAIN) terrainTexture = texture;
+            if (item == TextureItem.DESERT_RATES) desertRatsTextures = texture;
+        }
+
+        public void LoadFinished()
+        {
+            var waterTextures = new WaterTextures(terrainTexture);
+            var cityTexture = new TextureHolder(terrainTexture, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
+            var groundTexture = new TextureHolder(terrainTexture, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
+            var landUnitTexture = new TextureHolder(desertRatsTextures, new Rectangle(1 + 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
+
+            Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.Sea),
+                new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth),
+                new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth),
+                new GroundStrategy(groundTexture),
+                new LandUnitStrategy(landUnitTexture),
+                new CityStrategy(cityTexture));
+        }
+
+
 
         /// <summary>
         /// Holds together geopoint and texture used for that point to draw it.

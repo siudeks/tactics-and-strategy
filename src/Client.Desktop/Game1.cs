@@ -21,10 +21,6 @@ namespace Client.Desktop
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        // temporar variables to keep sample textures for demo purposes.
-        private Texture2D terrainSprite;
-        private IslandEntity island = IslandEntityGenerator.Random(new GeoPoint(20, 20));
-
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -57,40 +53,29 @@ namespace Client.Desktop
         }
 
         
-        Window window;
-
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            terrainSprite = Content.Load<Texture2D>(@"Terrain");
+            var textureConsumer = container.Resolve<ITextureConsumer>();
+
+            var terrainSprite = Content.Load<Texture2D>(@"Terrain");
+            textureConsumer.OnLoaded(terrainSprite, TextureItem.TERRAIN);
+
             var appSprites = Content.Load<Texture2D>("DesertRatsSprites");
+            textureConsumer.OnLoaded(appSprites, TextureItem.DESERT_RATES);
+
+            textureConsumer.LoadFinished();
+
 
 
             var selectionTexture = CreateSelectorTexture(GraphicsDevice);
+
             var sprite = container.Resolve<SelectionSprite>();
             sprite.Texture = selectionTexture;
 
-            var waterTextures = new WaterTextures(terrainSprite);
-            var cityTexture = new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
-            var groundTexture = new TextureHolder(terrainSprite, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
-            var landUnitTexture = new TextureHolder(appSprites, new Rectangle(1+ 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
-
             var spriteSize = new Rectangle(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
-            window = new Window(
-                waterTextures,
-                cityTexture,
-                new DefaultStrategy(waterTextures.Sea),
-                new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth),
-                new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth),
-                new GroundStrategy(groundTexture),
-                new LandUnitStrategy(landUnitTexture),
-                new CityStrategy(cityTexture)
-                );
-            window.AddIsland(island);
-            window.AddCity(new CityEntity(20, 20));
-            window.Include(new LandUnitEntity(21, 20));
 
         }
 
@@ -126,6 +111,7 @@ namespace Client.Desktop
 
             // display sample island
             {
+                var window = container.Resolve<Window>();
                 var points = window
                     .GetWindow(0, 0, 100, 100);
 
