@@ -1,10 +1,15 @@
-﻿using Client.Domain;
+﻿using Autofac;
+using Client.Desktop.Runtime;
+using Client.Domain;
+using Client.Resources;
 using Client.Runtime;
 using Client.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.Reflection;
 
 namespace Client.Desktop
 {
@@ -27,7 +32,7 @@ namespace Client.Desktop
         }
 
         private readonly CompositeDisposable instanceDisposer = new CompositeDisposable();
-        private BehaviorSubject<PointerState> pointerStateStream;
+        private IContainer container;
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -37,18 +42,21 @@ namespace Client.Desktop
         /// </summary>
         protected override void Initialize()
         {
-            pointerStateStream = new BehaviorSubject<PointerState>(new PointerState());
-            instanceDisposer.Add(pointerStateStream);
+            var builder = new ContainerBuilder();
+            // Scan an assembly for components
+            builder.RegisterAssemblyModules(Assembly.GetAssembly(typeof(Game1)));
 
-            // TODO: Add your initialization logic here
-            Components.Add(new PointerObserver(pointerStateStream));
+            builder.RegisterInstance(new SelectionSprite());
+            container = builder.Build();
+
+            var gameComponents = container.Resolve<IEnumerable<IGameComponent>>();
+            foreach (var item in gameComponents)
+                Components.Add(item);
 
             base.Initialize();
         }
 
-        // sprite used to mark a GeoPoint as selected.
-        private Texture2D selectionSprite;
-
+        
         Window window;
 
         protected override void LoadContent()
@@ -59,7 +67,10 @@ namespace Client.Desktop
             terrainSprite = Content.Load<Texture2D>(@"Terrain");
             var appSprites = Content.Load<Texture2D>("DesertRatsSprites");
 
-            selectionSprite = CreateSelectorTexture(GraphicsDevice);
+
+            var selectionTexture = CreateSelectorTexture(GraphicsDevice);
+            var sprite = container.Resolve<SelectionSprite>();
+            sprite.Texture = selectionTexture;
 
             var waterTextures = new WaterTextures(terrainSprite);
             var cityTexture = new TextureHolder(terrainSprite, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
@@ -126,10 +137,9 @@ namespace Client.Desktop
             }
 
             // drawing cursor Start
-            var selectionPoint = pointerStateStream.Value.Position;
-            var cameraSelectionPoint = new Point(selectionPoint.X * Config.SpriteSize, selectionPoint.Y * Config.SpriteSize);
-            var selectionPosition = new Vector2(cameraSelectionPoint.X - 1, cameraSelectionPoint.Y - 1);
-            spriteBatch.Draw(selectionSprite, selectionPosition);
+            var drawers = container.Resolve<IEnumerable<IBatchDrawer>>();
+            foreach (var drawer in drawers)
+                drawer.OnDraw(spriteBatch);
 
             spriteBatch.End();
 

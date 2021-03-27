@@ -1,14 +1,13 @@
 ﻿using Client.Domain;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Linq;
+using Xunit;
 
 namespace Client.View
 {
-    [TestClass]
     public sealed class WindowShould
     {
-        [TestMethod]
+        [Fact]
         public void UseProperTextureForIsland()
         {
             var ground = new TextureHolder();
@@ -25,7 +24,7 @@ namespace Client.View
         /// When a city need to be drawn, its texture should be used instead of
         /// terrain located behind the city.
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void CityTakesPrecedenceOnTerrain()
         {
             var ground = new TextureHolder();
@@ -44,7 +43,7 @@ namespace Client.View
         /// When a land unit need to be drawn, its texture should be used instead of
         /// terrain / city located behind the unit.
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void LandUnitTakesPrecedenceOnTerrain()
         {
             var ground = new TextureHolder();
@@ -60,7 +59,7 @@ namespace Client.View
             view.First().Texture.Should().Be(landUnit);
         }
 
-        [TestMethod]
+        [Fact]
         public void UseProperWaterTexturesForCoastWithLandToTheNorthAndSouthAndWestAndEast()
         {
             var waterTextures = new WaterTextures();
@@ -84,7 +83,7 @@ namespace Client.View
             view[1 * 3 + 2].Texture.Should().Be(waterTextures.CoastWithLandToTheEast);
         }
 
-        [TestMethod]
+        [Fact]
         public void UseProperWaterTexturesForCoastWithLandToTheNorthEastAndNorthWestAndSouthEastAndSouthWest()
         {
             var waterTextures = new WaterTextures();

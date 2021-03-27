@@ -1,16 +1,15 @@
-﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Client.Domain;
+using Xunit;
 
 namespace Client.Runtime
 {
-    [TestClass]
     public sealed class PointerObserverShould
     {
-        [TestMethod, Timeout(1000)]
+        [Fact(Timeout = 1000)]
         public async Task EmitPointerStateWhenUpdated()
         {
             var points = new ReplaySubject<PointerState>();

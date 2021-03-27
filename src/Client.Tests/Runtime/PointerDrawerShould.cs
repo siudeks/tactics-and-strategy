@@ -1,13 +1,12 @@
 ﻿using Client.Domain;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System.Reactive.Subjects;
+using Xunit;
 
 namespace Client.Runtime
 {
-    [TestClass]
     public sealed class PointerDrawerShould
     {
-        [TestMethod]
+        [Fact]
         public void ChangeSpriteColor()
         {
             var stream = new Subject<PointerState>();

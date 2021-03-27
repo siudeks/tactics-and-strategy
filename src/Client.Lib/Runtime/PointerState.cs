@@ -1,4 +1,5 @@
 ﻿using Client.Domain;
+using System.Diagnostics;
 
 namespace Client.Runtime
 {
@@ -9,8 +10,9 @@ namespace Client.Runtime
     /// To implement that abstract Pointer state we need to translate every platform-dependatn 
     /// input operation as well-known pointer command like 'select', 'zoom' etc.
     /// </summary>
-    public struct PointerState
+    [DebuggerDisplay("Position: X:{Position.X} Y:{Position.Y}")]
+    public record PointerState
     {
-        public GeoPoint Position;
+        public GeoPoint Position { get; init; }
     }
 }

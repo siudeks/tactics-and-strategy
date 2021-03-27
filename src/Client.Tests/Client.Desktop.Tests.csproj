@@ -14,14 +14,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Client.Desktop\Client.Desktop.csproj">
-      <Project>{47a2e703-36c5-4208-81ca-0244c0ecd69e}</Project>
-      <Name>Client.Desktop</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="xunit">
       <Version>2.4.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Client.Desktop\Client.Desktop.csproj" />
   </ItemGroup>
 </Project>
