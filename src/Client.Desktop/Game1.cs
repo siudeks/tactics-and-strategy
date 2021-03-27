@@ -105,23 +105,6 @@ namespace Client.Desktop
 
             spriteBatch.Begin();
 
-            // get screen center
-            var offsetx = graphics.GraphicsDevice.Viewport.Width / 2;
-            var offsety = graphics.GraphicsDevice.Viewport.Height / 2;
-
-            // display sample island
-            {
-                var window = container.Resolve<Window>();
-                var points = window
-                    .GetWindow(0, 0, 100, 100);
-
-                foreach (var it in points)
-                {
-                    var position = new Vector2(it.GeoPoint.X * Config.SpriteSize, it.GeoPoint.Y * Config.SpriteSize);
-                    spriteBatch.Draw(position, it.Texture);
-                }
-            }
-
             // drawing cursor Start
             var drawers = container.Resolve<IEnumerable<IBatchDrawer>>();
             foreach (var drawer in drawers)

@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Client.Desktop.Runtime;
 using Client.Resources;
 using Client.Runtime;
 using Microsoft.Xna.Framework;
@@ -11,7 +12,7 @@ namespace Client.View
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<Window>().As<IGameComponent, Window, ITextureConsumer>().SingleInstance();
+            builder.RegisterType<Window>().As<IGameComponent, IBatchDrawer, ITextureConsumer>().SingleInstance();
         }
     }
 }

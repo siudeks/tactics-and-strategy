@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Client.Resources;
 using Microsoft.Xna.Framework.Graphics;
+using Client.Desktop.Runtime;
 
 namespace Client.View
 {
@@ -13,6 +14,7 @@ namespace Client.View
     /// to textures.
     /// </summary>
     public sealed class Window : IGameComponent,
+                                 IBatchDrawer,
                                  ITextureConsumer
     {
         private readonly Dictionary<GeoPoint, LocationType> points = new Dictionary<GeoPoint, LocationType>();
@@ -238,6 +240,22 @@ namespace Client.View
                 new GroundStrategy(groundTexture),
                 new LandUnitStrategy(landUnitTexture),
                 new CityStrategy(cityTexture));
+        }
+
+        public void OnDraw(SpriteBatch spriteBatch)
+        {
+            // get screen center
+            // var offsetx = graphics.GraphicsDevice.Viewport.Width / 2;
+            // var offsety = graphics.GraphicsDevice.Viewport.Height / 2;
+
+            // display sample island
+            var points = this.GetWindow(0, 0, 100, 100);
+
+            foreach (var it in points)
+            {
+                var position = new Vector2(it.GeoPoint.X * Config.SpriteSize, it.GeoPoint.Y * Config.SpriteSize);
+                spriteBatch.Draw(position, it.Texture);
+            }
         }
 
 
