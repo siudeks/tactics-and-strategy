@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Client.Domain;
 using Xunit;
+using FluentAssertions;
 
 namespace Client.Runtime
 {
@@ -16,10 +17,10 @@ namespace Client.Runtime
             var observer = new PointerObserver(points);
 
             observer.Update(new GameTime(), Point.Zero);
-            Assert.AreEqual(new PointerState { Position = new GeoPoint() }, await points.FirstAsync());
+            new PointerState { Position = new GeoPoint() }.Should().BeEquivalentTo(await points.FirstAsync());
 
             observer.Update(new GameTime(), new Point(Config.SpriteSize, Config.SpriteSize));
-            Assert.AreEqual(new PointerState { Position = new GeoPoint { X = 1, Y = 1 } }, await points.Skip(1).FirstAsync());
+            new PointerState { Position = new GeoPoint { X = 1, Y = 1 } }.Should().BeEquivalentTo(await points.Skip(1).FirstAsync());
         }
     }
 }

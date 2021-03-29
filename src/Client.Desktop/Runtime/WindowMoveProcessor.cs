@@ -1,10 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Client.Domain;
+using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client.Desktop.Runtime
 {
@@ -15,6 +12,8 @@ namespace Client.Desktop.Runtime
 
         public event EventHandler<EventArgs> EnabledChanged;
         public event EventHandler<EventArgs> UpdateOrderChanged;
+
+        public IntendedMapCentre IntendedMapCentre { get; set; }
 
         public bool Enabled => true;
 
@@ -37,7 +36,8 @@ namespace Client.Desktop.Runtime
 
         private void OnUpdate()
         {
-            Debug.WriteLine(DateTime.Now);
+            IntendedMapCentre.X = IntendedMapCentre.X + 1;
+            IntendedMapCentre.Y = IntendedMapCentre.Y + 1;
         }
     }
 }

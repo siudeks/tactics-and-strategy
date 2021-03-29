@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Client.Resources;
 using Microsoft.Xna.Framework.Graphics;
 using Client.Desktop.Runtime;
+using System.Diagnostics;
 
 namespace Client.View
 {
@@ -17,7 +18,7 @@ namespace Client.View
                                  IBatchDrawer,
                                  ITextureConsumer
     {
-        private readonly Dictionary<GeoPoint, LocationType> points = new Dictionary<GeoPoint, LocationType>();
+        private readonly Dictionary<GeoPoint, LocationType> mapPoints = new Dictionary<GeoPoint, LocationType>();
 
         // defines single texture generator strategy
         // area: small array 3*3, where central point defines the point which need th have
@@ -59,7 +60,7 @@ namespace Client.View
             foreach (var item in island.GeneratePoints().ToArray())
             {
                 var point = new GeoPoint(item.X, item.Y);
-                points.Add(point, LocationType.Ground);
+                mapPoints.Add(point, LocationType.Ground);
             }
         }
 
@@ -72,45 +73,46 @@ namespace Client.View
         public void AddCity(CityEntity entity)
         {
             var point = new GeoPoint(entity.X, entity.Y);
-            points[point] = LocationType.City;
+            mapPoints[point] = LocationType.City;
         }
 
         public void Include(LandUnitEntity entity)
         {
             var point = new GeoPoint(entity.X, entity.Y);
-            points[point] = LocationType.LandUnit;
+            mapPoints[point] = LocationType.LandUnit;
         }
 
         /// <summary>
         /// Generates list of textures for given square, when left bottom corner is provided.
         /// </summary>
-        /// <param name="lbx"></param>
-        /// <param name="lby"></param>
-        /// <param name="dx"></param>
-        /// <param name="dy"></param>
+        /// <param name="lbcx"></param>
+        /// <param name="lbcy"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         /// <returns>Sequence contains textures, starting from left bottom corner and returning rows first.</returns>
-        public IEnumerable<PointContext> GetWindow(int lbx, int lby, int dx, int dy)
+        public IEnumerable<PointContext> GetWindow(int lbcx, int lbcy, int width, int height)
         {
-            for (int y = 0; y < dy; y++)
-                for (int x = 0; x < dx; x++)
+            for (int dy = 0; dy < height; dy++)
+                for (int dx = 0; dx < width; dx++)
                 {
-                    var geox = lbx + x;
-                    var geoy = lby + y;
+                    var geox = lbcx + dx;
+                    var geoy = lbcy + dy;
 
                     var area = new LocationType[9];
                     var centerOfArea = new GeoPoint(geox, geoy);
+                    var relativeCenterOfArea = new GeoPoint(dx, dy);
 
                     for (int i = 0; i < 9; i++) area[i] = LocationType.Water;
 
-                    area[Directions.NeighborTopLeft] = points.ContainsKey(centerOfArea.TopLeft()) ? points[centerOfArea.TopLeft()] : LocationType.Water;
-                    area[Directions.NeighborNorth] = points.ContainsKey(centerOfArea.Top()) ? points[centerOfArea.Top()] : LocationType.Water;
-                    area[Directions.NeighborTopRight] = points.ContainsKey(centerOfArea.TopRight()) ? points[centerOfArea.TopRight()] : LocationType.Water;
-                    area[Directions.NeighborWest] = points.ContainsKey(centerOfArea.Left()) ? points[centerOfArea.Left()] : LocationType.Water;
-                    area[Directions.NeighborThis] = points.ContainsKey(centerOfArea) ? points[centerOfArea] : LocationType.Water;
-                    area[Directions.NeighborEast] = points.ContainsKey(centerOfArea.Right()) ? points[centerOfArea.Right()] : LocationType.Water;
-                    area[Directions.NeighborDownLeft] = points.ContainsKey(centerOfArea.DownLeft()) ? points[centerOfArea.DownLeft()] : LocationType.Water;
-                    area[Directions.NeighborSouth] = points.ContainsKey(centerOfArea.Down()) ? points[centerOfArea.Down()] : LocationType.Water;
-                    area[Directions.NeighborDownRight] = points.ContainsKey(centerOfArea.DownRight()) ? points[centerOfArea.DownRight()] : LocationType.Water;
+                    area[Directions.NeighborTopLeft] = mapPoints.ContainsKey(centerOfArea.TopLeft()) ? mapPoints[centerOfArea.TopLeft()] : LocationType.Water;
+                    area[Directions.NeighborNorth] = mapPoints.ContainsKey(centerOfArea.Top()) ? mapPoints[centerOfArea.Top()] : LocationType.Water;
+                    area[Directions.NeighborTopRight] = mapPoints.ContainsKey(centerOfArea.TopRight()) ? mapPoints[centerOfArea.TopRight()] : LocationType.Water;
+                    area[Directions.NeighborWest] = mapPoints.ContainsKey(centerOfArea.Left()) ? mapPoints[centerOfArea.Left()] : LocationType.Water;
+                    area[Directions.NeighborThis] = mapPoints.ContainsKey(centerOfArea) ? mapPoints[centerOfArea] : LocationType.Water;
+                    area[Directions.NeighborEast] = mapPoints.ContainsKey(centerOfArea.Right()) ? mapPoints[centerOfArea.Right()] : LocationType.Water;
+                    area[Directions.NeighborDownLeft] = mapPoints.ContainsKey(centerOfArea.DownLeft()) ? mapPoints[centerOfArea.DownLeft()] : LocationType.Water;
+                    area[Directions.NeighborSouth] = mapPoints.ContainsKey(centerOfArea.Down()) ? mapPoints[centerOfArea.Down()] : LocationType.Water;
+                    area[Directions.NeighborDownRight] = mapPoints.ContainsKey(centerOfArea.DownRight()) ? mapPoints[centerOfArea.DownRight()] : LocationType.Water;
 
                     var centerTexture = new TextureHolder();
                     var handled = false;
@@ -138,7 +140,7 @@ namespace Client.View
 
                     if (!handled) centerTexture = fallbackStrategy.Execute(area);
 
-                    yield return new PointContext(centerOfArea, centerTexture);
+                    yield return new PointContext(relativeCenterOfArea, centerTexture);
                 }
         }
 
@@ -242,18 +244,25 @@ namespace Client.View
                 new CityStrategy(cityTexture));
         }
 
+        public IntendedMapCentre IntendedMapCentre { get; set; }
+
         public void OnDraw(SpriteBatch spriteBatch)
         {
             // get screen center
             // var offsetx = graphics.GraphicsDevice.Viewport.Width / 2;
             // var offsety = graphics.GraphicsDevice.Viewport.Height / 2;
 
+            var x = IntendedMapCentre.X;
+            var y = IntendedMapCentre.Y;
+
             // display sample island
-            var points = this.GetWindow(0, 0, 100, 100);
+            var points = this.GetWindow(0 + x, 0 + y, 30, 30);
 
             foreach (var it in points)
             {
-                var position = new Vector2(it.GeoPoint.X * Config.SpriteSize, it.GeoPoint.Y * Config.SpriteSize);
+                var position = new Vector2(
+                    it.GeoPoint.X * Config.SpriteSize,
+                    it.GeoPoint.Y * Config.SpriteSize);
                 spriteBatch.Draw(position, it.Texture);
             }
         }

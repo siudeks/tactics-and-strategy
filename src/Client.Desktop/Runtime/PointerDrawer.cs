@@ -43,7 +43,6 @@ namespace Client.Runtime
 
         public void OnDraw(SpriteBatch spriteBatch)
         {
-            Debug.WriteLine("Position: " + state.Position.X + "," + state.Position.Y);
             var selectionPoint = state.Position;
             var cameraSelectionPoint = new Point(selectionPoint.X * Config.SpriteSize, selectionPoint.Y * Config.SpriteSize);
             var selectionPosition = new Vector2(cameraSelectionPoint.X - 1, cameraSelectionPoint.Y - 1);

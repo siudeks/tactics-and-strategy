@@ -10,7 +10,7 @@ namespace Client.Desktop.Runtime
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<WindowMoveProcessor>().As<IGameComponent>();
+            builder.RegisterType<WindowMoveProcessor>().As<IGameComponent>().PropertiesAutowired();
             builder.RegisterType<PointerObserver>().As<IGameComponent>();
             builder.RegisterType<PointerDrawer>().As<IGameComponent, IBatchDrawer>().SingleInstance();
 
