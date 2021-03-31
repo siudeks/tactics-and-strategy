@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Client.Domain;
+using FluentAssertions;
+using Microsoft.Xna.Framework;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using System.Reactive.Linq;
-using Client.Domain;
 using Xunit;
-using FluentAssertions;
 
 namespace Client.Runtime
 {

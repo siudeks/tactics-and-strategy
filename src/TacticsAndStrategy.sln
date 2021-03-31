@@ -14,7 +14,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Lib.Tests", "Client.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Desktop", "Client.Desktop\Client.Desktop.csproj", "{47A2E703-36C5-4208-81CA-0244C0ECD69E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Desktop.Tests", "Client.Tests\Client.Desktop.Tests.csproj", "{4BD10C05-BBDE-4F90-986E-5891C4FF1809}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Desktop.Tests", "Client.Tests\Client.Desktop.Tests.csproj", "{4BD10C05-BBDE-4F90-986E-5891C4FF1809}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Tests", "Client.Tests\Client.Tests.csproj", "{2944B674-759A-47A1-B87A-67AC1F38DF34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +58,14 @@ Global
 		{4BD10C05-BBDE-4F90-986E-5891C4FF1809}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4BD10C05-BBDE-4F90-986E-5891C4FF1809}.Release|x86.ActiveCfg = Release|Any CPU
 		{4BD10C05-BBDE-4F90-986E-5891C4FF1809}.Release|x86.Build.0 = Release|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Debug|x86.Build.0 = Debug|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Release|x86.ActiveCfg = Release|Any CPU
+		{2944B674-759A-47A1-B87A-67AC1F38DF34}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

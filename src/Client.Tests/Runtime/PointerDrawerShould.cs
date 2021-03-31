@@ -14,7 +14,7 @@ namespace Client.Runtime
             //stream.OnNext(new PointerState { Position = new GeoPoint { X = 0, Y = 0 } });
 
             //tested.
-            
+
         }
     }
 }

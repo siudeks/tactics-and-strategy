@@ -75,7 +75,7 @@ namespace Client.View
             // where O - water, X - island, ? - water where we test textures.
             var island = new IslandEntity { Corners = new[] { new GeoPoint { X = 1, Y = 1 } } };
             var window = new Window();
-            window.Initialize(waterTextures, null, new DefaultStrategy(waterTextures.Sea), 
+            window.Initialize(waterTextures, null, new DefaultStrategy(waterTextures.Sea),
                 new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth),
                 new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth));
             window.AddIsland(island);
