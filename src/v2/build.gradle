@@ -9,15 +9,16 @@ buildscript {
         google()
     }
     dependencies {
-        
-
     }
+
 }
+
 
 allprojects {
     apply plugin: "eclipse"
 
     version = '1.0'
+
     ext {
         appName = "my-gdx-game"
         gdxVersion = '1.9.14'
@@ -35,11 +36,11 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
+
 }
 
 project(":core") {
     apply plugin: "java-library"
-
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -50,7 +51,7 @@ project(":core") {
 
 project(":desktop") {
     apply plugin: "java-library"
-
+    apply plugin: 'java'
 
     dependencies {
         implementation project(":core")
@@ -60,3 +61,4 @@ project(":desktop") {
         
     }
 }
+
