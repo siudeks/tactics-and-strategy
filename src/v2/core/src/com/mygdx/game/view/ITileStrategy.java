@@ -1,8 +1,8 @@
-﻿package com.mygdx.game.view;
+package com.mygdx.game.view;
 
 public interface ITileStrategy
 {
-    bool CanExecute(LocationType[] neighbors);
+    boolean CanExecute(LocationType[] neighbors);
 
     TextureHolder Execute(LocationType[] neighbors);
 }

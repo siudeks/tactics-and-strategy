@@ -42,6 +42,11 @@ allprojects {
 project(":core") {
     apply plugin: "java-library"
 
+    compileJava {
+        options.compilerArgs += '--enable-preview'
+        options.incremental = true
+    }
+
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -52,7 +57,7 @@ project(":core") {
 project(":desktop") {
     apply plugin: "java-library"
     apply plugin: 'java'
-
+    
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"

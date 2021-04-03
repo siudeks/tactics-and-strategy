@@ -1,17 +1,9 @@
 package com.mygdx.game.resources;
 
-using Microsoft.Xna.Framework.Graphics;
+import com.badlogic.gdx.graphics.Texture;
 
-namespace Client.Resources
-{
-    /// <summary>
-    /// Sprite used to mark a GeoPoint as selected.
-    /// Singleton instance.
-    /// </summary>
-    public class SelectionSprite
-    {
-        public Texture2D Texture { get; set; }
-    }
-
-
-}
+/**
+ * Sprite used to mark a GeoPoint as selected.
+ * Singleton instance.
+ */
+public record SelectionSprite(Texture texture) { }

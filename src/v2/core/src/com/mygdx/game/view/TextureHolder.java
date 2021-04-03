@@ -1,4 +1,4 @@
-﻿package com.mygdx.game.view;
+package com.mygdx.game.view;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
@@ -19,7 +19,7 @@ public class TextureHolder {
 
     public final Texture Texture2D;
     public final Rectangle Source;
-    
+
     public TextureHolder(Texture texture, Rectangle source)
     {
         this.Texture2D = texture;

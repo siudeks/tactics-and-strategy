@@ -1,12 +1,10 @@
-﻿package com.mygdx.game.domain;
+package com.mygdx.game.domain;
 
 import java.util.Random;
 
 import io.vavr.collection.List;
 
-/// <summary>
-/// Holds methods related to generating an island.
-/// </summary>
+/** Holds methods related to generating an island. */
 public class IslandEntityGenerator {
     /// <summary>
     /// Generates random island where some defined points need to be included in island as a 'centre'. 

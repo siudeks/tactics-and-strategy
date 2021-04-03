@@ -1,4 +1,4 @@
-﻿package com.mygdx.game.view;
+package com.mygdx.game.view;
 
 public enum LocationType {
     Water,

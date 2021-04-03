@@ -1,15 +1,26 @@
 package com.mygdx.game.view;
 
-import java.util.HashMap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.mygdx.game.Config;
+import com.mygdx.game.domain.CityEntity;
+import com.mygdx.game.domain.IslandEntity;
+import com.mygdx.game.domain.LandUnitEntity;
 import com.mygdx.game.domain.GeoPoint;
+import com.mygdx.game.domain.IntendedMapCentre;
 import com.mygdx.game.domain.IslandEntityGenerator;
+import com.mygdx.game.resources.ITextureConsumer;
 import com.mygdx.game.resources.WaterTextures;
 import com.mygdx.game.runtime.GameComponent;
+import com.mygdx.game.runtime.IBatchDrawer;
+
+import com.mygdx.game.resources.TextureItem;
 
 import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import io.vavr.collection.Map;
+import io.vavr.collection.HashMap;
 
 /**
  * Contains all entities which need to be visible in Game window and converts them
@@ -35,66 +46,55 @@ public final class Window implements GameComponent,
     private ITileStrategy[] strategies = new ITileStrategy[0];
     private ITileStrategy fallbackStrategy;
 
-    public event EventHandler<EventArgs> DrawOrderChanged;
-    public event EventHandler<EventArgs> VisibleChanged;
-
-    public int DrawOrder => 0;
-
-    public bool Visible => true;
-
-    public void Initialize(WaterTextures water, TextureHolder city, ITileStrategy fallbackStrategy, params ITileStrategy[] strategies)
-    {
+    public void Initialize(WaterTextures water, TextureHolder city, ITileStrategy fallbackStrategy, ITileStrategy... strategies) {
         this.water = water;
         this.city = city;
 
-        functionStrategies.Add(CoastWithLandToTheWest);
-        functionStrategies.Add(CoastWithLandToTheEast);
-        functionStrategies.Add(CoastWithLandToTheNorthEast);
-        functionStrategies.Add(CoastWithLandToTheNorthWest);
-        functionStrategies.Add(CoastWithLandToTheSouthEast);
-        functionStrategies.Add(CoastWithLandToTheSouthWest);
+        functionStrategies = functionStrategies
+            .append(this::CoastWithLandToTheWest)
+            .append(this::CoastWithLandToTheEast)
+            .append(this::CoastWithLandToTheNorthEast)
+            .append(this::CoastWithLandToTheNorthWest)
+            .append(this::CoastWithLandToTheSouthEast)
+            .append(this::CoastWithLandToTheSouthWest);
 
         this.strategies = strategies;
         this.fallbackStrategy = fallbackStrategy;
     }
 
-    public void AddIsland(IslandEntity island)
-    {
-        foreach (var item in island.GeneratePoints().ToArray())
-        {
+    public void AddIsland(IslandEntity island) {
+        for (var item : IslandEntityExtensions.GeneratePoints(island).ToArray()) {
             var point = new GeoPoint(item.X, item.Y);
             mapPoints.Add(point, LocationType.Ground);
         }
     }
 
-    /// <summary>
-    /// Defines a city on the map.
-    /// 
-    /// Needs to be invoked later then <see cref="AddIsland(IslandEntity)"/>
-    /// </summary>
-    /// <param name="entity"></param>
+    /**
+     * Needs to be invoked later then <see cref="AddIsland(IslandEntity)"/>.
+     * @param entity
+     */
     public void AddCity(CityEntity entity)
     {
         var point = new GeoPoint(entity.X, entity.Y);
         mapPoints[point] = LocationType.City;
     }
 
+    /**
+     * 
+     * @param entity
+     */
     public void Include(LandUnitEntity entity)
     {
         var point = new GeoPoint(entity.X, entity.Y);
         mapPoints[point] = LocationType.LandUnit;
     }
 
-    /// <summary>
-    /// Generates list of textures for given square, when left bottom corner is provided.
-    /// </summary>
-    /// <param name="lbcx"></param>
-    /// <param name="lbcy"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    /// <returns>Sequence contains textures, starting from left bottom corner and returning rows first.</returns>
-    public IEnumerable<PointContext> GetWindow(int lbcx, int lbcy, int width, int height)
-    {
+    /**
+     * Generates list of textures for given square, when left bottom corner is provided.
+     * @return Sequence contains textures, starting from left bottom corner and returning rows first
+     */
+    public Seq<PointContext> GetWindow(int lbcx, int lbcy, int width, int height) {
+        var result = List.<PointContext>empty();
         for (int dy = 0; dy < height; dy++)
             for (int dx = 0; dx < width; dx++)
             {
@@ -119,8 +119,7 @@ public final class Window implements GameComponent,
 
                 var centerTexture = new TextureHolder();
                 var handled = false;
-                foreach (var strategy in functionStrategies)
-                {
+                for (var strategy : functionStrategies) {
                     var texture = strategy(area, centerTexture);
                     if (texture == centerTexture) continue;
 
@@ -129,10 +128,8 @@ public final class Window implements GameComponent,
                     break;
                 }
 
-                if (!handled)
-                {
-                    foreach (var strategy in strategies)
-                    {
+                if (!handled) {
+                    for (var strategy : strategies) {
                         if (!strategy.CanExecute(area)) continue;
 
                         centerTexture = strategy.Execute(area);
@@ -143,8 +140,9 @@ public final class Window implements GameComponent,
 
                 if (!handled) centerTexture = fallbackStrategy.Execute(area);
 
-                yield return new PointContext(relativeCenterOfArea, centerTexture);
+                result = result.append(new PointContext(relativeCenterOfArea, centerTexture));
             }
+        return result;
     }
 
     private TextureHolder CoastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue)
@@ -155,7 +153,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheWest;
+        return water.getCoastWithLandToTheWest();
     }
 
     private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -166,7 +164,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheEast;
+        return water.getCoastWithLandToTheEast();
     }
 
     private TextureHolder CoastWithLandToTheNorthEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -226,8 +224,7 @@ public final class Window implements GameComponent,
     Texture terrainTexture;
     Texture desertRatsTextures;
 
-    public void OnLoaded(Texture texture, TextureItem item)
-    {
+    public void OnLoaded(Texture texture, TextureItem item) {
         if (item == TextureItem.TERRAIN) terrainTexture = texture;
         if (item == TextureItem.DESERT_RATES) desertRatsTextures = texture;
     }
@@ -239,21 +236,17 @@ public final class Window implements GameComponent,
         var groundTexture = new TextureHolder(terrainTexture, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
         var landUnitTexture = new TextureHolder(desertRatsTextures, new Rectangle(1 + 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
 
-        Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.Sea),
-            new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth),
-            new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth),
+        Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.getSea()),
+            new CoastWithLandToTheNorthStrategy(waterTextures.getCoastWithLandToTheNorth()),
+            new CoastWithLandToTheSouthStrategy(waterTextures.getCoastWithLandToTheSouth()),
             new GroundStrategy(groundTexture),
             new LandUnitStrategy(landUnitTexture),
             new CityStrategy(cityTexture));
     }
 
-    public IntendedMapCentre IntendedMapCentre { get; set; }
+    public IntendedMapCentre IntendedMapCentre;
 
-    public void OnDraw(SpriteBatch spriteBatch)
-    {
-        // get screen center
-        // var offsetx = graphics.GraphicsDevice.Viewport.Width / 2;
-        // var offsety = graphics.GraphicsDevice.Viewport.Height / 2;
+    public void OnDraw(SpriteBatch spriteBatch) {
 
         var x = IntendedMapCentre.X;
         var y = IntendedMapCentre.Y;
@@ -261,8 +254,7 @@ public final class Window implements GameComponent,
         // display sample island
         var points = this.GetWindow(0 + x, 0 + y, 30, 30);
 
-        foreach (var it in points)
-        {
+        for (var it : points) {
             var position = new Vector2(
                 it.GeoPoint.X * Config.SpriteSize,
                 it.GeoPoint.Y * Config.SpriteSize);

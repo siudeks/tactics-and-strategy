@@ -1,4 +1,4 @@
-﻿package com.mygdx.game.domain;
+package com.mygdx.game.domain;
 
 /**
  * Represents a square on 2D map.

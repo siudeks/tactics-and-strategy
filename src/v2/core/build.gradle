@@ -1,5 +1,27 @@
-sourceCompatibility = 11.0
+sourceCompatibility = 16
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+
+
+// https://github.com/redhat-developer/vscode-java/issues/671#issuecomment-477379761
+compileJava {
+    options.compilerArgs += ["--enable-preview"]
+}
+compileTestJava {
+    options.compilerArgs += ["--enable-preview"]
+}
+//Buildship doesn't use that hooks (https://discuss.gradle.org/t/when-does-buildship-eclipse-customization-run/20781/2)
+//you need to run `gradle eclipseJdt` separately
+eclipse.jdt.file.withProperties { props ->
+    props['org.eclipse.jdt.core.compiler.problem.enablePreviewFeatures']= 'enabled'
+    props['org.eclipse.jdt.core.compiler.problem.reportPreviewFeatures']= 'ignore'
+}
+
+test {
+    jvmArgs '--enable-preview'
+}
+
+
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
@@ -9,9 +31,4 @@ dependencies {
 	implementation group: 'com.google.inject', name: 'guice', version: '5.0.1'
   implementation group: 'io.vavr', name: 'vavr', version: '0.10.3'
 
-	compileOnly 'org.projectlombok:lombok:1.18.16'
-	annotationProcessor 'org.projectlombok:lombok:1.18.16'
-	
-	testCompileOnly 'org.projectlombok:lombok:1.18.16'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
-}
+  }

@@ -1,14 +1,11 @@
 package com.mygdx.game.domain;
 
-using Autofac;
-
-namespace Client.Domain
-{
-    class DiModule : Module
-    {
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder.RegisterInstance(new IntendedMapCentre()).AsSelf();
-        }
+import com.google.inject.AbstractModule;
+public class DiModule extends AbstractModule {
+ 
+    @Override
+    protected void configure() {
+        bind(IntendedMapCentre.class).to(IntendedMapCentre.class);
     }
+    
 }
