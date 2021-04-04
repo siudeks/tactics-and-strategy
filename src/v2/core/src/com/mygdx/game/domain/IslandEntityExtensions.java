@@ -1,40 +1,48 @@
 package com.mygdx.game.domain;
 
+import com.mygdx.game.view.Vector2;
+
+import io.vavr.collection.Queue;
+import io.vavr.collection.List;
+import io.vavr.collection.Seq;
+import io.vavr.collection.Iterator;
+import io.vavr.Tuple2;
+import io.vavr.Tuple;
+
+import java.util.Comparator;
+
 public class IslandEntityExtensions {
     
     /** Converts list of island borders to the list of all island tiles. */
     public static GeoPoint[] GeneratePoints(IslandEntity entries) {
-        return FillPolygon(entries.Corners)
-            .Select(o -> new GeoPoint(o.X, o.Y))
-            .ToArray();
+        return FillPolygon(entries.Corners())
+            .map(o -> new GeoPoint(o.X(), o.Y()))
+            .toJavaArray(GeoPoint[]::new);
     }
 
     // http://alienryderflex.com/polygon_fill/
-    private static (int X, int Y)[] FillPolygon(GeoPoint[] corners)
-    {
+    private static Seq<Vector2> FillPolygon(GeoPoint[] corners) {
         // convert all verticles to edges.
-        var edges = new Queue<GeoPoint[]>();
-        var cornersCount = corners.Length;
-        for (int i = 0; i < cornersCount; i++)
-        {
+        var edges = List.<List<GeoPoint>>empty();
+        var cornersCount = corners.length;
+        for (int i = 0; i < cornersCount; i++) {
             var next = i + 1;
             if (next == cornersCount) next = 0;
 
-            edges.Enqueue(AsLine(corners[i].X, corners[i].Y, corners[next].X, corners[next].Y));
+            edges = edges.append(AsLine(corners[i].X, corners[i].Y, corners[next].X, corners[next].Y));
         }
 
         // prepare all points of edges for horizontal linescan
         var sortedEdges = edges
-            .SelectMany(it => it)
-            .OrderBy(it => it, new GeoPointComparer())
-            .ToArray();
+            .flatMap(it -> it)
+            // TODO .sort(it -> it -> it, new GeoPointComparer())
+            .toJavaArray(GeoPoint[]::new);
 
         // convert edges to horizontal lines which fill the shape.
         var lineStart = sortedEdges[0];
         var lineEnd = sortedEdges[0];
-        var lines = new Queue<Tuple<GeoPoint, GeoPoint>>();
-        for (int i = 1; i < sortedEdges.Length; i++)
-        {
+        var lines = Queue.<Tuple2<GeoPoint, GeoPoint>>empty();
+        for (int i = 1; i < sortedEdges.length; i++) {
             // find the most right element in line and continue
             if (sortedEdges[i].Y == lineStart.Y)
             {
@@ -43,42 +51,41 @@ public class IslandEntityExtensions {
             }
 
             // hold just finished line and create new one
-            lines.Enqueue(Tuple.Create(lineStart, lineEnd));
+            lines = lines.enqueue(Tuple.of(lineStart, lineEnd));
             lineStart = sortedEdges[i];
             lineEnd = sortedEdges[i];
         }
-        lines.Enqueue(Tuple.Create(lineStart, lineEnd));
+        lines = lines.enqueue(Tuple.of(lineStart, lineEnd));
 
-        // now in lines we have all horizonta lines, so let's fill the polygon
-        var points = new Queue<(int x, int y)>();
-        foreach (var item in lines)
-        {
-            var liney = item.Item1.Y;
+        // now in lines we have all horizontal lines, so let's fill the polygon
+        var points = List.<Vector2>empty();
+        for (var item : lines) {
+            var liney = item._1.Y;
 
             //horizontal line contains at least initial point
-            points.Enqueue((item.Item1.X, liney));
+            points = points.append(new Vector2(item._1.X, liney));
 
             // if initial point is the same as end point, need to go to the next line.
-            if (item.Item1.X == item.Item2.X) continue;
+            if (item._1.X == item._2.X) continue;
 
-            for (int x = item.Item1.X + 1; x < item.Item2.X; x++)
-                points.Enqueue((x, liney));
+            for (int x = item._1.X + 1; x < item._2.X; x++)
+                points = points.append(new Vector2(x, liney));
 
-            points.Enqueue((item.Item2.X, liney));
+            points = points.append(new Vector2(item._2.X, liney));
         }
 
-        return points.ToArray();
+        return points;
 
     }
 
     // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     // https://github.com/fragkakis/bresenham/blob/master/src/main/java/org/fragkakis/Bresenham.java    
-    private static GeoPoint[] AsLine(int x0, int y0, int x1, int y1)
+    private static List<GeoPoint> AsLine(int x0, int y0, int x1, int y1)
     {
-        var line = new Queue<GeoPoint>();
+        var line = List.<GeoPoint>empty();
 
-        int dx = Math.Abs(x1 - x0);
-        int dy = Math.Abs(y1 - y0);
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
 
         int sx = x0 < x1 ? 1 : -1;
         int sy = y0 < y1 ? 1 : -1;
@@ -90,7 +97,7 @@ public class IslandEntityExtensions {
 
         while (true)
         {
-            line.Enqueue(new GeoPoint(currentX, currentY));
+            line = line.append(new GeoPoint(currentX, currentY));
 
             if (currentX == x1 && currentY == y1)
             {
@@ -111,7 +118,7 @@ public class IslandEntityExtensions {
             }
         }
 
-        return line.ToArray();
+        return line;
     }
 
     /// <summary>
@@ -126,8 +133,8 @@ public class IslandEntityExtensions {
     /// 
     /// So points 1 to 4 will be returned as 1,2,3,4
     /// </summary>
-    class GeoPointComparer implements Comparer<GeoPoint> {
-        public int Compare(GeoPoint first, GeoPoint second) {
+    class GeoPointComparer implements Comparator<GeoPoint> {
+        public int compare(GeoPoint first, GeoPoint second) {
             var deltay = first.Y - second.Y;
             if (deltay != 0) return deltay;
             return first.X - second.X;

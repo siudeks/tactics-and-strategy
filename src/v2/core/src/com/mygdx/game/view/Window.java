@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.game.Config;
 import com.mygdx.game.domain.CityEntity;
 import com.mygdx.game.domain.IslandEntity;
+import com.mygdx.game.domain.IslandEntityExtensions;
 import com.mygdx.game.domain.LandUnitEntity;
 import com.mygdx.game.domain.GeoPoint;
 import com.mygdx.game.domain.IntendedMapCentre;
@@ -63,9 +64,9 @@ public final class Window implements GameComponent,
     }
 
     public void AddIsland(IslandEntity island) {
-        for (var item : IslandEntityExtensions.GeneratePoints(island).ToArray()) {
+        for (var item : IslandEntityExtensions.GeneratePoints(island)) {
             var point = new GeoPoint(item.X, item.Y);
-            mapPoints.Add(point, LocationType.Ground);
+            mapPoints = mapPoints.put(point, LocationType.Ground);
         }
     }
 
@@ -75,8 +76,8 @@ public final class Window implements GameComponent,
      */
     public void AddCity(CityEntity entity)
     {
-        var point = new GeoPoint(entity.X, entity.Y);
-        mapPoints[point] = LocationType.City;
+        var point = new GeoPoint(entity.x(), entity.y());
+        mapPoints.put(point, LocationType.City);
     }
 
     /**
@@ -85,8 +86,8 @@ public final class Window implements GameComponent,
      */
     public void Include(LandUnitEntity entity)
     {
-        var point = new GeoPoint(entity.X, entity.Y);
-        mapPoints[point] = LocationType.LandUnit;
+        var point = new GeoPoint(entity.X(), entity.Y());
+        mapPoints.put(point, LocationType.LandUnit);
     }
 
     /**
