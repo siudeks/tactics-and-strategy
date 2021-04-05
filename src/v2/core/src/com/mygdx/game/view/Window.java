@@ -108,15 +108,15 @@ public final class Window implements GameComponent,
 
                 for (int i = 0; i < 9; i++) area[i] = LocationType.Water;
 
-                area[Directions.NeighborTopLeft] = mapPoints.ContainsKey(centerOfArea.TopLeft()) ? mapPoints[centerOfArea.TopLeft()] : LocationType.Water;
-                area[Directions.NeighborNorth] = mapPoints.ContainsKey(centerOfArea.Top()) ? mapPoints[centerOfArea.Top()] : LocationType.Water;
-                area[Directions.NeighborTopRight] = mapPoints.ContainsKey(centerOfArea.TopRight()) ? mapPoints[centerOfArea.TopRight()] : LocationType.Water;
-                area[Directions.NeighborWest] = mapPoints.ContainsKey(centerOfArea.Left()) ? mapPoints[centerOfArea.Left()] : LocationType.Water;
-                area[Directions.NeighborThis] = mapPoints.ContainsKey(centerOfArea) ? mapPoints[centerOfArea] : LocationType.Water;
-                area[Directions.NeighborEast] = mapPoints.ContainsKey(centerOfArea.Right()) ? mapPoints[centerOfArea.Right()] : LocationType.Water;
-                area[Directions.NeighborDownLeft] = mapPoints.ContainsKey(centerOfArea.DownLeft()) ? mapPoints[centerOfArea.DownLeft()] : LocationType.Water;
-                area[Directions.NeighborSouth] = mapPoints.ContainsKey(centerOfArea.Down()) ? mapPoints[centerOfArea.Down()] : LocationType.Water;
-                area[Directions.NeighborDownRight] = mapPoints.ContainsKey(centerOfArea.DownRight()) ? mapPoints[centerOfArea.DownRight()] : LocationType.Water;
+                area[Directions.NeighborTopLeft] = mapPoints.get(centerOfArea.TopLeft()).getOrElse(LocationType.Water);
+                area[Directions.NeighborNorth] = mapPoints.get(centerOfArea.Top()).getOrElse(LocationType.Water);
+                area[Directions.NeighborTopRight] = mapPoints.get(centerOfArea.TopRight()).getOrElse(LocationType.Water);
+                area[Directions.NeighborWest] = mapPoints.get(centerOfArea.Left()).getOrElse(LocationType.Water);
+                area[Directions.NeighborThis] = mapPoints.get(centerOfArea).getOrElse(LocationType.Water);
+                area[Directions.NeighborEast] = mapPoints.get(centerOfArea.Right()).getOrElse(LocationType.Water);
+                area[Directions.NeighborDownLeft] = mapPoints.get(centerOfArea.DownLeft()).getOrElse(LocationType.Water);
+                area[Directions.NeighborSouth] = mapPoints.get(centerOfArea.Down()).getOrElse(LocationType.Water);
+                area[Directions.NeighborDownRight] = mapPoints.get(centerOfArea.DownRight()).getOrElse(LocationType.Water);
 
                 var centerTexture = new TextureHolder();
                 var handled = false;
