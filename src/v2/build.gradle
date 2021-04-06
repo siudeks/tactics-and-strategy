@@ -58,6 +58,10 @@ project(":desktop") {
     apply plugin: "java-library"
     apply plugin: 'java'
     
+    compileJava {
+        options.compilerArgs += '--enable-preview'
+    }
+
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
