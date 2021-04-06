@@ -1,8 +1,10 @@
 package com.mygdx.game.view;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 import com.badlogic.gdx.graphics.Texture;
+
+import com.mygdx.game.extensions.SpriteBatchUtils;
 import com.mygdx.game.Config;
 import com.mygdx.game.domain.CityEntity;
 import com.mygdx.game.domain.IslandEntity;
@@ -13,6 +15,7 @@ import com.mygdx.game.domain.IntendedMapCentre;
 import com.mygdx.game.domain.IslandEntityGenerator;
 import com.mygdx.game.resources.ITextureConsumer;
 import com.mygdx.game.resources.WaterTextures;
+import com.mygdx.game.resources.WaterTexturesUtils;
 import com.mygdx.game.runtime.GameComponent;
 import com.mygdx.game.runtime.IBatchDrawer;
 
@@ -121,7 +124,7 @@ public final class Window implements GameComponent,
                 var centerTexture = new TextureHolder();
                 var handled = false;
                 for (var strategy : functionStrategies) {
-                    var texture = strategy(area, centerTexture);
+                    var texture = strategy.apply(area, centerTexture);
                     if (texture == centerTexture) continue;
 
                     centerTexture = texture;
@@ -154,7 +157,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.getCoastWithLandToTheWest();
+        return water.CoastWithLandToTheWest();
     }
 
     private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -165,7 +168,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.getCoastWithLandToTheEast();
+        return water.CoastWithLandToTheEast();
     }
 
     private TextureHolder CoastWithLandToTheNorthEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -176,7 +179,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheNorthEast;
+        return water.CoastWithLandToTheNorthEast();
     }
 
     private TextureHolder CoastWithLandToTheNorthWest(LocationType[] neighbors, TextureHolder defaultValue)
@@ -187,7 +190,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheNorthWest;
+        return water.CoastWithLandToTheNorthWest();
     }
 
     private TextureHolder CoastWithLandToTheSouthEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -198,7 +201,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheSouthEast;
+        return water.CoastWithLandToTheSouthEast();
     }
 
     private TextureHolder CoastWithLandToTheSouthWest(LocationType[] neighbors, TextureHolder defaultValue)
@@ -209,7 +212,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheSouthWest;
+        return water.CoastWithLandToTheSouthWest();
     }
 
     public void Initialize()
@@ -232,14 +235,14 @@ public final class Window implements GameComponent,
 
     public void LoadFinished()
     {
-        var waterTextures = new WaterTextures(terrainTexture);
+        var waterTextures = WaterTexturesUtils.create(terrainTexture);
         var cityTexture = new TextureHolder(terrainTexture, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
         var groundTexture = new TextureHolder(terrainTexture, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
         var landUnitTexture = new TextureHolder(desertRatsTextures, new Rectangle(1 + 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
 
-        Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.getSea()),
-            new CoastWithLandToTheNorthStrategy(waterTextures.getCoastWithLandToTheNorth()),
-            new CoastWithLandToTheSouthStrategy(waterTextures.getCoastWithLandToTheSouth()),
+        Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.sea()),
+            new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth()),
+            new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth()),
             new GroundStrategy(groundTexture),
             new LandUnitStrategy(landUnitTexture),
             new CityStrategy(cityTexture));
@@ -249,8 +252,8 @@ public final class Window implements GameComponent,
 
     public void OnDraw(SpriteBatch spriteBatch) {
 
-        var x = IntendedMapCentre.X;
-        var y = IntendedMapCentre.Y;
+        var x = IntendedMapCentre.X();
+        var y = IntendedMapCentre.Y();
 
         // display sample island
         var points = this.GetWindow(0 + x, 0 + y, 30, 30);
@@ -259,7 +262,7 @@ public final class Window implements GameComponent,
             var position = new Vector2(
                 it.GeoPoint.X * Config.SpriteSize,
                 it.GeoPoint.Y * Config.SpriteSize);
-            spriteBatch.Draw(position, it.Texture);
+            SpriteBatchUtils.draw(spriteBatch, position, it.Texture);
         }
     }
 

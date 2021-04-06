@@ -16,7 +16,7 @@ import com.mygdx.game.view.TextureHolder;
  */
 public record WaterTextures (
     TextureHolder CoastWithLandToTheNorth,
-    TextureHolder coastWithLandToTheSouth,
+    TextureHolder CoastWithLandToTheSouth,
     TextureHolder CoastWithLandToTheWest,
     TextureHolder CoastWithLandToTheEast,
     TextureHolder CoastWithLandToTheNorthEast,
@@ -24,23 +24,3 @@ public record WaterTextures (
     TextureHolder CoastWithLandToTheSouthEast,
     TextureHolder CoastWithLandToTheSouthWest,
     TextureHolder sea) { }
-
-//     public WaterTextures() {
-//         this(null);
-//     }
-
-//     public WaterTextures(Texture terrain)
-//     {
-//         var ss = Config.SpriteSize;
-//         CoastWithLandToTheNorth = new TextureHolder(terrain, new Rectangle(4 * ss, 0 * ss, ss, ss));
-//         CoastWithLandToTheSouth = new TextureHolder(terrain, new Rectangle(10 * ss, 0 * ss, ss, ss));
-//         CoastWithLandToTheWest = new TextureHolder(terrain, new Rectangle(6 * ss, 0 * ss, ss, ss));
-//         CoastWithLandToTheEast = new TextureHolder(terrain, new Rectangle(18 * ss, 0 * ss, ss, ss));
-//         CoastWithLandToTheNorthEast = new TextureHolder(terrain, new Rectangle(14 * ss, 0 * ss, ss, ss)); 
-//         CoastWithLandToTheNorthWest = new TextureHolder(terrain, new Rectangle(6 * ss, 1 * ss, ss, ss));
-//         CoastWithLandToTheSouthEast = new TextureHolder(terrain, new Rectangle(8 * ss, 0 * ss, ss, ss));
-//         CoastWithLandToTheSouthWest = new TextureHolder(terrain, new Rectangle(0 * ss, 1 * ss, ss, ss)); 
-//         Sea = new TextureHolder(terrain, new Rectangle(2 * ss, 0 * ss, ss, ss));
-//     }
-// }
-
