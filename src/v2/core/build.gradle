@@ -1,28 +1,6 @@
 sourceCompatibility = 11
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-
-
-// https://github.com/redhat-developer/vscode-java/issues/671#issuecomment-477379761
-compileJava {
-    options.compilerArgs += ["--enable-preview"]
-}
-compileTestJava {
-    options.compilerArgs += ["--enable-preview"]
-}
-//Buildship doesn't use that hooks (https://discuss.gradle.org/t/when-does-buildship-eclipse-customization-run/20781/2)
-//you need to run `gradle eclipseJdt` separately
-eclipse.jdt.file.withProperties { props ->
-    props['org.eclipse.jdt.core.compiler.problem.enablePreviewFeatures']= 'enabled'
-    props['org.eclipse.jdt.core.compiler.problem.reportPreviewFeatures']= 'ignore'
-}
-
-test {
-    jvmArgs '--enable-preview'
-}
-
-
-
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 eclipse.project.name = appName + "-core"
