@@ -1,4 +1,4 @@
-sourceCompatibility = 16
+sourceCompatibility = 11
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 
@@ -30,4 +30,10 @@ eclipse.project.name = appName + "-core"
 dependencies {
 	implementation group: 'com.google.inject', name: 'guice', version: '5.0.1'
     implementation group: 'io.vavr', name: 'vavr', version: '0.10.3'
+
+	compileOnly 'org.projectlombok:lombok:1.18.16'
+	annotationProcessor 'org.projectlombok:lombok:1.18.16'
+	
+	testCompileOnly 'org.projectlombok:lombok:1.18.16'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
 }

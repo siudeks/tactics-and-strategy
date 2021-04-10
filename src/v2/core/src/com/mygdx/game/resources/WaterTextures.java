@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.Config;
 import com.mygdx.game.view.TextureHolder;
 
+import lombok.Value;
+
 /**
  *  Extracts and holds textures for Water map
  *
@@ -14,13 +16,15 @@ import com.mygdx.game.view.TextureHolder;
  *  some known places in big texture.
  * 
  */
-public record WaterTextures (
-    TextureHolder CoastWithLandToTheNorth,
-    TextureHolder CoastWithLandToTheSouth,
-    TextureHolder CoastWithLandToTheWest,
-    TextureHolder CoastWithLandToTheEast,
-    TextureHolder CoastWithLandToTheNorthEast,
-    TextureHolder CoastWithLandToTheNorthWest,
-    TextureHolder CoastWithLandToTheSouthEast,
-    TextureHolder CoastWithLandToTheSouthWest,
-    TextureHolder sea) { }
+@Value
+public class WaterTextures {
+    private TextureHolder coastWithLandToTheNorth;
+    private TextureHolder coastWithLandToTheSouth;
+    private TextureHolder coastWithLandToTheWest;
+    private TextureHolder coastWithLandToTheEast;
+    private TextureHolder coastWithLandToTheNorthEast;
+    private TextureHolder coastWithLandToTheNorthWest;
+    private TextureHolder coastWithLandToTheSouthEast;
+    private TextureHolder coastWithLandToTheSouthWest;
+    private TextureHolder sea;
+}

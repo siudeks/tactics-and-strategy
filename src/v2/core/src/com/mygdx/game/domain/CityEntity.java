@@ -1,3 +1,9 @@
 package com.mygdx.game.domain;
 
-public record CityEntity(int x, int y) { }
+import lombok.Value;
+
+@Value
+public class CityEntity {
+  private int x;
+  private  int y;
+}

@@ -15,8 +15,8 @@ public class IslandEntityExtensions {
     
     /** Converts list of island borders to the list of all island tiles. */
     public static GeoPoint[] GeneratePoints(IslandEntity entries) {
-        return FillPolygon(entries.Corners())
-            .map(o -> new GeoPoint(o.X(), o.Y()))
+        return FillPolygon(entries.getCorners())
+            .map(o -> new GeoPoint(o.getX(), o.getY()))
             .toJavaArray(GeoPoint[]::new);
     }
 

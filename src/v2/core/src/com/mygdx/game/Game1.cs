@@ -1,31 +1,12 @@
-﻿using Autofac;
-using Client.Desktop.Runtime;
-using Client.Domain;
-using Client.Resources;
-using Client.Runtime;
-using Client.View;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Reactive.Disposables;
-using System.Reactive.Subjects;
-using System.Reflection;
+package com.mygdx.game;
 
-namespace Client.Desktop
-{
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class Game1
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
-        public Game1()
-        {
-            graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-        }
 
         private readonly CompositeDisposable instanceDisposer = new CompositeDisposable();
         private IContainer container;

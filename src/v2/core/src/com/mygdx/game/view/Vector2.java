@@ -1,3 +1,9 @@
 package com.mygdx.game.view;
 
-public record Vector2 (int X, int Y) { }
+import lombok.Value;
+
+@Value
+public class Vector2 {
+  private int x;
+  private int y;
+}

@@ -79,7 +79,7 @@ public final class Window implements GameComponent,
      */
     public void AddCity(CityEntity entity)
     {
-        var point = new GeoPoint(entity.x(), entity.y());
+        var point = new GeoPoint(entity.getX(), entity.getY());
         mapPoints.put(point, LocationType.City);
     }
 
@@ -89,7 +89,7 @@ public final class Window implements GameComponent,
      */
     public void Include(LandUnitEntity entity)
     {
-        var point = new GeoPoint(entity.X(), entity.Y());
+        var point = new GeoPoint(entity.getX(), entity.getY());
         mapPoints.put(point, LocationType.LandUnit);
     }
 
@@ -157,7 +157,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheWest();
+        return water.getCoastWithLandToTheWest();
     }
 
     private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -168,7 +168,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheEast();
+        return water.getCoastWithLandToTheEast();
     }
 
     private TextureHolder CoastWithLandToTheNorthEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -179,7 +179,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheNorthEast();
+        return water.getCoastWithLandToTheNorthEast();
     }
 
     private TextureHolder CoastWithLandToTheNorthWest(LocationType[] neighbors, TextureHolder defaultValue)
@@ -190,7 +190,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheNorthWest();
+        return water.getCoastWithLandToTheNorthWest();
     }
 
     private TextureHolder CoastWithLandToTheSouthEast(LocationType[] neighbors, TextureHolder defaultValue)
@@ -201,7 +201,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheSouthEast();
+        return water.getCoastWithLandToTheSouthEast();
     }
 
     private TextureHolder CoastWithLandToTheSouthWest(LocationType[] neighbors, TextureHolder defaultValue)
@@ -212,7 +212,7 @@ public final class Window implements GameComponent,
         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
 
-        return water.CoastWithLandToTheSouthWest();
+        return water.getCoastWithLandToTheSouthWest();
     }
 
     public void Initialize()
@@ -240,9 +240,9 @@ public final class Window implements GameComponent,
         var groundTexture = new TextureHolder(terrainTexture, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
         var landUnitTexture = new TextureHolder(desertRatsTextures, new Rectangle(1 + 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
 
-        Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.sea()),
-            new CoastWithLandToTheNorthStrategy(waterTextures.CoastWithLandToTheNorth()),
-            new CoastWithLandToTheSouthStrategy(waterTextures.CoastWithLandToTheSouth()),
+        Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.getSea()),
+            new CoastWithLandToTheNorthStrategy(waterTextures.getCoastWithLandToTheNorth()),
+            new CoastWithLandToTheSouthStrategy(waterTextures.getCoastWithLandToTheSouth()),
             new GroundStrategy(groundTexture),
             new LandUnitStrategy(landUnitTexture),
             new CityStrategy(cityTexture));
@@ -252,8 +252,8 @@ public final class Window implements GameComponent,
 
     public void OnDraw(SpriteBatch spriteBatch) {
 
-        var x = IntendedMapCentre.X();
-        var y = IntendedMapCentre.Y();
+        var x = IntendedMapCentre.getX();
+        var y = IntendedMapCentre.getY();
 
         // display sample island
         var points = this.GetWindow(0 + x, 0 + y, 30, 30);

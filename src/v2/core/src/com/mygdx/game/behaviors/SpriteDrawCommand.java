@@ -1,6 +1,7 @@
 package com.mygdx.game.behaviors;
 
-/// <summary>
-/// Declares operation context to draw a sprite.
-/// </summary>
-public record SpriteDrawCommand(int X, int Y) { }
+/** Declares operation context to draw a sprite. */
+public class SpriteDrawCommand {
+  private int x;
+  private int y;
+}

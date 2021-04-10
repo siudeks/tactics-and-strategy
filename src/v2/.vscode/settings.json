@@ -1,6 +1,6 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
-  "xml.java.home": "S:\\programs\\zulu-16",
+  "xml.java.home": "S:\\programs\\zulu-11",
   "java.import.gradle.wrapper.enabled": false,
   "java.import.gradle.home": "s:\\Programs\\Gradle",
   "java.errors.incompleteClasspath.severity": "error",

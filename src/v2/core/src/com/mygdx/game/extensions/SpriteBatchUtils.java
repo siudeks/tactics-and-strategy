@@ -8,6 +8,6 @@ import com.mygdx.game.view.TextureHolder;
 public class SpriteBatchUtils {
 
     public static void draw(SpriteBatch spriteBatch, Vector2 position, TextureHolder texture) {
-        spriteBatch.draw(texture.Texture2D, position.X(), position.Y(), texture.Source.width, texture.Source.height);
+        spriteBatch.draw(texture.Texture2D, position.getX(), position.getY(), texture.Source.width, texture.Source.height);
     }
 }
