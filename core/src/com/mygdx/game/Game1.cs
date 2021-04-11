@@ -1,12 +1,6 @@
 package com.mygdx.game;
 
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
-    public class Game1
-    {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+public class Game1 {
 
         private readonly CompositeDisposable instanceDisposer = new CompositeDisposable();
         private IContainer container;
