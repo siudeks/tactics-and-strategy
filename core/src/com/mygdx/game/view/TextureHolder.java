@@ -1,7 +1,6 @@
 package com.mygdx.game.view;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Rectangle;
 
 /**
  *  TextureHolder represents part of a texture. Because of Monogame/XNA limitations, can' create texture
@@ -18,9 +17,9 @@ public class TextureHolder {
     }
 
     public final Texture Texture2D;
-    public final Rectangle Source;
+    public final IntRectangle Source;
 
-    public TextureHolder(Texture texture, Rectangle source)
+    public TextureHolder(Texture texture, IntRectangle source)
     {
         this.Texture2D = texture;
         this.Source = source;

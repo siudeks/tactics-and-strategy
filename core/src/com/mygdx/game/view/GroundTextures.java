@@ -1,6 +1,5 @@
 package com.mygdx.game.view;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.Config;
@@ -11,6 +10,6 @@ public class GroundTextures extends TextureHolder {
 
   @Inject
   public GroundTextures(TerrainTexture terrain) {
-    super(terrain.getTexture(), new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
+    super(terrain.getTexture(), IntRectangle.of(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
   }
 }

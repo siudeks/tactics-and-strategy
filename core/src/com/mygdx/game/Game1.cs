@@ -50,7 +50,7 @@ public class Game1 {
             var sprite = container.Resolve<SelectionSprite>();
             sprite.Texture = selectionTexture;
 
-            var spriteSize = new Rectangle(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
+            var spriteSize = IntRectangle.of(1, 1 + 1 + Config.SpriteSize, Config.SpriteSize, Config.SpriteSize);
 
         }
 
