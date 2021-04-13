@@ -1,5 +1,6 @@
 package com.mygdx.game.view;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.resources.WaterTextures;
 
@@ -8,6 +9,7 @@ public final class CoastWithLandToTheSouthStrategy implements ITileStrategy {
 
     private final TextureHolder texture;
 
+    @Inject
     public CoastWithLandToTheSouthStrategy(WaterTextures waterTextures) {
         this.texture = waterTextures.getCoastWithLandToTheSouth();
     }

@@ -1,5 +1,6 @@
 package com.mygdx.game.view;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.resources.WaterTextures;
 
@@ -8,6 +9,7 @@ import com.mygdx.game.resources.WaterTextures;
 public class DefaultStrategy implements ITileFallbackStrategy {
     private final TextureHolder texture;
 
+    @Inject
     public DefaultStrategy(WaterTextures waterTextures) {
         this.texture = waterTextures.getSea();
     }

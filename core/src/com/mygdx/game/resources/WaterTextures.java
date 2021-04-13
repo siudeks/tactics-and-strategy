@@ -1,6 +1,7 @@
 package com.mygdx.game.resources;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.Config;
 import com.mygdx.game.view.TextureHolder;
@@ -19,6 +20,8 @@ import lombok.Getter;
 @Singleton
 @Getter
 public class WaterTextures {
+
+    @Inject
     public WaterTextures(TerrainTexture terrainTexture) {
         var texture = terrainTexture.getTexture();
         var ss = Config.SpriteSize;
