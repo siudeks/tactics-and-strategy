@@ -13,12 +13,12 @@ public final class CityStrategy implements ITileStrategy {
         this.texture = texture;
     }
 
-    public boolean CanExecute(LocationType[] neighbors) {
+    public boolean canExecute(LocationType[] neighbors) {
         return neighbors[Directions.NeighborThis] == LocationType.City;
 
     }
 
-    public TextureHolder Execute(LocationType[] neighbors) {
+    public TextureHolder execute(LocationType[] neighbors) {
         return texture;
     }
 }

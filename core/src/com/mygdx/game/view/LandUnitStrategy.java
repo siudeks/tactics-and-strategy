@@ -13,11 +13,11 @@ public final class LandUnitStrategy implements ITileStrategy {
         texture = landUnitTexture;
     }
 
-    public boolean CanExecute(LocationType[] neighbors) {
+    public boolean canExecute(LocationType[] neighbors) {
         return neighbors[Directions.NeighborThis] == LocationType.LandUnit;
     }
 
-    public TextureHolder Execute(LocationType[] neighbors) {
+    public TextureHolder execute(LocationType[] neighbors) {
         return texture;
     }
 }

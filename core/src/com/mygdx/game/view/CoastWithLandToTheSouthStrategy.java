@@ -14,7 +14,7 @@ public final class CoastWithLandToTheSouthStrategy implements ITileStrategy {
         this.texture = waterTextures.getCoastWithLandToTheSouth();
     }
 
-    public boolean CanExecute(LocationType[] neighbors) {
+    public boolean canExecute(LocationType[] neighbors) {
         if (neighbors[Directions.NeighborWest] != LocationType.Water) return false;
         if (neighbors[Directions.NeighborEast] != LocationType.Water) return false;
         if (neighbors[Directions.NeighborNorth] == LocationType.Water) return false;
@@ -25,7 +25,7 @@ public final class CoastWithLandToTheSouthStrategy implements ITileStrategy {
 
     }
 
-    public TextureHolder Execute(LocationType[] neighbors) {
+    public TextureHolder execute(LocationType[] neighbors) {
         return texture;
     }
 }

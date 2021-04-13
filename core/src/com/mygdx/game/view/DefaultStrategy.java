@@ -14,11 +14,11 @@ public class DefaultStrategy implements ITileFallbackStrategy {
         this.texture = waterTextures.getSea();
     }
 
-    public boolean CanExecute(LocationType[] neighbors) {
+    public boolean canExecute(LocationType[] neighbors) {
         return true;
     }
 
-    public TextureHolder Execute(LocationType[] neighbors) {
+    public TextureHolder execute(LocationType[] neighbors) {
         return texture;
     }
 }

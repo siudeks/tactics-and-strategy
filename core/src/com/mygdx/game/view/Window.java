@@ -131,15 +131,15 @@ public final class Window implements GameComponent,
 
                 if (!handled) {
                     for (var strategy : strategies) {
-                        if (!strategy.CanExecute(area)) continue;
+                        if (!strategy.canExecute(area)) continue;
 
-                        centerTexture = strategy.Execute(area);
+                        centerTexture = strategy.execute(area);
                         handled = true;
                         break;
                     }
                 }
 
-                if (!handled) centerTexture = fallbackStrategy.Execute(area);
+                if (!handled) centerTexture = fallbackStrategy.execute(area);
 
                 result = result.append(new PointContext(relativeCenterOfArea, centerTexture));
             }

@@ -13,11 +13,11 @@ public final class GroundStrategy implements ITileStrategy {
         this.texture = texture;
     }
 
-    public boolean CanExecute(LocationType[] neighbors) {
+    public boolean canExecute(LocationType[] neighbors) {
         return neighbors[Directions.NeighborThis] == LocationType.Ground;
     }
 
-    public TextureHolder Execute(LocationType[] neighbors) {
+    public TextureHolder execute(LocationType[] neighbors) {
         return texture;
     }
 }
