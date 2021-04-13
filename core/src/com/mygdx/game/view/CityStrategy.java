@@ -1,10 +1,13 @@
 package com.mygdx.game.view;
 
+import com.google.inject.Singleton;
+
+@Singleton
 public final class CityStrategy implements ITileStrategy {
     
     private final TextureHolder texture;
 
-    public CityStrategy(TextureHolder texture)
+    public CityStrategy(CityTextures texture)
     {
         this.texture = texture;
     }

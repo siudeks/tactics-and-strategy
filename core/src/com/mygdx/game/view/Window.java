@@ -1,6 +1,7 @@
 package com.mygdx.game.view;
 
-import com.badlogic.gdx.math.Rectangle;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -13,9 +14,7 @@ import com.mygdx.game.domain.LandUnitEntity;
 import com.mygdx.game.domain.GeoPoint;
 import com.mygdx.game.domain.IntendedMapCentre;
 import com.mygdx.game.domain.IslandEntityGenerator;
-import com.mygdx.game.resources.ITextureConsumer;
 import com.mygdx.game.resources.WaterTextures;
-import com.mygdx.game.resources.WaterTexturesUtils;
 import com.mygdx.game.runtime.GameComponent;
 import com.mygdx.game.runtime.IBatchDrawer;
 
@@ -30,9 +29,9 @@ import io.vavr.collection.HashMap;
  * Contains all entities which need to be visible in Game window and converts them
  * to textures.
  */
+@Singleton
 public final class Window implements GameComponent,
-                                     IBatchDrawer,
-                                     ITextureConsumer
+                                     IBatchDrawer
 {
     private Map<GeoPoint, LocationType> mapPoints = HashMap.<GeoPoint, LocationType>empty();
 
@@ -45,14 +44,12 @@ public final class Window implements GameComponent,
     }
 
     private WaterTextures water;
-    private TextureHolder city;
     private List<Generator> functionStrategies = List.<Generator>empty();
-    private ITileStrategy[] strategies = new ITileStrategy[0];
-    private ITileStrategy fallbackStrategy;
+    private Strategy[] strategies = new ITileStrategy[0];
+    private Strategy fallbackStrategy;
 
-    public void Initialize(WaterTextures water, TextureHolder city, ITileStrategy fallbackStrategy, ITileStrategy... strategies) {
+    public void Window(WaterTextures water, ITileFallbackStrategy fallbackStrategy, ITileStrategy... strategies) {
         this.water = water;
-        this.city = city;
 
         functionStrategies = functionStrategies
             .append(this::CoastWithLandToTheWest)
@@ -233,22 +230,8 @@ public final class Window implements GameComponent,
         if (item == TextureItem.DESERT_RATES) desertRatsTextures = texture;
     }
 
-    public void LoadFinished()
-    {
-        var waterTextures = WaterTexturesUtils.create(terrainTexture);
-        var cityTexture = new TextureHolder(terrainTexture, new Rectangle(7 * Config.SpriteSize, 9 * Config.SpriteSize, Config.SpriteSize, Config.SpriteSize));
-        var groundTexture = new TextureHolder(terrainTexture, new Rectangle(0 * Config.SpriteSize, 0, Config.SpriteSize, Config.SpriteSize));
-        var landUnitTexture = new TextureHolder(desertRatsTextures, new Rectangle(1 + 0 * Config.SpriteSize, 1 + 0, Config.SpriteSize, Config.SpriteSize));
-
-        Initialize(waterTextures, cityTexture, new DefaultStrategy(waterTextures.getSea()),
-            new CoastWithLandToTheNorthStrategy(waterTextures.getCoastWithLandToTheNorth()),
-            new CoastWithLandToTheSouthStrategy(waterTextures.getCoastWithLandToTheSouth()),
-            new GroundStrategy(groundTexture),
-            new LandUnitStrategy(landUnitTexture),
-            new CityStrategy(cityTexture));
-    }
-
-    public IntendedMapCentre IntendedMapCentre;
+    @Inject
+    IntendedMapCentre IntendedMapCentre;
 
     public void OnDraw(SpriteBatch spriteBatch) {
 

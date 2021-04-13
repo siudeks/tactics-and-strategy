@@ -1,11 +1,15 @@
 package com.mygdx.game.view;
 
-// should be invoked at the end of strategies
-public class DefaultStrategy implements ITileStrategy {
+import com.google.inject.Singleton;
+import com.mygdx.game.resources.WaterTextures;
+
+/** Should be invoked at the end of strategies. */
+@Singleton
+public class DefaultStrategy implements ITileFallbackStrategy {
     private final TextureHolder texture;
 
-    public DefaultStrategy(TextureHolder texture) {
-        this.texture = texture;
+    public DefaultStrategy(WaterTextures waterTextures) {
+        this.texture = waterTextures.getSea();
     }
 
     public boolean CanExecute(LocationType[] neighbors) {

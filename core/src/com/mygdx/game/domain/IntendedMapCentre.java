@@ -1,9 +1,12 @@
 package com.mygdx.game.domain;
 
-import lombok.Value;
+import com.google.inject.Singleton;
+
+import lombok.Data;
 
 /** Contains intended position of the center of the Window. */
-@Value
+@Data
+@Singleton
 public class IntendedMapCentre {
   private int x;
   private int y;

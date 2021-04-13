@@ -1,11 +1,15 @@
 package com.mygdx.game.view;
 
+import com.google.inject.Singleton;
+import com.mygdx.game.resources.WaterTextures;
+
+@Singleton
 public final class CoastWithLandToTheNorthStrategy implements ITileStrategy {
     
     private final TextureHolder texture;
 
-    public CoastWithLandToTheNorthStrategy(TextureHolder texture) {
-        this.texture = texture;
+    public CoastWithLandToTheNorthStrategy(WaterTextures waterTextures) {
+        this.texture = waterTextures.getCoastWithLandToTheNorth();
     }
 
     public boolean CanExecute(LocationType[] neighbors) {
