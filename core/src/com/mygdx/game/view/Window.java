@@ -1,37 +1,35 @@
 package com.mygdx.game.view;
 
+import java.util.Set;
+
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.Texture;
-
-import com.mygdx.game.extensions.SpriteBatchUtils;
 import com.mygdx.game.Config;
 import com.mygdx.game.domain.CityEntity;
-import com.mygdx.game.domain.IslandEntity;
-import com.mygdx.game.domain.IslandEntityExtensions;
-import com.mygdx.game.domain.LandUnitEntity;
 import com.mygdx.game.domain.GeoPoint;
 import com.mygdx.game.domain.IntendedMapCentre;
+import com.mygdx.game.domain.IslandEntity;
+import com.mygdx.game.domain.IslandEntityExtensions;
 import com.mygdx.game.domain.IslandEntityGenerator;
+import com.mygdx.game.domain.LandUnitEntity;
+import com.mygdx.game.extensions.SpriteBatchUtils;
+import com.mygdx.game.resources.TextureItem;
 import com.mygdx.game.resources.WaterTextures;
-import com.mygdx.game.runtime.GameComponent;
 import com.mygdx.game.runtime.IBatchDrawer;
 
-import com.mygdx.game.resources.TextureItem;
-
-import io.vavr.collection.List;
-import io.vavr.collection.Seq;
-import io.vavr.collection.Map;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.Seq;
 
 /**
  * Contains all entities which need to be visible in Game window and converts them
  * to textures.
  */
 @Singleton
-public final class Window implements GameComponent,
-                                     IBatchDrawer
+public final class Window implements IBatchDrawer
 {
     private Map<GeoPoint, LocationType> mapPoints = HashMap.<GeoPoint, LocationType>empty();
 
@@ -45,10 +43,11 @@ public final class Window implements GameComponent,
 
     private WaterTextures water;
     private List<Generator> functionStrategies = List.<Generator>empty();
-    private Strategy[] strategies = new ITileStrategy[0];
+    private Set<ITileStrategy> strategies;
     private Strategy fallbackStrategy;
 
-    public void Window(WaterTextures water, ITileFallbackStrategy fallbackStrategy, ITileStrategy... strategies) {
+    @Inject
+    public Window(WaterTextures water, ITileFallbackStrategy fallbackStrategy, Set<ITileStrategy> strategies) {
         this.water = water;
 
         functionStrategies = functionStrategies

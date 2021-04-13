@@ -6,12 +6,13 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 
 @Singleton
-public class TerrainTexture {
+public class TerrainTexture implements ResourceLoader {
 
   @Getter
   private Texture texture;
 
-  public TerrainTexture() {
+  @Override
+  public void initialize() {
     texture = new Texture("Terrain.bmp");
   }
 }
