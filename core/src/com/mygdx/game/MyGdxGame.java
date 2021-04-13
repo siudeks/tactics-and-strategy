@@ -8,24 +8,23 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.google.inject.Inject;
-import com.mygdx.game.resources.ResourceLoader;
+import com.mygdx.game.resources.GameComponent;
 import com.mygdx.game.view.Window;
 
 public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
-	Texture img;
 	
 	@Inject
 	Window window;
 	
 	@Inject
-	Set<ResourceLoader> resourceLoaders;
+	Set<GameComponent> resourceLoaders;
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("background.png");
-		resourceLoaders.forEach(ResourceLoader::initialize);
+		resourceLoaders.forEach(GameComponent::loadTextures);
+		resourceLoaders.forEach(GameComponent::useTextures);
 		window.Initialize();
 	}
 
@@ -38,7 +37,6 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		window.OnDraw(batch);
 
-		batch.draw(img, 0, 0);
 		batch.end();
 	}
 	

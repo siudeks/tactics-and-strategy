@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.Config;
+import com.mygdx.game.runtime.GameComponentBase;
 import com.mygdx.game.view.TextureHolder;
 
 import lombok.Getter;
@@ -19,10 +20,27 @@ import lombok.Getter;
  */
 @Singleton
 @Getter
-public class WaterTextures {
+public class WaterTextures extends GameComponentBase {
 
+    private TerrainTexture terrainTexture;
+    
     @Inject
     public WaterTextures(TerrainTexture terrainTexture) {
+        this.terrainTexture = terrainTexture;
+    }
+
+    private TextureHolder coastWithLandToTheNorth;
+    private TextureHolder coastWithLandToTheSouth;
+    private TextureHolder coastWithLandToTheWest;
+    private TextureHolder coastWithLandToTheEast;
+    private TextureHolder coastWithLandToTheNorthEast;
+    private TextureHolder coastWithLandToTheNorthWest;
+    private TextureHolder coastWithLandToTheSouthEast;
+    private TextureHolder coastWithLandToTheSouthWest;
+    private TextureHolder sea;
+
+    @Override
+    public void useTextures() {
         var texture = terrainTexture.getTexture();
         var ss = Config.SpriteSize;
         coastWithLandToTheNorth = new TextureHolder(texture, new Rectangle(4 * ss, 0 * ss, ss, ss));
@@ -35,13 +53,4 @@ public class WaterTextures {
         coastWithLandToTheSouthWest = new TextureHolder(texture, new Rectangle(0 * ss, 1 * ss, ss, ss)); 
         sea = new TextureHolder(texture, new Rectangle(2 * ss, 0 * ss, ss, ss));
     }
-    private TextureHolder coastWithLandToTheNorth;
-    private TextureHolder coastWithLandToTheSouth;
-    private TextureHolder coastWithLandToTheWest;
-    private TextureHolder coastWithLandToTheEast;
-    private TextureHolder coastWithLandToTheNorthEast;
-    private TextureHolder coastWithLandToTheNorthWest;
-    private TextureHolder coastWithLandToTheSouthEast;
-    private TextureHolder coastWithLandToTheSouthWest;
-    private TextureHolder sea;
 }

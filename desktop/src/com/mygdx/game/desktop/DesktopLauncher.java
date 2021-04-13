@@ -7,7 +7,7 @@ import com.mygdx.game.GameModule;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.domain.DomainDiModule;
 import com.mygdx.game.resources.DiModuleResources;
-import com.mygdx.game.view.DiModule;
+import com.mygdx.game.view.DiModuleView;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -16,7 +16,7 @@ public class DesktopLauncher {
 
 		var injector = Guice.createInjector(
 			new GameModule(),
-			new DiModule(),
+			new DiModuleView(),
 			new DomainDiModule(),
 			new DiModuleResources());
 

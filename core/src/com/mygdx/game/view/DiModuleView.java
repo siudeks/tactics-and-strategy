@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.mygdx.game.runtime.IBatchDrawer;
 
-public class DiModule extends AbstractModule {
+public class DiModuleView extends AbstractModule {
   @Override
   protected void configure() {
     bind(IBatchDrawer.class).to(Window.class);

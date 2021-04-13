@@ -95,9 +95,8 @@ public final class Window implements IBatchDrawer
      */
     public Seq<PointContext> GetWindow(int lbcx, int lbcy, int width, int height) {
         var result = List.<PointContext>empty();
-        for (int dy = 0; dy < height; dy++)
-            for (int dx = 0; dx < width; dx++)
-            {
+        for (int dy = 0; dy < height; dy++) 
+            for (int dx = 0; dx < width; dx++) {
                 var geox = lbcx + dx;
                 var geoy = lbcy + dy;
 
@@ -145,8 +144,7 @@ public final class Window implements IBatchDrawer
         return result;
     }
 
-    private TextureHolder CoastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue)
-    {
+    private TextureHolder CoastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue) {
         if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
@@ -156,8 +154,7 @@ public final class Window implements IBatchDrawer
         return water.getCoastWithLandToTheWest();
     }
 
-    private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue)
-    {
+    private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue) {
         if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
