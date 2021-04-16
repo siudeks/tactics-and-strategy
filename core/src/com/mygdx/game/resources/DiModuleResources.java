@@ -14,6 +14,7 @@ public class DiModuleResources extends AbstractModule {
     resourceLoaderBinder.addBinding().to(TerrainTexture.class);
     resourceLoaderBinder.addBinding().to(WaterTextures.class);
     resourceLoaderBinder.addBinding().to(DefaultStrategy.class);
+    resourceLoaderBinder.addBinding().to(SelectorTexture.class);
     
   }
 }
