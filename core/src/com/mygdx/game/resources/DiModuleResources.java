@@ -2,6 +2,7 @@ package com.mygdx.game.resources;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.mygdx.game.runtime.PointerObserver;
 import com.mygdx.game.view.DefaultStrategy;
 
 public class DiModuleResources extends AbstractModule {
@@ -15,6 +16,7 @@ public class DiModuleResources extends AbstractModule {
     resourceLoaderBinder.addBinding().to(WaterTextures.class);
     resourceLoaderBinder.addBinding().to(DefaultStrategy.class);
     resourceLoaderBinder.addBinding().to(SelectorTexture.class);
+    resourceLoaderBinder.addBinding().to(PointerObserver.class);
     
   }
 }

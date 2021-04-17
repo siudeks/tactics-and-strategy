@@ -25,6 +25,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		resourceLoaders.forEach(GameComponent::loadTextures);
 		resourceLoaders.forEach(GameComponent::useTextures);
+		resourceLoaders.forEach(GameComponent::initialize);
 		window.Initialize();
 	}
 

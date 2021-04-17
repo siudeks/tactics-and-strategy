@@ -15,6 +15,7 @@ import com.mygdx.game.domain.IslandEntityExtensions;
 import com.mygdx.game.domain.IslandEntityGenerator;
 import com.mygdx.game.domain.LandUnitEntity;
 import com.mygdx.game.extensions.SpriteBatchUtils;
+import com.mygdx.game.resources.SelectorTexture;
 import com.mygdx.game.resources.TextureItem;
 import com.mygdx.game.resources.WaterTextures;
 import com.mygdx.game.runtime.IBatchDrawer;
@@ -243,8 +244,11 @@ public final class Window implements IBatchDrawer
                 it.GeoPoint.Y * Config.SpriteSize);
             SpriteBatchUtils.draw(spriteBatch, position, it.Texture);
         }
+        SpriteBatchUtils.draw(spriteBatch, new Vector2(0, 0), st.getTexture());
     }
 
+    @Inject
+    SelectorTexture st;
 
 
     /**
