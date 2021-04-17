@@ -13,7 +13,7 @@ import com.mygdx.game.view.TextureHolder;
 import lombok.Getter;
 
 @Singleton
-public class SelectorTexture extends GameComponentBase {
+public class SelectionTexture extends GameComponentBase {
 
   @Getter
   private TextureHolder texture;

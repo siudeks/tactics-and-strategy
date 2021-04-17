@@ -1,10 +1,13 @@
-﻿package com.mygdx.game.runtime;
+package com.mygdx.game.runtime;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.Config;
 import com.mygdx.game.domain.GeoPoint;
+
+import io.vavr.control.Option;
 
 /**
  * Observes which GeoPoint is currently selected
@@ -13,6 +16,9 @@ import com.mygdx.game.domain.GeoPoint;
 @Singleton
 public final class PointerObserver extends GameComponentBase
                                    implements InputProcessor {
+
+    @Inject
+    public PointerState pointerState;
 
     @Override
     public void initialize() {
@@ -58,9 +64,9 @@ public final class PointerObserver extends GameComponentBase
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         var x = screenX / Config.SpriteSize;
-        var y = screenY / Config.SpriteSize;
+        var y = (Gdx.graphics.getHeight() - screenY) / Config.SpriteSize;
 
-        var state = new PointerState(new GeoPoint(x,y));
+        pointerState.setPosition(Option.of(new GeoPoint(x,y)));
         return true;
     }
 

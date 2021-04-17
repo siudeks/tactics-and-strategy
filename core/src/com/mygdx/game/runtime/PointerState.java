@@ -1,8 +1,10 @@
 package com.mygdx.game.runtime;
 
+import com.google.inject.Singleton;
 import com.mygdx.game.domain.GeoPoint;
 
-import lombok.Value;
+import io.vavr.control.Option;
+import lombok.Data;
 
 /**
  * Contains data related to pointer (e.g. mouse pointer on desktop app) known location and 
@@ -11,8 +13,9 @@ import lombok.Value;
  * To implement that abstract Pointer state we need to translate every platform-dependatn 
  * input operation as well-known pointer command like 'select', 'zoom' etc.
  */
-@Value
+@Data
+@Singleton
 public class PointerState {
-    private GeoPoint position;
+    private Option<GeoPoint> position = Option.none();
 }
 

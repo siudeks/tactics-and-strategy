@@ -15,7 +15,7 @@ import com.mygdx.game.domain.IslandEntityExtensions;
 import com.mygdx.game.domain.IslandEntityGenerator;
 import com.mygdx.game.domain.LandUnitEntity;
 import com.mygdx.game.extensions.SpriteBatchUtils;
-import com.mygdx.game.resources.SelectorTexture;
+import com.mygdx.game.resources.SelectionTexture;
 import com.mygdx.game.resources.TextureItem;
 import com.mygdx.game.resources.WaterTextures;
 import com.mygdx.game.runtime.IBatchDrawer;
@@ -30,8 +30,7 @@ import io.vavr.collection.Seq;
  * to textures.
  */
 @Singleton
-public final class Window implements IBatchDrawer
-{
+public final class Window {
     private Map<GeoPoint, LocationType> mapPoints = HashMap.<GeoPoint, LocationType>empty();
 
     // defines single texture generator strategy
@@ -45,6 +44,10 @@ public final class Window implements IBatchDrawer
     private WaterTextures water;
     private List<Generator> functionStrategies = List.<Generator>empty();
     private Set<ITileStrategy> strategies;
+
+    @Inject
+    private Set<IBatchDrawer> batchDrawers;
+
     private Strategy fallbackStrategy;
 
     @Inject
@@ -244,11 +247,16 @@ public final class Window implements IBatchDrawer
                 it.GeoPoint.Y * Config.SpriteSize);
             SpriteBatchUtils.draw(spriteBatch, position, it.Texture);
         }
-        SpriteBatchUtils.draw(spriteBatch, new Vector2(0, 0), st.getTexture());
+
+        //SpriteBatchUtils.draw(spriteBatch, new Vector2(0, 0), st.getTexture());
+
+        for (var drawer : this.batchDrawers) {
+            drawer.OnDraw(spriteBatch);
+        }
     }
 
     @Inject
-    SelectorTexture st;
+    SelectionTexture st;
 
 
     /**
