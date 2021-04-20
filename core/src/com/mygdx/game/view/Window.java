@@ -66,7 +66,7 @@ public final class Window {
         this.fallbackStrategy = fallbackStrategy;
     }
 
-    public void AddIsland(IslandEntity island) {
+    public void addIsland(IslandEntity island) {
         for (var item : IslandEntityExtensions.GeneratePoints(island)) {
             var point = new GeoPoint(item.X, item.Y);
             mapPoints = mapPoints.put(point, LocationType.Ground);
@@ -77,7 +77,7 @@ public final class Window {
      * Needs to be invoked later then <see cref="AddIsland(IslandEntity)"/>.
      * @param entity
      */
-    public void AddCity(CityEntity entity)
+    public void addCity(CityEntity entity)
     {
         var point = new GeoPoint(entity.getX(), entity.getY());
         mapPoints.put(point, LocationType.City);
@@ -87,7 +87,7 @@ public final class Window {
      * 
      * @param entity
      */
-    public void Include(LandUnitEntity entity)
+    public void include(LandUnitEntity entity)
     {
         var point = new GeoPoint(entity.getX(), entity.getY());
         mapPoints.put(point, LocationType.LandUnit);
@@ -212,20 +212,20 @@ public final class Window {
         return water.getCoastWithLandToTheSouthWest();
     }
 
-    public void Initialize()
+    public void initialize()
     {
         // temporar variables to keep sample textures for demo purposes.
         var island = IslandEntityGenerator.Random(new GeoPoint(20, 20));
 
-        this.AddIsland(island);
-        this.AddCity(new CityEntity(20, 20));
-        this.Include(new LandUnitEntity(21, 20));
+        this.addIsland(island);
+        this.addCity(new CityEntity(20, 20));
+        this.include(new LandUnitEntity(21, 20));
     }
 
     Texture terrainTexture;
     Texture desertRatsTextures;
 
-    public void OnLoaded(Texture texture, TextureItem item) {
+    public void onLoaded(Texture texture, TextureItem item) {
         if (item == TextureItem.TERRAIN) terrainTexture = texture;
         if (item == TextureItem.DESERT_RATES) desertRatsTextures = texture;
     }
@@ -233,7 +233,7 @@ public final class Window {
     @Inject
     IntendedMapCentre IntendedMapCentre;
 
-    public void OnDraw(SpriteBatch spriteBatch) {
+    public void onDraw(SpriteBatch spriteBatch) {
 
         var x = IntendedMapCentre.getX();
         var y = IntendedMapCentre.getY();
@@ -247,8 +247,6 @@ public final class Window {
                 it.GeoPoint.Y * Config.SpriteSize);
             SpriteBatchUtils.draw(spriteBatch, position, it.Texture);
         }
-
-        //SpriteBatchUtils.draw(spriteBatch, new Vector2(0, 0), st.getTexture());
 
         for (var drawer : this.batchDrawers) {
             drawer.OnDraw(spriteBatch);

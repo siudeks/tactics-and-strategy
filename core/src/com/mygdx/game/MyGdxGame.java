@@ -25,7 +25,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		resourceLoaders.forEach(GameComponent::loadTextures);
 		resourceLoaders.forEach(GameComponent::useTextures);
 		resourceLoaders.forEach(GameComponent::initialize);
-		window.Initialize();
+		window.initialize();
 	}
 
 	
@@ -35,7 +35,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 
-		window.OnDraw(batch);
+		window.onDraw(batch);
 
 		batch.end();
 	}
