@@ -11,7 +11,7 @@ public class IslandEntityGenerator {
     /// </summary>
     /// <param name="center">Centre of the island.</param>
     /// <returns>Definition of generated island.</returns>
-    public static IslandEntity Random(GeoPoint... center) {
+    public static IslandEntity random(GeoPoint... center) {
         var random = new Random();
 
         var corners = List.<GeoPoint>empty();
@@ -30,14 +30,14 @@ public class IslandEntityGenerator {
             var x = (int)(Math.cos(currentAngle * Math.PI / 360 * 2) * length);
             var y = (int)(Math.sin(currentAngle * Math.PI / 360 * 2) * length);
 
-            var candidate = (GeoPoint) null;
+            GeoPoint candidate = null;
             var distance = 0d;
             for (int j = 0; j < center.length; j++) {
-                var point = new GeoPoint(x + center[j].X, y + center[j].Y);
+                var point = new GeoPoint(x + center[j].x, y + center[j].y);
                 var distanceTotal = 0d;
                 for (int i = 0; i < center.length; i++) {
                     var testedCenter = center[i];
-                    var testedDistance = Math.sqrt(Math.pow(point.X - testedCenter.X, 2) + Math.pow(point.Y - testedCenter.Y, 2));
+                    var testedDistance = Math.sqrt(Math.pow(point.x - testedCenter.x, 2) + Math.pow(point.y - testedCenter.y, 2));
                     distanceTotal += testedDistance;
                 }
                 if (distanceTotal > distance) {

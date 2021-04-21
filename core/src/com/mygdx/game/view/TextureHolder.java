@@ -3,8 +3,8 @@ package com.mygdx.game.view;
 import com.badlogic.gdx.graphics.Texture;
 
 /**
- *  TextureHolder represents part of a texture. Because of Monogame/XNA limitations, can' create texture
- *  in unit tests, so TextureHolder is natural replacement of Texture2D.
+ *  TextureHolder represents part of a texture. Because of game engine limitation, can' create texture
+ *  in unit tests, so TextureHolder is a natural replacement of Texture.
  *  THe calss can be extended for purpose of Dependency Injection to mark individual types types of textured
  */
 
@@ -16,12 +16,12 @@ public class TextureHolder {
         this(null, null);
     }
 
-    public final Texture Texture2D;
-    public final IntRectangle Source;
+    public final Texture texture;
+    public final IntRectangle source;
 
     public TextureHolder(Texture texture, IntRectangle source)
     {
-        this.Texture2D = texture;
-        this.Source = source;
+        this.texture = texture;
+        this.source = source;
     }
 }

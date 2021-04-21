@@ -28,8 +28,8 @@ public final class PointerDrawer extends GameComponentBase {
         if (!maybePosition.isDefined()) return;
         var position = maybePosition.get();
         
-        var x = position.X * Config.SpriteSize;
-        var y = position.Y * Config.SpriteSize;
+        var x = position.x * Config.SpriteSize;
+        var y = position.y * Config.SpriteSize;
         var selectionPosition = new Vector2(x - 1, y - 1);
         SpriteBatchUtils.draw(spriteBatch, selectionPosition, selectionTexture.getTexture());
     }

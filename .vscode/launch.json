@@ -9,7 +9,8 @@
       "name": "Launch DesktopLauncher",
       "request": "launch",
       "mainClass": "com.mygdx.game.desktop.DesktopLauncher",
-      "projectName": "my-gdx-game-desktop"
+      "projectName": "my-gdx-game-desktop",
+      "vmArgs": "-enableassertions"
     }
   ]
 }

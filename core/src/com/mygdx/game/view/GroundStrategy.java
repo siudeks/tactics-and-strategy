@@ -2,15 +2,17 @@ package com.mygdx.game.view;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mygdx.game.runtime.GameComponentBase;
 
 @Singleton
-public final class GroundStrategy implements ITileStrategy {
+public final class GroundStrategy extends GameComponentBase
+                                  implements ITileStrategy {
 
-    private final TextureHolder texture;
+    private final GroundTextures textures;
 
     @Inject
-    public GroundStrategy(GroundTextures texture) {
-        this.texture = texture;
+    public GroundStrategy(GroundTextures textures) {
+        this.textures = textures;
     }
 
     public boolean canExecute(LocationType[] neighbors) {
@@ -18,6 +20,6 @@ public final class GroundStrategy implements ITileStrategy {
     }
 
     public TextureHolder execute(LocationType[] neighbors) {
-        return texture;
+        return textures.getTexture();
     }
 }

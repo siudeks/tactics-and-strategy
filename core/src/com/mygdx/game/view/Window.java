@@ -68,7 +68,7 @@ public final class Window {
 
     public void addIsland(IslandEntity island) {
         for (var item : IslandEntityExtensions.generatePoints(island)) {
-            var point = new GeoPoint(item.X, item.Y);
+            var point = new GeoPoint(item.x, item.y);
             mapPoints = mapPoints.put(point, LocationType.Ground);
         }
     }
@@ -97,7 +97,7 @@ public final class Window {
      * Generates list of textures for given square, when left bottom corner is provided.
      * @return Sequence contains textures, starting from left bottom corner and returning rows first
      */
-    public Seq<PointContext> GetWindow(int lbcx, int lbcy, int width, int height) {
+    public Seq<PointContext> getWindow(int lbcx, int lbcy, int width, int height) {
         var result = List.<PointContext>empty();
         for (int dy = 0; dy < height; dy++) 
             for (int dx = 0; dx < width; dx++) {
@@ -110,15 +110,16 @@ public final class Window {
 
                 for (int i = 0; i < 9; i++) area[i] = LocationType.Water;
 
-                area[Directions.NeighborTopLeft] = mapPoints.get(centerOfArea.TopLeft()).getOrElse(LocationType.Water);
-                area[Directions.NeighborNorth] = mapPoints.get(centerOfArea.Top()).getOrElse(LocationType.Water);
-                area[Directions.NeighborTopRight] = mapPoints.get(centerOfArea.TopRight()).getOrElse(LocationType.Water);
-                area[Directions.NeighborWest] = mapPoints.get(centerOfArea.Left()).getOrElse(LocationType.Water);
+                area[Directions.NeighborTopLeft] = mapPoints.get(centerOfArea.topLeft()).getOrElse(LocationType.Water);
+                area[Directions.NeighborNorth] = mapPoints.get(centerOfArea.top()).getOrElse(LocationType.Water);
+                area[Directions.NeighborTopRight] = 
+                
+                area[Directions.NeighborWest] = mapPoints.get(centerOfArea.left()).getOrElse(LocationType.Water);
                 area[Directions.NeighborThis] = mapPoints.get(centerOfArea).getOrElse(LocationType.Water);
-                area[Directions.NeighborEast] = mapPoints.get(centerOfArea.Right()).getOrElse(LocationType.Water);
-                area[Directions.NeighborDownLeft] = mapPoints.get(centerOfArea.DownLeft()).getOrElse(LocationType.Water);
-                area[Directions.NeighborSouth] = mapPoints.get(centerOfArea.Down()).getOrElse(LocationType.Water);
-                area[Directions.NeighborDownRight] = mapPoints.get(centerOfArea.DownRight()).getOrElse(LocationType.Water);
+                area[Directions.NeighborEast] = mapPoints.get(centerOfArea.right()).getOrElse(LocationType.Water);
+                area[Directions.NeighborDownLeft] = mapPoints.get(centerOfArea.downLeft()).getOrElse(LocationType.Water);
+                area[Directions.NeighborSouth] = mapPoints.get(centerOfArea.down()).getOrElse(LocationType.Water);
+                area[Directions.NeighborDownRight] = mapPoints.get(centerOfArea.downRight()).getOrElse(LocationType.Water);
 
                 var centerTexture = new TextureHolder();
                 var handled = false;
@@ -215,11 +216,11 @@ public final class Window {
     public void initialize()
     {
         // temporar variables to keep sample textures for demo purposes.
-        var island = IslandEntityGenerator.Random(new GeoPoint(20, 20));
+        var island = IslandEntityGenerator.random(new GeoPoint(5, 5));
 
         this.addIsland(island);
-        this.addCity(new CityEntity(20, 20));
-        this.include(new LandUnitEntity(21, 20));
+        this.addCity(new CityEntity(10, 10));
+        this.include(new LandUnitEntity(11, 10));
     }
 
     Texture terrainTexture;
@@ -239,12 +240,15 @@ public final class Window {
         var y = intendedMapCentre.getY();
 
         // display sample island
-        var points = this.GetWindow(0 + x, 0 + y, 30, 30);
+        var points = this.getWindow(0 + x, 0 + y, 20, 20);
 
         for (var it : points) {
             var position = new Vector2(
-                it.geoPoint.X * Config.SpriteSize,
-                it.geoPoint.Y * Config.SpriteSize);
+                it.geoPoint.x * Config.SpriteSize,
+                it.geoPoint.y * Config.SpriteSize);
+            if (it.texture == null) {
+                assert false;
+            }
             SpriteBatchUtils.draw(spriteBatch, position, it.texture);
         }
 

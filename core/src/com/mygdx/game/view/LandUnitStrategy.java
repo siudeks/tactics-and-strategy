@@ -2,15 +2,16 @@ package com.mygdx.game.view;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mygdx.game.resources.LandUnitTextures;
 
 @Singleton
 public final class LandUnitStrategy implements ITileStrategy {
 
-    private final TextureHolder texture;
+    private final LandUnitTextures textures;
 
     @Inject
     public LandUnitStrategy(LandUnitTextures landUnitTexture) {
-        texture = landUnitTexture;
+        textures = landUnitTexture;
     }
 
     public boolean canExecute(LocationType[] neighbors) {
@@ -18,6 +19,6 @@ public final class LandUnitStrategy implements ITileStrategy {
     }
 
     public TextureHolder execute(LocationType[] neighbors) {
-        return texture;
+        return textures.getTexture();
     }
 }

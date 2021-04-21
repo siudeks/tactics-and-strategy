@@ -28,7 +28,7 @@ public class IslandEntityExtensions {
             var next = i + 1;
             if (next == cornersCount) next = 0;
 
-            edges = edges.append(AsLine(corners[i].X, corners[i].Y, corners[next].X, corners[next].Y));
+            edges = edges.append(AsLine(corners[i].x, corners[i].y, corners[next].x, corners[next].y));
         }
 
         // prepare all points of edges for horizontal linescan
@@ -43,7 +43,7 @@ public class IslandEntityExtensions {
         var lines = Queue.<Tuple2<GeoPoint, GeoPoint>>empty();
         for (int i = 1; i < sortedEdges.length; i++) {
             // find the most right element in line and continue
-            if (sortedEdges[i].Y == lineStart.Y)
+            if (sortedEdges[i].y == lineStart.y)
             {
                 lineEnd = sortedEdges[i];
                 continue;
@@ -59,18 +59,18 @@ public class IslandEntityExtensions {
         // now in lines we have all horizontal lines, so let's fill the polygon
         var points = List.<Vector2>empty();
         for (var item : lines) {
-            var liney = item._1.Y;
+            var liney = item._1.y;
 
             //horizontal line contains at least initial point
-            points = points.append(new Vector2(item._1.X, liney));
+            points = points.append(new Vector2(item._1.x, liney));
 
             // if initial point is the same as end point, need to go to the next line.
-            if (item._1.X == item._2.X) continue;
+            if (item._1.x == item._2.x) continue;
 
-            for (int x = item._1.X + 1; x < item._2.X; x++)
+            for (int x = item._1.x + 1; x < item._2.x; x++)
                 points = points.append(new Vector2(x, liney));
 
-            points = points.append(new Vector2(item._2.X, liney));
+            points = points.append(new Vector2(item._2.x, liney));
         }
 
         return points;
@@ -134,9 +134,9 @@ public class IslandEntityExtensions {
     /// </summary>
     class GeoPointComparer implements Comparator<GeoPoint> {
         public int compare(GeoPoint first, GeoPoint second) {
-            var deltay = first.Y - second.Y;
+            var deltay = first.y - second.y;
             if (deltay != 0) return deltay;
-            return first.X - second.X;
+            return first.x - second.x;
         }
     }
 }

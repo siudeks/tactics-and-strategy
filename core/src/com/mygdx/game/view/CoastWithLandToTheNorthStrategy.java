@@ -3,15 +3,24 @@ package com.mygdx.game.view;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.resources.WaterTextures;
+import com.mygdx.game.runtime.GameComponentBase;
 
 @Singleton
-public final class CoastWithLandToTheNorthStrategy implements ITileStrategy {
+public final class CoastWithLandToTheNorthStrategy extends GameComponentBase
+                                                   implements ITileStrategy {
     
-    private final TextureHolder texture;
+    
+    private final WaterTextures textures;
+    private TextureHolder texture;
 
     @Inject
     public CoastWithLandToTheNorthStrategy(WaterTextures waterTextures) {
-        this.texture = waterTextures.getCoastWithLandToTheNorth();
+        this.textures = waterTextures;
+    }
+
+    @Override
+    public void useTextures() {
+        this.texture = textures.getCoastWithLandToTheNorth();
     }
 
     public boolean canExecute(LocationType[] neighbors) {
