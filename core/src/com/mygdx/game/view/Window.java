@@ -55,19 +55,19 @@ public final class Window {
         this.water = water;
 
         functionStrategies = functionStrategies
-            .append(this::CoastWithLandToTheWest)
-            .append(this::CoastWithLandToTheEast)
-            .append(this::CoastWithLandToTheNorthEast)
-            .append(this::CoastWithLandToTheNorthWest)
-            .append(this::CoastWithLandToTheSouthEast)
-            .append(this::CoastWithLandToTheSouthWest);
+            .append(this::coastWithLandToTheWest)
+            .append(this::coastWithLandToTheEast)
+            .append(this::coastWithLandToTheNorthEast)
+            .append(this::coastWithLandToTheNorthWest)
+            .append(this::coastWithLandToTheSouthEast)
+            .append(this::coastWithLandToTheSouthWest);
 
         this.strategies = strategies;
         this.fallbackStrategy = fallbackStrategy;
     }
 
     public void addIsland(IslandEntity island) {
-        for (var item : IslandEntityExtensions.GeneratePoints(island)) {
+        for (var item : IslandEntityExtensions.generatePoints(island)) {
             var point = new GeoPoint(item.X, item.Y);
             mapPoints = mapPoints.put(point, LocationType.Ground);
         }
@@ -148,7 +148,7 @@ public final class Window {
         return result;
     }
 
-    private TextureHolder CoastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue) {
+    private TextureHolder coastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue) {
         if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
@@ -158,7 +158,7 @@ public final class Window {
         return water.getCoastWithLandToTheWest();
     }
 
-    private TextureHolder CoastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue) {
+    private TextureHolder coastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue) {
         if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
@@ -168,7 +168,7 @@ public final class Window {
         return water.getCoastWithLandToTheEast();
     }
 
-    private TextureHolder CoastWithLandToTheNorthEast(LocationType[] neighbors, TextureHolder defaultValue)
+    private TextureHolder coastWithLandToTheNorthEast(LocationType[] neighbors, TextureHolder defaultValue)
     {
         if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
@@ -179,7 +179,7 @@ public final class Window {
         return water.getCoastWithLandToTheNorthEast();
     }
 
-    private TextureHolder CoastWithLandToTheNorthWest(LocationType[] neighbors, TextureHolder defaultValue)
+    private TextureHolder coastWithLandToTheNorthWest(LocationType[] neighbors, TextureHolder defaultValue)
     {
         if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
@@ -190,7 +190,7 @@ public final class Window {
         return water.getCoastWithLandToTheNorthWest();
     }
 
-    private TextureHolder CoastWithLandToTheSouthEast(LocationType[] neighbors, TextureHolder defaultValue)
+    private TextureHolder coastWithLandToTheSouthEast(LocationType[] neighbors, TextureHolder defaultValue)
     {
         if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
@@ -201,7 +201,7 @@ public final class Window {
         return water.getCoastWithLandToTheSouthEast();
     }
 
-    private TextureHolder CoastWithLandToTheSouthWest(LocationType[] neighbors, TextureHolder defaultValue)
+    private TextureHolder coastWithLandToTheSouthWest(LocationType[] neighbors, TextureHolder defaultValue)
     {
         if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
         if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
@@ -231,21 +231,21 @@ public final class Window {
     }
 
     @Inject
-    IntendedMapCentre IntendedMapCentre;
+    IntendedMapCentre intendedMapCentre;
 
     public void onDraw(SpriteBatch spriteBatch) {
 
-        var x = IntendedMapCentre.getX();
-        var y = IntendedMapCentre.getY();
+        var x = intendedMapCentre.getX();
+        var y = intendedMapCentre.getY();
 
         // display sample island
         var points = this.GetWindow(0 + x, 0 + y, 30, 30);
 
         for (var it : points) {
             var position = new Vector2(
-                it.GeoPoint.X * Config.SpriteSize,
-                it.GeoPoint.Y * Config.SpriteSize);
-            SpriteBatchUtils.draw(spriteBatch, position, it.Texture);
+                it.geoPoint.X * Config.SpriteSize,
+                it.geoPoint.Y * Config.SpriteSize);
+            SpriteBatchUtils.draw(spriteBatch, position, it.texture);
         }
 
         for (var drawer : this.batchDrawers) {
@@ -261,13 +261,12 @@ public final class Window {
      * Holds together geopoint and texture used for that point to draw it.
      */
     public class PointContext {
-        public final GeoPoint GeoPoint;
-        public final TextureHolder Texture;
+        public final GeoPoint geoPoint;
+        public final TextureHolder texture;
 
-        public PointContext(GeoPoint geopoint, TextureHolder texture)
-        {
-            GeoPoint = geopoint;
-            Texture = texture;
+        public PointContext(GeoPoint geopoint, TextureHolder texture) {
+            this.geoPoint = geopoint;
+            this.texture = texture;
         }
     }
 }

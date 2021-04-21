@@ -1,27 +1,26 @@
 package com.mygdx.game.domain;
 
+import java.util.Comparator;
+
 import com.mygdx.game.view.Vector2;
 
-import io.vavr.collection.Queue;
-import io.vavr.collection.List;
-import io.vavr.collection.Seq;
-import io.vavr.collection.Iterator;
-import io.vavr.Tuple2;
 import io.vavr.Tuple;
-
-import java.util.Comparator;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
+import io.vavr.collection.Queue;
+import io.vavr.collection.Seq;
 
 public class IslandEntityExtensions {
     
     /** Converts list of island borders to the list of all island tiles. */
-    public static GeoPoint[] GeneratePoints(IslandEntity entries) {
-        return FillPolygon(entries.getCorners())
+    public static GeoPoint[] generatePoints(IslandEntity entries) {
+        return fillPolygon(entries.getCorners())
             .map(o -> new GeoPoint(o.getX(), o.getY()))
             .toJavaArray(GeoPoint[]::new);
     }
 
     // http://alienryderflex.com/polygon_fill/
-    private static Seq<Vector2> FillPolygon(GeoPoint[] corners) {
+    private static Seq<Vector2> fillPolygon(GeoPoint[] corners) {
         // convert all verticles to edges.
         var edges = List.<List<GeoPoint>>empty();
         var cornersCount = corners.length;
