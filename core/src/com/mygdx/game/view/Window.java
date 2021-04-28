@@ -112,8 +112,7 @@ public final class Window {
 
                 area[Directions.NeighborTopLeft] = mapPoints.get(centerOfArea.topLeft()).getOrElse(LocationType.Water);
                 area[Directions.NeighborNorth] = mapPoints.get(centerOfArea.top()).getOrElse(LocationType.Water);
-                area[Directions.NeighborTopRight] = 
-                
+                area[Directions.NeighborTopRight] = mapPoints.get(centerOfArea.topRight()).getOrElse(LocationType.Water);
                 area[Directions.NeighborWest] = mapPoints.get(centerOfArea.left()).getOrElse(LocationType.Water);
                 area[Directions.NeighborThis] = mapPoints.get(centerOfArea).getOrElse(LocationType.Water);
                 area[Directions.NeighborEast] = mapPoints.get(centerOfArea.right()).getOrElse(LocationType.Water);
