@@ -28,6 +28,6 @@ public final class CoastWithLandToTheSouthStrategy extends GameComponentBase
     }
 
     public TextureHolder execute(LocationType[] neighbors) {
-        return textures.getCoastWithLandToTheSouth();
+        return textures.getLandSouth();
     }
 }

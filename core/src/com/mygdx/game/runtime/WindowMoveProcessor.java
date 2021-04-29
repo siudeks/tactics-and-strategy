@@ -29,7 +29,7 @@ public class WindowMoveProcessor extends GameComponentBase {
 
     private void OnUpdate()
     {
-        intendedMapCentre.setX(intendedMapCentre.getX() + 1);
-        intendedMapCentre.setY(intendedMapCentre.getY() + 1);
+        // intendedMapCentre.setX(intendedMapCentre.getX() + 1);
+        // intendedMapCentre.setY(intendedMapCentre.getY() + 1);
     }
 }

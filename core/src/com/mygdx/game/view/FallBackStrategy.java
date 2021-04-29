@@ -7,13 +7,13 @@ import com.mygdx.game.runtime.GameComponentBase;
 
 /** Should be invoked at the end of strategies. */
 @Singleton
-public class DefaultStrategy extends GameComponentBase
-                             implements ITileFallbackStrategy {
+public class FallBackStrategy extends GameComponentBase
+                              implements ITileFallbackStrategy {
 
     private TextureHolder texture;
 
     @Inject
-    WaterTextures waterTextures;
+    private WaterTextures waterTextures;
 
     public boolean canExecute(LocationType[] neighbors) {
         return true;

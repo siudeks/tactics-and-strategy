@@ -5,9 +5,8 @@ import com.google.inject.multibindings.Multibinder;
 import com.mygdx.game.runtime.GameComponentBase;
 import com.mygdx.game.runtime.PointerDrawer;
 import com.mygdx.game.runtime.PointerObserver;
-import com.mygdx.game.view.CoastWithLandToTheNorthStrategy;
 import com.mygdx.game.view.CoastWithLandToTheSouthStrategy;
-import com.mygdx.game.view.DefaultStrategy;
+import com.mygdx.game.view.FallBackStrategy;
 import com.mygdx.game.view.GroundStrategy;
 import com.mygdx.game.view.GroundTextures;
 
@@ -22,7 +21,7 @@ public class DiModuleResources extends AbstractModule {
     var resourceLoaderBinder = Multibinder.newSetBinder(binder(), GameComponent.class);
     List.<Class<? extends GameComponentBase>>of(TerrainTexture.class)
       .append(WaterTextures.class)
-      .append(DefaultStrategy.class)
+      .append(FallBackStrategy.class)
       .append(SelectionTexture.class)
       .append(PointerObserver.class)
       .append(PointerDrawer.class)
@@ -30,7 +29,6 @@ public class DiModuleResources extends AbstractModule {
       .append(DesertRatsTexture.class)
       .append(GroundStrategy.class)
       .append(GroundTextures.class)
-      .append(CoastWithLandToTheNorthStrategy.class)
       .append(CoastWithLandToTheSouthStrategy.class)
       .forEach(it -> resourceLoaderBinder.addBinding().to(it));
   }

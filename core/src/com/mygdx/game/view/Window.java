@@ -33,17 +33,9 @@ import io.vavr.collection.Seq;
 public final class Window {
     private Map<GeoPoint, LocationType> mapPoints = HashMap.<GeoPoint, LocationType>empty();
 
-    // defines single texture generator strategy
-    // area: small array 3*3, where central point defines the point which need th have
-    // generated texture, and the rest of array items defines neighbers with indexes as constatns above.
-    // if strategy can't generate texture, returns defaultTexture.
-    private interface Generator {
-        TextureHolder apply(LocationType[] area, TextureHolder defaultTexture);
-    }
-
     private WaterTextures water;
-    private List<Generator> functionStrategies = List.<Generator>empty();
-    private Set<ITileStrategy> strategies;
+    private List<ITileStrategy> mergeStrategies = List.empty();
+    private List<ITileStrategy> strategies;
 
     @Inject
     private Set<IBatchDrawer> batchDrawers;
@@ -54,15 +46,14 @@ public final class Window {
     public Window(WaterTextures water, ITileFallbackStrategy fallbackStrategy, Set<ITileStrategy> strategies) {
         this.water = water;
 
-        functionStrategies = functionStrategies
-            .append(this::coastWithLandToTheWest)
-            .append(this::coastWithLandToTheEast)
-            .append(this::coastWithLandToTheNorthEast)
-            .append(this::coastWithLandToTheNorthWest)
-            .append(this::coastWithLandToTheSouthEast)
-            .append(this::coastWithLandToTheSouthWest);
+        mergeStrategies = mergeStrategies
+            .append(new CoastWithLandToTheEast(water))
+            .append(new CoastWithLandToTheNorth(water))
+            .append(new CoastWithLandToTheWest(water))
+            .append(new CoastWithLandToTheNorthEast(water))
+            .append(new CoastWithLandToTheSouthWest(water));
 
-        this.strategies = strategies;
+        this.strategies = List.ofAll(strategies);
         this.fallbackStrategy = fallbackStrategy;
     }
 
@@ -120,96 +111,14 @@ public final class Window {
                 area[Directions.NeighborSouth] = mapPoints.get(centerOfArea.down()).getOrElse(LocationType.Water);
                 area[Directions.NeighborDownRight] = mapPoints.get(centerOfArea.downRight()).getOrElse(LocationType.Water);
 
-                var centerTexture = new TextureHolder();
-                var handled = false;
-                for (var strategy : functionStrategies) {
-                    var texture = strategy.apply(area, centerTexture);
-                    if (texture == centerTexture) continue;
-
-                    centerTexture = texture;
-                    handled = true;
-                    break;
-                }
-
-                if (!handled) {
-                    for (var strategy : strategies) {
-                        if (!strategy.canExecute(area)) continue;
-
-                        centerTexture = strategy.execute(area);
-                        handled = true;
-                        break;
-                    }
-                }
-
-                if (!handled) centerTexture = fallbackStrategy.execute(area);
+                
+                var allStrategies = strategies.appendAll(mergeStrategies);
+                var handler = allStrategies.filter(it -> it.canExecute(area)).headOption();
+                var centerTexture = handler.map(it -> it.execute(area)).getOrElse(water.getBlank());
 
                 result = result.append(new PointContext(relativeCenterOfArea, centerTexture));
             }
         return result;
-    }
-
-    private TextureHolder coastWithLandToTheWest(LocationType[] neighbors, TextureHolder defaultValue) {
-        if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-
-        return water.getCoastWithLandToTheWest();
-    }
-
-    private TextureHolder coastWithLandToTheEast(LocationType[] neighbors, TextureHolder defaultValue) {
-        if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-
-        return water.getCoastWithLandToTheEast();
-    }
-
-    private TextureHolder coastWithLandToTheNorthEast(LocationType[] neighbors, TextureHolder defaultValue)
-    {
-        if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborNorth] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-
-        return water.getCoastWithLandToTheNorthEast();
-    }
-
-    private TextureHolder coastWithLandToTheNorthWest(LocationType[] neighbors, TextureHolder defaultValue)
-    {
-        if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborNorth] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborSouth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-
-        return water.getCoastWithLandToTheNorthWest();
-    }
-
-    private TextureHolder coastWithLandToTheSouthEast(LocationType[] neighbors, TextureHolder defaultValue)
-    {
-        if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-
-        return water.getCoastWithLandToTheSouthEast();
-    }
-
-    private TextureHolder coastWithLandToTheSouthWest(LocationType[] neighbors, TextureHolder defaultValue)
-    {
-        if (neighbors[Directions.NeighborWest] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborEast] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
-        if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-
-        return water.getCoastWithLandToTheSouthWest();
     }
 
     public void initialize()
@@ -217,7 +126,9 @@ public final class Window {
         // temporar variables to keep sample textures for demo purposes.
         var island = IslandEntityGenerator.random(new GeoPoint(5, 5));
 
-        this.addIsland(island);
+        // this.addIsland(island);
+        var island1 = new IslandEntity(new GeoPoint[] {new GeoPoint(1, 1)});
+        this.addIsland(island1);
         this.addCity(new CityEntity(10, 10));
         this.include(new LandUnitEntity(11, 10));
     }
@@ -273,3 +184,221 @@ public final class Window {
         }
     }
 }
+
+// defines single texture generator strategy
+// area: small array 3*3, where central point defines the point which need th have
+// generated texture, and the rest of array items defines neighbers with indexes as constatns above.
+// if strategy can't generate texture, returns defaultTexture.
+interface MergeStrategy extends ITileStrategy {
+}
+
+final class CoastWithLandToTheEast implements MergeStrategy {
+    private WaterTextures water;
+    CoastWithLandToTheEast(WaterTextures water) {
+        this.water = water;
+    }
+
+    @Override
+    public boolean canExecute(LocationType[] neighbors) {
+        if (neighbors[Directions.NeighborWest] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborEast] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborSouth] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
+        return true;
+    }
+
+    @Override
+    public TextureHolder execute(LocationType[] neighbors) {
+        return water.getLandEast();
+    }
+
+}
+
+final class CoastWithLandToTheNorth implements MergeStrategy {
+
+    private WaterTextures water;
+
+    CoastWithLandToTheNorth(WaterTextures water) {
+        this.water = water;
+    }
+
+    @Override
+    public boolean canExecute(LocationType[] neighbors) {
+        if (neighbors[Directions.NeighborWest] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborEast] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborSouth] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborThis] == LocationType.Water) return false;
+        return true;
+    }
+
+    @Override
+    public TextureHolder execute(LocationType[] neighbors) {
+        return water.getLandNorth();
+    }
+
+}
+
+final class CoastWithLandToTheWest implements MergeStrategy {
+
+    private WaterTextures water;
+
+    CoastWithLandToTheWest(WaterTextures water) {
+        this.water = water;
+    }
+
+    @Override
+    public boolean canExecute(LocationType[] neighbors) {
+        if (neighbors[Directions.NeighborWest] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborEast] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborSouth] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
+        return true;
+    }
+
+    @Override
+    public TextureHolder execute(LocationType[] neighbors) {
+        return water.getLandWest();
+    }
+
+}
+
+final class CoastWithLandToTheNorthEast implements MergeStrategy {
+
+    private WaterTextures water;
+
+    CoastWithLandToTheNorthEast(WaterTextures water) {
+        this.water = water;
+    }
+    
+    @Override
+    public boolean canExecute(LocationType[] neighbors) {
+        if (neighbors[Directions.NeighborWest] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborEast] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborNorth] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborSouth] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
+        return true;
+    }
+
+    @Override
+    public TextureHolder execute(LocationType[] neighbors) {
+        return water.getLandNorthEast();
+    }
+}
+
+final class CoastWithLandToTheSouthWest implements MergeStrategy {
+
+    private WaterTextures water;
+
+    CoastWithLandToTheSouthWest(WaterTextures water) {
+        this.water = water;
+    }
+    
+    @Override
+    public boolean canExecute(LocationType[] neighbors) {
+        if (neighbors[Directions.NeighborWest] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborEast] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborNorth] != LocationType.Water) return false;
+        if (neighbors[Directions.NeighborSouth] == LocationType.Water) return false;
+        if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
+    
+        return true;
+    }
+
+    @Override
+    public TextureHolder execute(LocationType[] neighbors) {
+        return water.getLandSouthWest();
+    }
+}
+
+// final class CoastWithLandToTheNorthWest implements MergeStrategy {
+
+//     private WaterTextures water;
+
+//     CoastWithLandToTheNorthWest(WaterTextures water) {
+//         this.water = water;
+//     }
+    
+//     @Override
+//     public boolean canExecute(LocationType[] neighbors) {
+//         // TODO Auto-generated method stub
+//         return false;
+//     }
+
+//     @Override
+//     public TextureHolder execute() {
+//         // TODO Auto-generated method stub
+//         return null;
+//     }
+
+// }
+
+// final class CoastWithLandToTheSouthEast implements MergeStrategy {
+
+//     private WaterTextures water;
+
+//     CoastWithLandToTheSouthEast(WaterTextures water) {
+//         this.water = water;
+//     }
+
+//     @Override
+//     public boolean canExecute(LocationType[] neighbors) {
+//         if (neighbors[Directions.NeighborWest] == LocationType.Water) return false;
+//         if (neighbors[Directions.NeighborEast] != LocationType.Water) return false;
+//         if (neighbors[Directions.NeighborNorth] == LocationType.Water) return false;
+//         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return false;
+//         if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
+//         return true;
+//     }
+
+//     @Override
+//     public TextureHolder execute() {
+//         return water.getCoastWithLandToTheNorthWest();
+//     }
+
+// }
+
+//     @Override
+//     public boolean canExecute(LocationType[] neighbors) {
+//         if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
+//         if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
+//         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
+//         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
+//         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
+//     }
+
+//     @Override
+//     public TextureHolder execute() {
+//         return water.getCoastWithLandToTheSouthEast();
+//     }
+
+// }
+// public final class CoastWithLandToTheNorthStrategy implements MergeStrategy {
+    
+    
+//     private final WaterTextures textures;
+
+//     @Inject
+//     public CoastWithLandToTheNorthStrategy(WaterTextures waterTextures) {
+//         this.textures = waterTextures;
+//     }
+
+//     public boolean canExecute(LocationType[] neighbors) {
+//         if (neighbors[Directions.NeighborWest] == LocationType.Ground) return false;
+//         if (neighbors[Directions.NeighborEast] != LocationType.Water) return false;
+//         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return false;
+//         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return false;
+//         if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
+
+//         return true;
+
+//     }
+
+//     @Override
+//     public TextureHolder execute() {
+//         return textures.getLandNorth();
+//     }
+// }

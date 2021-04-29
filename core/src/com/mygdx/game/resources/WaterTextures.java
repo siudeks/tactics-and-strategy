@@ -30,28 +30,30 @@ public class WaterTextures extends GameComponentBase {
         this.terrainTexture = terrainTexture;
     }
 
-    private TextureHolder coastWithLandToTheNorth;
-    private TextureHolder coastWithLandToTheSouth;
-    private TextureHolder coastWithLandToTheWest;
-    private TextureHolder coastWithLandToTheEast;
-    private TextureHolder coastWithLandToTheNorthEast;
-    private TextureHolder coastWithLandToTheNorthWest;
-    private TextureHolder coastWithLandToTheSouthEast;
-    private TextureHolder coastWithLandToTheSouthWest;
+    private TextureHolder landNorth;
+    private TextureHolder landSouth;
+    private TextureHolder landWest;
+    private TextureHolder landEast;
+    private TextureHolder landSouthEast;
+    private TextureHolder landSouthWest;
+    private TextureHolder landNorthEast;
+    private TextureHolder landNorthWest;
     private TextureHolder sea;
+    private TextureHolder blank;
 
     @Override
     public void useTextures() {
         var texture = terrainTexture.getTexture();
         var ss = Config.SpriteSize;
-        coastWithLandToTheNorth = new TextureHolder(texture, IntRectangle.of(4 * ss, 0 * ss, ss, ss));
-        coastWithLandToTheSouth = new TextureHolder(texture, IntRectangle.of(10 * ss, 0 * ss, ss, ss));
-        coastWithLandToTheWest = new TextureHolder(texture, IntRectangle.of(6 * ss, 0 * ss, ss, ss));
-        coastWithLandToTheEast = new TextureHolder(texture, IntRectangle.of(18 * ss, 0 * ss, ss, ss));
-        coastWithLandToTheNorthEast = new TextureHolder(texture, IntRectangle.of(14 * ss, 0 * ss, ss, ss)); 
-        coastWithLandToTheNorthWest = new TextureHolder(texture, IntRectangle.of(6 * ss, 1 * ss, ss, ss));
-        coastWithLandToTheSouthEast = new TextureHolder(texture, IntRectangle.of(8 * ss, 0 * ss, ss, ss));
-        coastWithLandToTheSouthWest = new TextureHolder(texture, IntRectangle.of(0 * ss, 1 * ss, ss, ss)); 
+        landNorth = new TextureHolder(texture, IntRectangle.of(4 * ss, 0 * ss, ss, ss));
+        landSouth = new TextureHolder(texture, IntRectangle.of(10 * ss, 0 * ss, ss, ss));
+        landEast = new TextureHolder(texture, IntRectangle.of(6 * ss, 0 * ss, ss, ss));
+        landWest = new TextureHolder(texture, IntRectangle.of(18 * ss, 0 * ss, ss, ss));
+        landSouthEast = new TextureHolder(texture, IntRectangle.of(14 * ss, 0 * ss, ss, ss)); 
+        landSouthWest = new TextureHolder(texture, IntRectangle.of(6 * ss, 1 * ss, ss, ss));
+        landNorthEast = new TextureHolder(texture, IntRectangle.of(8 * ss, 0 * ss, ss, ss));
+        landNorthWest = new TextureHolder(texture, IntRectangle.of(0 * ss, 1 * ss, ss, ss)); 
         sea = new TextureHolder(texture, IntRectangle.of(2 * ss, 0 * ss, ss, ss));
+        blank = new TextureHolder(texture, IntRectangle.of(15 * ss, 8 * ss, ss, ss));
     }
 }
