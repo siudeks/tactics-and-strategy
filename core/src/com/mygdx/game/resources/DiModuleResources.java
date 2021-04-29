@@ -5,7 +5,6 @@ import com.google.inject.multibindings.Multibinder;
 import com.mygdx.game.runtime.GameComponentBase;
 import com.mygdx.game.runtime.PointerDrawer;
 import com.mygdx.game.runtime.PointerObserver;
-import com.mygdx.game.view.CoastWithLandToTheSouthStrategy;
 import com.mygdx.game.view.FallBackStrategy;
 import com.mygdx.game.view.GroundStrategy;
 import com.mygdx.game.view.GroundTextures;
@@ -29,7 +28,6 @@ public class DiModuleResources extends AbstractModule {
       .append(DesertRatsTexture.class)
       .append(GroundStrategy.class)
       .append(GroundTextures.class)
-      .append(CoastWithLandToTheSouthStrategy.class)
       .forEach(it -> resourceLoaderBinder.addBinding().to(it));
   }
 }

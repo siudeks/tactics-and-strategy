@@ -15,7 +15,6 @@ public class DiModuleView extends AbstractModule {
 
     var strategyBinder = Multibinder.newSetBinder(binder(), ITileStrategy.class);
     strategyBinder.addBinding().to(CityStrategy.class);
-    strategyBinder.addBinding().to(CoastWithLandToTheSouthStrategy.class);
     strategyBinder.addBinding().to(GroundStrategy.class);
     strategyBinder.addBinding().to(LandUnitStrategy.class);
     bind(ITileFallbackStrategy.class).to(FallBackStrategy.class);
