@@ -1,6 +1,7 @@
 package com.mygdx.game.view;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -40,22 +41,25 @@ public final class Window {
     @Inject
     private Set<IBatchDrawer> batchDrawers;
 
-    private Strategy fallbackStrategy;
-
     @Inject
-    public Window(WaterTextures water, ITileFallbackStrategy fallbackStrategy, Set<ITileStrategy> strategies) {
+    public Window(WaterTextures water, Set<ITileStrategy> strategies) {
         this.water = water;
 
         mergeStrategies = mergeStrategies
+            .append(new Water(water))
+            .append(new Ground(water))
             .append(new CoastWithLandToTheEast(water))
             .append(new CoastWithLandToTheNorth(water))
             .append(new CoastWithLandToTheWest(water))
             .append(new CoastWithLandToTheNorthEast(water))
             .append(new CoastWithLandToTheSouthWest(water))
-            .append(new CoastWithLandToTheSouthStrategy(water)) ;
+            .append(new CoastWithLandToTheSouthStrategy(water))
+            .append(new WaterWithLandSouthEast(water))
+            .append(new WaterWithLandNorthEast(water))
+            .append(new WaterWithLandNorthSouthEast(water))
+            ;
 
         this.strategies = List.ofAll(strategies);
-        this.fallbackStrategy = fallbackStrategy;
     }
 
     public void addIsland(IslandEntity island) {
@@ -112,7 +116,7 @@ public final class Window {
                 area[Directions.NeighborSouth] = mapPoints.get(centerOfArea.down()).getOrElse(LocationType.Water);
                 area[Directions.NeighborDownRight] = mapPoints.get(centerOfArea.downRight()).getOrElse(LocationType.Water);
 
-                
+
                 var allStrategies = strategies.appendAll(mergeStrategies);
                 var handler = allStrategies.filter(it -> it.canExecute(area)).headOption();
                 var centerTexture = handler.map(it -> it.execute(area)).getOrElse(water.getBlank());
@@ -127,9 +131,9 @@ public final class Window {
         // temporar variables to keep sample textures for demo purposes.
         var island = IslandEntityGenerator.random(new GeoPoint(5, 5));
 
-        // this.addIsland(island);
-        var island1 = new IslandEntity(new GeoPoint[] {new GeoPoint(1, 1)});
-        this.addIsland(island1);
+        this.addIsland(island);
+        // var island1 = new IslandEntity(new GeoPoint[] {new GeoPoint(1, 1), new GeoPoint(2, 2)});
+        // this.addIsland(island1);
         this.addCity(new CityEntity(10, 10));
         this.include(new LandUnitEntity(11, 10));
     }
@@ -315,95 +319,6 @@ final class CoastWithLandToTheSouthWest implements MergeStrategy {
     }
 }
 
-// final class CoastWithLandToTheNorthWest implements MergeStrategy {
-
-//     private WaterTextures water;
-
-//     CoastWithLandToTheNorthWest(WaterTextures water) {
-//         this.water = water;
-//     }
-    
-//     @Override
-//     public boolean canExecute(LocationType[] neighbors) {
-//         // TODO Auto-generated method stub
-//         return false;
-//     }
-
-//     @Override
-//     public TextureHolder execute() {
-//         // TODO Auto-generated method stub
-//         return null;
-//     }
-
-// }
-
-// final class CoastWithLandToTheSouthEast implements MergeStrategy {
-
-//     private WaterTextures water;
-
-//     CoastWithLandToTheSouthEast(WaterTextures water) {
-//         this.water = water;
-//     }
-
-//     @Override
-//     public boolean canExecute(LocationType[] neighbors) {
-//         if (neighbors[Directions.NeighborWest] == LocationType.Water) return false;
-//         if (neighbors[Directions.NeighborEast] != LocationType.Water) return false;
-//         if (neighbors[Directions.NeighborNorth] == LocationType.Water) return false;
-//         if (neighbors[Directions.NeighborSouth] != LocationType.Water) return false;
-//         if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
-//         return true;
-//     }
-
-//     @Override
-//     public TextureHolder execute() {
-//         return water.getCoastWithLandToTheNorthWest();
-//     }
-
-// }
-
-//     @Override
-//     public boolean canExecute(LocationType[] neighbors) {
-//         if (neighbors[Directions.NeighborWest] != LocationType.Water) return defaultValue;
-//         if (neighbors[Directions.NeighborEast] == LocationType.Water) return defaultValue;
-//         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return defaultValue;
-//         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return defaultValue;
-//         if (neighbors[Directions.NeighborThis] != LocationType.Water) return defaultValue;
-//     }
-
-//     @Override
-//     public TextureHolder execute() {
-//         return water.getCoastWithLandToTheSouthEast();
-//     }
-
-// }
-// public final class CoastWithLandToTheNorthStrategy implements MergeStrategy {
-    
-    
-//     private final WaterTextures textures;
-
-//     @Inject
-//     public CoastWithLandToTheNorthStrategy(WaterTextures waterTextures) {
-//         this.textures = waterTextures;
-//     }
-
-//     public boolean canExecute(LocationType[] neighbors) {
-//         if (neighbors[Directions.NeighborWest] == LocationType.Ground) return false;
-//         if (neighbors[Directions.NeighborEast] != LocationType.Water) return false;
-//         if (neighbors[Directions.NeighborNorth] != LocationType.Water) return false;
-//         if (neighbors[Directions.NeighborSouth] == LocationType.Water) return false;
-//         if (neighbors[Directions.NeighborThis] != LocationType.Water) return false;
-
-//         return true;
-
-//     }
-
-//     @Override
-//     public TextureHolder execute() {
-//         return textures.getLandNorth();
-//     }
-// }
-
 final class CoastWithLandToTheSouthStrategy implements ITileStrategy {
 
     private final WaterTextures textures;
@@ -426,5 +341,104 @@ final class CoastWithLandToTheSouthStrategy implements ITileStrategy {
 
     public TextureHolder execute(LocationType[] neighbors) {
         return textures.getLandSouth();
+    }
+}
+
+final class WaterWithLandSouthEast extends BaseGroundStrategy {
+
+    @Inject
+    public WaterWithLandSouthEast(WaterTextures waterTextures) {
+        super(LocationType.Water, LocationType.Ground, LocationType.Ground, LocationType.Water,
+        LocationType.Water,
+        waterTextures::getLandSouthEast);
+    }
+}
+
+final class WaterWithLandNorthEast extends BaseGroundStrategy {
+
+    @Inject
+    public WaterWithLandNorthEast(WaterTextures waterTextures) {
+        super(LocationType.Ground, LocationType.Water, LocationType.Water, LocationType.Ground,
+        LocationType.Water,
+        waterTextures::getLandNorthWest);
+    }
+}
+
+final class WaterWithLandNorthSouthEast extends BaseGroundStrategy {
+
+    @Inject
+    public WaterWithLandNorthSouthEast(WaterTextures waterTextures) {
+        super(LocationType.Ground, LocationType.Ground, LocationType.Ground, LocationType.Water,
+        LocationType.Water,
+        waterTextures::getLandNorthSouthEast);
+    }
+}
+
+final class Ground implements ITileStrategy {
+
+    private final WaterTextures textures;
+
+    @Inject
+    public Ground(WaterTextures waterTextures) {
+        this.textures = waterTextures;
+    }
+
+    @Override
+    public boolean canExecute(LocationType[] neighbors) {
+        if (neighbors[Directions.NeighborThis] != LocationType.Ground) return false;
+        return true;
+
+    }
+
+    @Override
+    public TextureHolder execute(LocationType[] neighbors) {
+        return textures.getGround();
+    }
+}
+
+final class Water extends BaseGroundStrategy {
+
+    @Inject
+    public Water(WaterTextures waterTextures) {
+        super(LocationType.Water, LocationType.Water, LocationType.Water, LocationType.Water,
+        LocationType.Water,
+        waterTextures::getSea);
+    }
+}
+
+
+abstract class BaseGroundStrategy implements ITileStrategy {
+    private final LocationType north;
+    private final LocationType south;
+    private final LocationType east;
+    private final LocationType west;
+    private final LocationType self;
+    private final Supplier<TextureHolder> supplier;
+
+    @Inject
+    protected BaseGroundStrategy(
+        LocationType north, LocationType south, LocationType east, LocationType west,
+        LocationType self,
+        Supplier<TextureHolder> supplier) {
+        this.north = north;
+        this.south = south;
+        this.east = east;
+        this.west = west;
+        this.self = self;
+        this.supplier = supplier;
+    }
+
+    public boolean canExecute(LocationType[] neighbors) {
+        if (neighbors[Directions.NeighborNorth] != north) return false;
+        if (neighbors[Directions.NeighborSouth] != south) return false;
+        if (neighbors[Directions.NeighborEast] != east) return false;
+        if (neighbors[Directions.NeighborWest] != west) return false;
+        if (neighbors[Directions.NeighborThis] != self) return false;
+        return true;
+
+    }
+
+    public TextureHolder execute(LocationType[] neighbors) {
+        return supplier.get();
     }
 }

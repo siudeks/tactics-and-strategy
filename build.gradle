@@ -41,6 +41,7 @@ allprojects {
 
 project(":core") {
     apply plugin: "java-library"
+    apply plugin: "scala"
 
     compileJava {
         options.compilerArgs += '--enable-preview'
@@ -50,7 +51,7 @@ project(":core") {
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        
+        implementation "org.scala-lang:scala-library:2.12.13"
     }
 }
 

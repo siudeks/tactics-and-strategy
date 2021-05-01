@@ -1,6 +1,5 @@
 package com.mygdx.game.resources;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mygdx.game.Config;
@@ -38,7 +37,9 @@ public class WaterTextures extends GameComponentBase {
     private TextureHolder landSouthWest;
     private TextureHolder landNorthEast;
     private TextureHolder landNorthWest;
+    private TextureHolder landNorthSouthEast;
     private TextureHolder sea;
+    private TextureHolder ground;
     private TextureHolder blank;
 
     @Override
@@ -52,7 +53,9 @@ public class WaterTextures extends GameComponentBase {
         landSouthEast = new TextureHolder(texture, IntRectangle.of(14 * ss, 0 * ss, ss, ss)); 
         landSouthWest = new TextureHolder(texture, IntRectangle.of(6 * ss, 1 * ss, ss, ss));
         landNorthEast = new TextureHolder(texture, IntRectangle.of(8 * ss, 0 * ss, ss, ss));
+        landNorthSouthEast = new TextureHolder(texture, IntRectangle.of(16 * ss, 0 * ss, ss, ss));
         landNorthWest = new TextureHolder(texture, IntRectangle.of(0 * ss, 1 * ss, ss, ss)); 
+        ground = new TextureHolder(texture, IntRectangle.of(0 * ss, 0 * ss, ss, ss));
         sea = new TextureHolder(texture, IntRectangle.of(2 * ss, 0 * ss, ss, ss));
         blank = new TextureHolder(texture, IntRectangle.of(15 * ss, 8 * ss, ss, ss));
     }
