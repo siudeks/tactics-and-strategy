@@ -34,7 +34,7 @@ public class IslandEntityExtensions {
         // prepare all points of edges for horizontal linescan
         var sortedEdges = edges
             .flatMap(it -> it)
-            // TODO .sort(it -> it -> it, new GeoPointComparer())
+            .toPriorityQueue(new GeoPointComparer())
             .toJavaArray(GeoPoint[]::new);
 
         // convert edges to horizontal lines which fill the shape.
@@ -132,7 +132,7 @@ public class IslandEntityExtensions {
     /// 
     /// So points 1 to 4 will be returned as 1,2,3,4
     /// </summary>
-    class GeoPointComparer implements Comparator<GeoPoint> {
+    static class GeoPointComparer implements Comparator<GeoPoint> {
         public int compare(GeoPoint first, GeoPoint second) {
             var deltay = first.y - second.y;
             if (deltay != 0) return deltay;
