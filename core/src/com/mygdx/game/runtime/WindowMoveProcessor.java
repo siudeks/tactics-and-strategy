@@ -4,15 +4,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mygdx.game.domain.IntendedMapCentre;
+import com.mygdx.game.domain.IntendedViewPosition;
+import com.mygdx.game.domain.IntendedViewPosition.Current;
 
 @Singleton
-public class WindowMoveProcessor extends GameComponentBase {
-
-    @Inject
-    public IntendedMapCentre intendedMapCentre;
+public class WindowMoveProcessor extends GameComponentBase
+                                         implements IntendedViewPosition.Provider {
 
     private final LocalDateTime start = LocalDateTime.now();
     private long totalSeconds = 0;
@@ -24,12 +22,20 @@ public class WindowMoveProcessor extends GameComponentBase {
         if (currentTotalSeconds == totalSeconds) return;
 
         totalSeconds = currentTotalSeconds;
-        OnUpdate();
+        onUpdate();
     }
 
-    private void OnUpdate()
-    {
-        // intendedMapCentre.setX(intendedMapCentre.getX() + 1);
-        // intendedMapCentre.setY(intendedMapCentre.getY() + 1);
+    private int centerX;
+    private int centerY;
+
+    private void onUpdate() {
+        centerX ++;
+        centerY ++;
+    }
+
+
+    @Override
+    public Current current() {
+        return Current.of(centerX, centerY);
     }
 }

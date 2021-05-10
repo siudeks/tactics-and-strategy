@@ -10,7 +10,7 @@ import com.google.inject.Singleton;
 import com.mygdx.game.Config;
 import com.mygdx.game.domain.CityEntity;
 import com.mygdx.game.domain.GeoPoint;
-import com.mygdx.game.domain.IntendedMapCentre;
+import com.mygdx.game.domain.IntendedViewPosition;
 import com.mygdx.game.domain.IslandEntity;
 import com.mygdx.game.domain.IslandEntityExtensions;
 import com.mygdx.game.domain.IslandEntityGenerator;
@@ -147,15 +147,16 @@ public final class Window {
     }
 
     @Inject
-    IntendedMapCentre intendedMapCentre;
+    IntendedViewPosition.Provider intendedMapCentre;
 
     public void onDraw(SpriteBatch spriteBatch) {
 
-        var x = intendedMapCentre.getX();
-        var y = intendedMapCentre.getY();
+        var current = intendedMapCentre.current();
+        var x = current.getX();
+        var y = current.getY();
 
         // display sample island
-        var points = this.getWindow(0 + x, 0 + y, 20, 20);
+        var points = this.getWindow( + x, 0 + y, 20, 20);
 
         for (var it : points) {
             var position = new Vector2(
