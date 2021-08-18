@@ -12,6 +12,8 @@ import lombok.Data;
  * <p>
  * To implement that abstract Pointer state we need to translate every platform-dependatn 
  * input operation as well-known pointer command like 'select', 'zoom' etc.
+ * <p>
+ * The structure is shared as the easiest way of implementing in single-thread application.
  */
 @Data
 @Singleton

@@ -66,7 +66,9 @@ public final class PointerObserver extends GameComponentBase
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        return false;
+        // amountY = 1 - scroll down
+        // amountX = 1 - scroll up
+        return true;
     }
 
 }
