@@ -3,6 +3,10 @@ package com.mygdx.game.runtime;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.resources.GameComponent;
 
+/**
+ * Simplifies inheritance of GameComponen by overriding with empty methods all livvecycles on the Component life.
+ * Toy may override only methods which you really want to support by your component
+ */
 public class GameComponentBase implements GameComponent, IBatchDrawer {
   
   protected GameComponentBase() {
@@ -10,23 +14,17 @@ public class GameComponentBase implements GameComponent, IBatchDrawer {
 
   @Override
   public void loadTextures() {
-    // TODO Auto-generated method stub
-    
   }
 
   @Override
   public void useTextures() {
-    // TODO Auto-generated method stub
-    
   }
 
   @Override
   public void initialize() {
-    // TODO Auto-generated method stub
   }
 
   @Override
   public void OnDraw(SpriteBatch spriteBatch) {
-    // TODO Auto-generated method stub
   }
 }
