@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="384" viewBox="0 0 512 384">
+  <!-- ZX Spectrum Unit Information Panel – Desert Rats -->
+  <!-- Map visible in top half (simplified) -->
+  <rect width="512" height="384" fill="#00AAAA"/>
+  <rect x="32" y="32" width="448" height="320" fill="#D4AA00"/>
+  <!-- Grid hint -->
+  <g stroke="#C09000" stroke-width="0.5" opacity="0.4">
+    <line x1="32" y1="68" x2="480" y2="68"/>
+    <line x1="32" y1="96" x2="480" y2="96"/>
+    <line x1="32" y1="124" x2="480" y2="124"/>
+    <line x1="32" y1="152" x2="480" y2="152"/>
+    <line x1="32" y1="180" x2="480" y2="180"/>
+    <line x1="60" y1="32" x2="60" y2="200"/>
+    <line x1="88" y1="32" x2="88" y2="200"/>
+    <line x1="116" y1="32" x2="116" y2="200"/>
+    <line x1="144" y1="32" x2="144" y2="200"/>
+    <line x1="172" y1="32" x2="172" y2="200"/>
+    <line x1="200" y1="32" x2="200" y2="200"/>
+  </g>
+  <!-- Info panel overlay (semi-transparent black) -->
+  <rect x="32" y="185" width="448" height="167" fill="#000000" opacity="0.92"/>
+
+  <!-- Panel title -->
+  <text x="256" y="210" font-family="monospace" font-size="16" font-weight="bold"
+        fill="#FFFF00" text-anchor="middle">UNIT INFORMATION</text>
+
+  <!-- Large tank icon -->
+  <rect x="60" y="222" width="56" height="40" fill="#008800" rx="4"/>
+  <rect x="66" y="230" width="44" height="24" fill="#006600" rx="2"/>
+  <text x="88" y="248" font-family="monospace" font-size="18" fill="#FFFFFF" text-anchor="middle">╠═╣</text>
+
+  <!-- Stats table -->
+  <text x="135" y="232" font-family="monospace" font-size="12" fill="#FFFFFF">NAME    : 7TH ARMD DIV (TANKS)</text>
+  <text x="135" y="248" font-family="monospace" font-size="12" fill="#FFFFFF">TYPE    : ARMOURED</text>
+  <text x="135" y="264" font-family="monospace" font-size="12" fill="#FFFFFF">ATTACK  : 4</text>
+  <text x="135" y="280" font-family="monospace" font-size="12" fill="#FFFFFF">DEFENCE : 3</text>
+  <text x="135" y="296" font-family="monospace" font-size="12" fill="#FFFFFF">MOVEMENT: 4 / 4 remaining</text>
+  <text x="135" y="312" font-family="monospace" font-size="12" fill="#00FF00">SUPPLY  : IN SUPPLY</text>
+  <text x="135" y="328" font-family="monospace" font-size="12" fill="#FFFFFF">STATUS  : ACTIVE</text>
+
+  <!-- Close instruction -->
+  <text x="256" y="348" font-family="monospace" font-size="13" fill="#FFFF00" text-anchor="middle">PRESS SPACE TO CLOSE</text>
+
+  <!-- Placeholder label -->
+  <text x="256" y="375" font-family="monospace" font-size="10" fill="#888888" text-anchor="middle">[ PLACEHOLDER – replace with real screenshot ]</text>
+</svg>
