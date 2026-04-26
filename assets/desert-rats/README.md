@@ -2,20 +2,25 @@
 
 ## Overview
 
-**Desert Rats** is a turn-based tactical wargame for the ZX Spectrum computer,
-published in **1985** by **CCS (Computer Conflict Simulations)**. The game
-simulates key armoured battles of the **North African campaign (1941–1942)**,
-pitting the British 8th Army (the legendary "Desert Rats" – 7th Armoured
-Division) against **Rommel's Afrika Korps**.
+**Desert Rats** (subtitle: *The North Africa Campaign*) is a turn-based
+tactical wargame for the ZX Spectrum computer, published in **1985** by
+**CCS (Computer Conflict Simulations)**. The game simulates key armoured
+battles of the **North African campaign (1941–1942)**, pitting the British
+8th Army (the legendary "Desert Rats" – 7th Armoured Division) against
+**Rommel's Afrika Korps**.
 
 | Attribute     | Details                                         |
 |---------------|-------------------------------------------------|
+| ZXDB ID       | 1357 (Spectrum Computing / ZXDB)                |
 | Publisher     | CCS (Computer Conflict Simulations)             |
 | Year          | 1985                                            |
 | Platform      | ZX Spectrum 48K / 128K                          |
-| Genre         | Turn-based Tactical Wargame                     |
+| Genre         | Strategy Game: War (Turn based)                 |
+| Authors       | Robert T. Smith (code), John Berry (art)        |
 | Players       | 1–2                                             |
-| Perspective   | Top-down 2-D map                                |
+| Controls      | Cursor keys, Interface 2, Kempston Joystick     |
+| Score         | 8.2 / 10 (Spectrum Computing community)         |
+| Awards        | Crash Readers Award 1986                        |
 | Setting       | North Africa, WWII (1941–1942)                  |
 
 ---
@@ -33,12 +38,6 @@ Division) against **Rommel's Afrika Korps**.
 | `screenshots/04-unit-info.svg`   | Unit information panel placeholder                 |
 | `screenshots/05-combat.svg`      | Combat resolution screen placeholder               |
 | `screenshots/06-end-game.svg`    | End-of-game / victory screen placeholder           |
-
-> **Note on SVG placeholders** — The `.svg` files are schematic representations
-> of the original ZX Spectrum screens drawn from documented game descriptions.
-> To obtain pixel-accurate screenshots, load the original `.tzx` / `.tap` image
-> in a ZX Spectrum emulator (e.g. **Fuse**, **ZEsarUX** or **Spectaculator**)
-> and capture frames at the key points described in `screenshots/README.md`.
 
 ---
 
@@ -65,3 +64,34 @@ will:
 2. Provide a graphical upgrade while preserving the original rules
 3. Support single-player (vs AI) and two-player hot-seat modes
 4. Use libGDX for cross-platform deployment (Desktop, Android, HTML5)
+
+---
+
+## Verified Source Files (ZXDB entry 1357)
+
+The following file paths are from the ZXDB / Spectrum Computing archive.
+Use `https://spectrumcomputing.co.uk` as the base URL.
+
+| Path (relative to base URL)                                                        | Type                    |
+|------------------------------------------------------------------------------------|-------------------------|
+| `/pub/sinclair/screens/load/d/scr/DesertRats.scr`                                  | Loading screen (48K)    |
+| `/pub/sinclair/screens/load/d/scr/DesertRats128.scr`                               | Loading screen (128K)   |
+| `/pub/sinclair/screens/in-game/d/DesertRats.gif`                                   | In-game screenshot      |
+| `/zxdb/sinclair/entries/0001357/DesertRats_Front.jpg`                              | Inlay – front           |
+| `/zxdb/sinclair/entries/0001357/DesertRats_Front_2.jpg`                            | Inlay – front (alt)     |
+| `/zxdb/sinclair/entries/0001357/DesertRats_SideA.jpg`                              | Cassette – side A       |
+| `/zxdb/sinclair/entries/0001357/DesertRats_SideB.jpg`                              | Cassette – side B       |
+| `/pub/sinclair/games/d/DesertRats.tzx.zip`                                         | Tape image (TZX)        |
+| `/pub/sinclair/games/d/DesertRats48.z80.zip`                                       | 48K Z80 snapshot        |
+| `/pub/sinclair/games/d/DesertRats128.z80.zip`                                      | 128K Z80 snapshot       |
+| `/pub/sinclair/games-info/d/DesertRats.txt`                                        | Instructions (text)     |
+| `/pub/sinclair/games-info/d/DesertRats_Front.jpg`                                  | Scanned instructions    |
+| `/pub/sinclair/games-maps/d/DesertRats.jpg`                                        | Game map                |
+
+> **Note on SVG placeholders** — The `.svg` files in `screenshots/` are
+> schematic representations of the original ZX Spectrum screens.  To obtain
+> pixel-accurate screenshots, download the `.tzx` or `.z80` file above, load
+> it in a ZX Spectrum emulator (e.g. **Fuse**, **ZEsarUX** or
+> **Spectaculator**) and capture frames at the key points described in
+> `screenshots/README.md`.  Save each PNG alongside the matching `.svg` using
+> the same base name (e.g. `01-title.png`) and delete the `.svg` placeholder.

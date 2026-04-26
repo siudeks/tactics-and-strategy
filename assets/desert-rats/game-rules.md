@@ -1,5 +1,9 @@
 # Desert Rats – Game Rules (ZX Spectrum, CCS 1985)
 
+> **Full title:** Desert Rats: The North Africa Campaign  
+> **Authors:** Robert T. Smith (code), John Berry (art)  
+> **ZXDB entry:** #1357 at spectrumcomputing.co.uk
+
 ## 1. Introduction
 
 Desert Rats is a two-player (or one-player vs computer) **turn-based tactical

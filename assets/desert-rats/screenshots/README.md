@@ -5,8 +5,10 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
 
 ## How to Capture Real Screenshots
 
-1. Download the original `.tzx` or `.tap` image from the World of Spectrum
-   archive (entry **#0001310**).
+1. Download the tape image from Spectrum Computing (ZXDB entry **#1357**):
+   * Tape image: `https://spectrumcomputing.co.uk/pub/sinclair/games/d/DesertRats.tzx.zip`
+   * 48K snapshot: `https://spectrumcomputing.co.uk/pub/sinclair/games/d/DesertRats48.z80.zip`
+   * 128K snapshot: `https://spectrumcomputing.co.uk/pub/sinclair/games/d/DesertRats128.z80.zip`
 2. Open it in a ZX Spectrum emulator:
    * **Fuse** (Linux/macOS/Windows) — `File › Open`
    * **ZEsarUX** (cross-platform) — `File › Open ROM`
@@ -18,6 +20,10 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
    base name (e.g. `01-title.png` next to `01-title.svg`). Once real
    screenshots are available, update `assets/desert-rats/README.md` to
    reference the `.png` files and delete the `.svg` placeholders.
+
+> **Already available** — An in-game screenshot (GIF) and loading screen (SCR)
+> are hosted at Spectrum Computing.  See the Verified Source Files table in
+> `../README.md` for direct URLs.
 
 ---
 
