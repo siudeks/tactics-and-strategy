@@ -1,9 +1,11 @@
 # Desert Rats – Screenshots
 
-This directory contains annotated placeholders for all key screens in the
-original ZX Spectrum version of Desert Rats (CCS, 1985).
+This directory contains reconstructed PNG screenshots of all key screens in
+the original ZX Spectrum version of Desert Rats (CCS, 1985).  The images are
+generated using the actual ZX Spectrum ROM character set and exact ZX Spectrum
+colour palette, based on documented game descriptions.
 
-## How to Capture Real Screenshots
+## How to Replace With Real Emulator Screenshots
 
 1. Download the tape image from Spectrum Computing (ZXDB entry **#1357**):
    * Tape image: `https://spectrumcomputing.co.uk/pub/sinclair/games/d/DesertRats.tzx.zip`
@@ -16,20 +18,18 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
 3. Play through to each screen listed below.
 4. Use the emulator's screenshot function (usually `F10` or
    `Screenshot` in the `File` menu) to save a **256 × 192 px PNG**.
-5. Save the PNG alongside the matching `.svg` placeholder, using the same
-   base name (e.g. `01-title.png` next to `01-title.svg`). Once real
-   screenshots are available, update `assets/desert-rats/README.md` to
-   reference the `.png` files and delete the `.svg` placeholders.
+5. Replace the corresponding PNG in this directory with the emulator capture,
+   keeping the same filename (e.g. `01-title.png`).
 
-> **Already available** — An in-game screenshot (GIF) and loading screen (SCR)
-> are hosted at Spectrum Computing.  See the Verified Source Files table in
-> `../README.md` for direct URLs.
+> **Already available on Spectrum Computing** — An in-game screenshot (GIF) and
+> loading screen (SCR) are hosted at the URLs in `../README.md` under
+> "Verified Source Files".
 
 ---
 
 ## Screen Descriptions
 
-### `01-title.svg` — Title Screen
+### `01-title.png` — Title Screen
 
 **When shown:** Immediately after loading completes.
 
@@ -44,7 +44,7 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
 
 ---
 
-### `02-setup.svg` — Game Setup Screen
+### `02-setup.png` — Game Setup Screen
 
 **When shown:** After the title screen, before the scenario starts.
 
@@ -63,7 +63,7 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
 
 ---
 
-### `03-map.svg` — Main Strategic Map
+### `03-map.png` — Main Strategic Map
 
 **When shown:** During gameplay (movement and combat phases).
 
@@ -92,7 +92,7 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
 
 ---
 
-### `04-unit-info.svg` — Unit Information Panel
+### `04-unit-info.png` — Unit Information Panel
 
 **When shown:** Player presses `F` to inspect a unit.
 
@@ -115,7 +115,7 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
 
 ---
 
-### `05-combat.svg` — Combat Resolution Screen
+### `05-combat.png` — Combat Resolution Screen
 
 **When shown:** When the player confirms an attack.
 
@@ -134,7 +134,7 @@ original ZX Spectrum version of Desert Rats (CCS, 1985).
 
 ---
 
-### `06-end-game.svg` — End of Game / Victory Screen
+### `06-end-game.png` — End of Game / Victory Screen
 
 **When shown:** When victory conditions are met, or the final turn ends.
 

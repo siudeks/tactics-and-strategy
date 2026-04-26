@@ -32,12 +32,12 @@ battles of the **North African campaign (1941–1942)**, pitting the British
 | `README.md`                      | This file – game overview and asset index          |
 | `game-rules.md`                  | Full game rules in English                         |
 | `screenshots/README.md`          | Annotated description of every game screen         |
-| `screenshots/01-title.svg`       | Title screen placeholder                           |
-| `screenshots/02-setup.svg`       | Game setup / options screen placeholder            |
-| `screenshots/03-map.svg`         | Main strategic map screen placeholder              |
-| `screenshots/04-unit-info.svg`   | Unit information panel placeholder                 |
-| `screenshots/05-combat.svg`      | Combat resolution screen placeholder               |
-| `screenshots/06-end-game.svg`    | End-of-game / victory screen placeholder           |
+| `screenshots/01-title.png`       | Title / loading screen (512×384 px, 2× scale)      |
+| `screenshots/02-setup.png`       | Scenario selection / game setup screen             |
+| `screenshots/03-map.png`         | Main strategic map screen during gameplay          |
+| `screenshots/04-unit-info.png`   | Unit information panel                             |
+| `screenshots/05-combat.png`      | Combat resolution screen                           |
+| `screenshots/06-end-game.png`    | End-of-game / victory screen                       |
 
 ---
 
@@ -88,10 +88,11 @@ Use `https://spectrumcomputing.co.uk` as the base URL.
 | `/pub/sinclair/games-info/d/DesertRats_Front.jpg`                                  | Scanned instructions    |
 | `/pub/sinclair/games-maps/d/DesertRats.jpg`                                        | Game map                |
 
-> **Note on SVG placeholders** — The `.svg` files in `screenshots/` are
-> schematic representations of the original ZX Spectrum screens.  To obtain
-> pixel-accurate screenshots, download the `.tzx` or `.z80` file above, load
-> it in a ZX Spectrum emulator (e.g. **Fuse**, **ZEsarUX** or
-> **Spectaculator**) and capture frames at the key points described in
-> `screenshots/README.md`.  Save each PNG alongside the matching `.svg` using
-> the same base name (e.g. `01-title.png`) and delete the `.svg` placeholder.
+> **Note on screenshots** — The PNG files in `screenshots/` are reconstructed
+> representations of the original ZX Spectrum screens, generated using the
+> actual ZX Spectrum ROM character set and exact ZX Spectrum palette, based
+> on documented game descriptions.  To obtain pixel-accurate captures from the
+> real game ROM, download the `.tzx` or `.z80` file above, load it in a ZX
+> Spectrum emulator (e.g. **Fuse**, **ZEsarUX** or **Spectaculator**), and
+> capture frames at the key points described in `screenshots/README.md`.
+> Replace the existing PNGs with the emulator captures.
