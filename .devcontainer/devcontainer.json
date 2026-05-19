@@ -10,7 +10,9 @@
       "version": "3.12"
     }
   },
-  "postCreateCommand": "java -version && gradle -v && python --version",
+  // libGDX/LWJGL desktop needs GLX/OpenGL runtime libs inside container.
+  // Without these packages GLFW fails with: GLFW_API_UNAVAILABLE (GLX: Failed to load GLX).
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libgl1 libgl1-mesa-dri libglx-mesa0 mesa-utils xvfb && java -version && gradle -v && python --version",
   "customizations": {
     "vscode": {
       "extensions": [
