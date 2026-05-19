@@ -24,7 +24,8 @@ public class BattlefieldScreen extends ScreenAdapter {
     private static final Color PANEL_BG = Color.valueOf("2C3038");
     private static final Color STATUS_BG = Color.valueOf("1F242B");
     private static final Color GRID = Color.valueOf("4E5D4A");
-    private static final Color UNIT = Color.valueOf("D87C5D");
+    private static final Color UNIT_FILL = Color.valueOf("E5D44E");
+    private static final Color UNIT_OUTLINE = Color.valueOf("243B8F");
 
     private Stage stage;
     private BitmapFont font;
@@ -137,12 +138,56 @@ public class BattlefieldScreen extends ScreenAdapter {
                 batch.draw(pixel, x, yy, w, 1f);
             }
 
-            float unitSize = 18f;
-            batch.setColor(UNIT);
-            batch.draw(pixel, x + w * 0.45f, y + h * 0.58f, unitSize, unitSize);
-            batch.draw(pixel, x + w * 0.64f, y + h * 0.38f, unitSize, unitSize);
+            float unitSize = cell * 2f;
+            float unitX = x + cell * 3f;
+            float unitY = y + cell * 3f;
+            drawUnitIcon(batch, unitX, unitY, unitSize);
 
             batch.setColor(Color.WHITE);
+        }
+
+        private void drawUnitIcon(Batch batch, float x, float y, float size) {
+            float pixel = size / 8f;
+            // 8x8 grid, 0=border, 1=fill, 2=diagonal, 3=side square, 4=center
+            int[][] pattern = {
+                {0,0,0,0,0,0,0,0},
+                {0,2,1,1,1,1,2,0},
+                {0,1,2,1,1,2,1,0},
+                {0,1,1,3,3,1,1,0},
+                {0,1,1,3,3,1,1,0},
+                {0,1,2,1,1,2,1,0},
+                {0,2,1,1,1,1,2,0},
+                {0,0,0,4,4,0,0,0},
+            };
+            for (int gy = 0; gy < 8; gy++) {
+                for (int gx = 0; gx < 8; gx++) {
+                    int v = pattern[gy][gx];
+                    if (v == 0) {
+                        batch.setColor(UNIT_OUTLINE);
+                        drawCell(batch, x, y, pixel, gx, gy);
+                    } else if (v == 1) {
+                        batch.setColor(UNIT_FILL);
+                        drawCell(batch, x, y, pixel, gx, gy);
+                    } else if (v == 2) {
+                        batch.setColor(UNIT_OUTLINE);
+                        drawCell(batch, x, y, pixel, gx, gy);
+                    } else if (v == 3) {
+                        batch.setColor(UNIT_OUTLINE);
+                        drawCell(batch, x, y, pixel, gx, gy);
+                    } else if (v == 4) {
+                        batch.setColor(UNIT_OUTLINE);
+                        drawCell(batch, x, y, pixel, gx, gy);
+                    }
+                }
+            }
+        }
+
+        private void drawBlock(Batch batch, float x, float y, float width, float height) {
+            batch.draw(pixel, x, y, width, height);
+        }
+
+        private void drawCell(Batch batch, float baseX, float baseY, float pixelSize, int gridX, int gridY) {
+            drawBlock(batch, baseX + gridX * pixelSize, baseY + gridY * pixelSize, pixelSize, pixelSize);
         }
     }
 }
