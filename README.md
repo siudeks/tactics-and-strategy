@@ -1,5 +1,32 @@
 # tactics-and-strategy
 
+## libGDX Hello World
+This repository now contains a runnable libGDX starter app with a tactical screen layout:
+- center map viewport (grid + sample units)
+- right command panel for unit orders
+- bottom status bar
+
+### Modules
+- `core` - shared game logic and `BattlefieldScreen`
+- `lwjgl3` - desktop launcher with windowed UI
+- `headless` - devcontainer-safe launcher (no GUI required)
+
+### Run
+Build all modules:
+```bash
+./gradlew build
+```
+
+Run desktop app (requires graphical session):
+```bash
+./gradlew lwjgl3:run
+```
+
+Run in devcontainer (headless smoke run):
+```bash
+./gradlew headless:run
+```
+
 ## Documentation
 - [Project Docs Index](docs/README.md)
 - [Game Requirements v0](docs/requirements/game-requirements-v0.md)

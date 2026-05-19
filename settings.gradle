@@ -1,0 +1,3 @@
+rootProject.name = 'tactics-and-strategy'
+
+include 'core', 'lwjgl3', 'headless'
