@@ -26,7 +26,7 @@ import pl.tactics.terrain.TerrainTileAtlas;
 
 public class BattlefieldScreen extends ScreenAdapter {
     private static final Color BG = Color.valueOf("1E232B");
-    private static final Color MAP_BG = Color.valueOf("6A7A63");
+    private static final Color MAP_BG = Color.valueOf("181814");
     private static final Color PANEL_BG = Color.valueOf("2C3038");
     private static final Color STATUS_BG = Color.valueOf("1F242B");
     private static final Color GRID = Color.valueOf("4E5D4A");

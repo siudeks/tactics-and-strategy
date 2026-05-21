@@ -18,9 +18,9 @@ public final class GeneratedTerrainData {
 
     public static final int[][] TERRAIN_COLORS_RGB = new int[][] {
         {0, 0, 0},
-        {202, 202, 0},
-        {196, 91, 91},
-        {0, 0, 202}
+        {194, 171, 109},
+        {146, 96, 78},
+        {56, 92, 137}
     };
 
     public static final byte[][] UNIQUE_TILE_PATTERNS = createUniqueTilePatterns();
