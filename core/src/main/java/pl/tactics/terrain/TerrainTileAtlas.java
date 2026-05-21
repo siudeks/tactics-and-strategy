@@ -33,7 +33,8 @@ public final class TerrainTileAtlas implements Disposable {
                         continue;
                     }
 
-                    int packedColor = mapDefinition.getTerrainColor(terrainCode).toIntBits();
+                    // Pixmap RGBA8888 expects RGBA-packed int, not ABGR.
+                    int packedColor = com.badlogic.gdx.graphics.Color.rgba8888(mapDefinition.getTerrainColor(terrainCode));
                     atlas.drawPixel(atlasX + x, atlasY + y, packedColor);
                 }
             }
