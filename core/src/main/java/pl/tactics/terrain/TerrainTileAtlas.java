@@ -8,12 +8,34 @@ import com.badlogic.gdx.utils.Disposable;
 public final class TerrainTileAtlas implements Disposable {
     private static final int SOURCE_TILE_SIZE = GeneratedTerrainData.SOURCE_TILE_SIZE;
 
-    private final Texture atlasTexture;
-    private final TextureRegion[] regions;
+    private Texture atlasTexture;
+    private TextureRegion[] regions;
+    private int[] regionX;
+    private int[] regionY;
+    private int tileCount;
+    private int columns;
 
     public TerrainTileAtlas(TerrainMapDefinition mapDefinition) {
-        int tileCount = mapDefinition.getUniqueTileCount();
-        int columns = (int) Math.ceil(Math.sqrt(tileCount));
+        tileCount = mapDefinition.getUniqueTileCount();
+        columns = (int) Math.ceil(Math.sqrt(tileCount));
+        int rows = (tileCount + columns - 1) / columns;
+
+        regionX = new int[tileCount];
+        regionY = new int[tileCount];
+        regions = new TextureRegion[tileCount];
+        for (int tileId = 0; tileId < tileCount; tileId++) {
+            regionX[tileId] = (tileId % columns) * SOURCE_TILE_SIZE;
+            regionY[tileId] = (tileId / columns) * SOURCE_TILE_SIZE;
+        }
+
+        rebuild(mapDefinition);
+    }
+
+    public void rebuild(TerrainMapDefinition mapDefinition) {
+        if (atlasTexture != null) {
+            atlasTexture.dispose();
+        }
+
         int rows = (tileCount + columns - 1) / columns;
 
         Pixmap atlas = new Pixmap(columns * SOURCE_TILE_SIZE, rows * SOURCE_TILE_SIZE, Pixmap.Format.RGBA8888);
@@ -22,8 +44,8 @@ public final class TerrainTileAtlas implements Disposable {
 
         for (int tileId = 0; tileId < tileCount; tileId++) {
             byte[] pattern = mapDefinition.getTilePattern(tileId);
-            int atlasX = (tileId % columns) * SOURCE_TILE_SIZE;
-            int atlasY = (tileId / columns) * SOURCE_TILE_SIZE;
+            int atlasX = regionX[tileId];
+            int atlasY = regionY[tileId];
 
             for (int y = 0; y < SOURCE_TILE_SIZE; y++) {
                 for (int x = 0; x < SOURCE_TILE_SIZE; x++) {
@@ -43,11 +65,8 @@ public final class TerrainTileAtlas implements Disposable {
         atlasTexture = new Texture(atlas);
         atlas.dispose();
 
-        regions = new TextureRegion[tileCount];
         for (int tileId = 0; tileId < tileCount; tileId++) {
-            int atlasX = (tileId % columns) * SOURCE_TILE_SIZE;
-            int atlasY = (tileId / columns) * SOURCE_TILE_SIZE;
-            regions[tileId] = new TextureRegion(atlasTexture, atlasX, atlasY, SOURCE_TILE_SIZE, SOURCE_TILE_SIZE);
+            regions[tileId] = new TextureRegion(atlasTexture, regionX[tileId], regionY[tileId], SOURCE_TILE_SIZE, SOURCE_TILE_SIZE);
         }
     }
 

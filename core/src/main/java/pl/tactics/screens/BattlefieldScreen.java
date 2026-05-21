@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -60,7 +61,7 @@ public class BattlefieldScreen extends ScreenAdapter {
 
         Table topArea = new Table();
         topArea.add(mapPanel).grow().pad(8f);
-        topArea.add(createCommandPanel(labelStyle, buttonStyle, base.tint(PANEL_BG))).width(300f).growY().pad(8f, 0f, 8f, 8f);
+        topArea.add(createCommandPanel(labelStyle, buttonStyle, base.tint(PANEL_BG), mapPanel)).width(300f).growY().pad(8f, 0f, 8f, 8f);
 
         Label status = new Label("Status: Jednostka Alpha gotowa | Paliwo 100% | Łączność OK", labelStyle);
         status.setAlignment(1);
@@ -77,13 +78,24 @@ public class BattlefieldScreen extends ScreenAdapter {
 
     private Table createCommandPanel(Label.LabelStyle labelStyle,
                                      TextButton.TextButtonStyle buttonStyle,
-                                     Drawable background) {
+                                     Drawable background,
+                                     MapPanel mapPanel) {
         Table panel = new Table();
         panel.setBackground(background);
         panel.defaults().growX().pad(8f);
 
+        TextButton paletteButton = new TextButton("Paleta: " + mapPanel.getPaletteLabel(), buttonStyle);
+        paletteButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                mapPanel.togglePalette();
+                paletteButton.setText("Paleta: " + mapPanel.getPaletteLabel());
+            }
+        });
+
         panel.add(new Label("Panel rozkazow", labelStyle)).left().padTop(10f).row();
         panel.add(new Label("Jednostka: Alpha", labelStyle)).left().row();
+        panel.add(paletteButton).row();
         panel.add(new TextButton("Ruch", buttonStyle)).row();
         panel.add(new TextButton("Atak", buttonStyle)).row();
         panel.add(new TextButton("Obrona", buttonStyle)).row();
@@ -185,9 +197,29 @@ public class BattlefieldScreen extends ScreenAdapter {
                         debugGridOverlay = !debugGridOverlay;
                         return true;
                     }
+                    if (keycode == com.badlogic.gdx.Input.Keys.P) {
+                        togglePalette();
+                        return true;
+                    }
                     return false;
                 }
             });
+        }
+
+        public String getPaletteLabel() {
+            if (mapDefinition.getPaletteMode() == TerrainMapDefinition.PaletteMode.ORIGINAL) {
+                return "Oryginalna";
+            }
+            return "Poprawiona";
+        }
+
+        public void togglePalette() {
+            TerrainMapDefinition.PaletteMode currentMode = mapDefinition.getPaletteMode();
+            TerrainMapDefinition.PaletteMode nextMode = currentMode == TerrainMapDefinition.PaletteMode.ORIGINAL
+                ? TerrainMapDefinition.PaletteMode.IMPROVED
+                : TerrainMapDefinition.PaletteMode.ORIGINAL;
+            mapDefinition.setPaletteMode(nextMode);
+            tileAtlas.rebuild(mapDefinition);
         }
 
         @Override

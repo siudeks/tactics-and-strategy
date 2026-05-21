@@ -3,6 +3,11 @@ package pl.tactics.terrain;
 import com.badlogic.gdx.graphics.Color;
 
 public final class TerrainMapDefinition {
+    public enum PaletteMode {
+        ORIGINAL,
+        IMPROVED
+    }
+
     private static final int TILE_PATTERN_PIXELS = GeneratedTerrainData.SOURCE_TILE_SIZE * GeneratedTerrainData.SOURCE_TILE_SIZE;
 
     private final int widthTiles;
@@ -10,7 +15,8 @@ public final class TerrainMapDefinition {
     private final short[] mapTileIds;
     private final byte[][] uniqueTilePatterns;
     private final byte[] tileDominantTerrain;
-    private final Color[] terrainColors;
+    private Color[] terrainColors;
+    private PaletteMode paletteMode;
 
     public TerrainMapDefinition() {
         this.widthTiles = GeneratedTerrainData.MAP_WIDTH_TILES;
@@ -18,7 +24,8 @@ public final class TerrainMapDefinition {
         this.mapTileIds = GeneratedTerrainData.MAP_TILE_IDS;
         this.uniqueTilePatterns = GeneratedTerrainData.UNIQUE_TILE_PATTERNS;
         this.tileDominantTerrain = GeneratedTerrainData.TILE_DOMINANT_TERRAIN;
-        this.terrainColors = buildTerrainColors();
+        this.paletteMode = PaletteMode.IMPROVED;
+        this.terrainColors = buildTerrainColors(resolvePaletteRgb(paletteMode));
 
         validate();
     }
@@ -51,8 +58,27 @@ public final class TerrainMapDefinition {
         return uniqueTilePatterns.length;
     }
 
-    private Color[] buildTerrainColors() {
-        int[][] rgb = GeneratedTerrainData.TERRAIN_COLORS_RGB;
+    public PaletteMode getPaletteMode() {
+        return paletteMode;
+    }
+
+    public void setPaletteMode(PaletteMode mode) {
+        if (mode == paletteMode) {
+            return;
+        }
+
+        paletteMode = mode;
+        terrainColors = buildTerrainColors(resolvePaletteRgb(mode));
+    }
+
+    private int[][] resolvePaletteRgb(PaletteMode mode) {
+        if (mode == PaletteMode.ORIGINAL) {
+            return GeneratedTerrainData.TERRAIN_COLORS_RGB_ORIGINAL;
+        }
+        return GeneratedTerrainData.TERRAIN_COLORS_RGB_IMPROVED;
+    }
+
+    private Color[] buildTerrainColors(int[][] rgb) {
         Color[] colors = new Color[rgb.length];
         for (int i = 0; i < rgb.length; i++) {
             colors[i] = new Color(rgb[i][0] / 255f, rgb[i][1] / 255f, rgb[i][2] / 255f, 1f);
