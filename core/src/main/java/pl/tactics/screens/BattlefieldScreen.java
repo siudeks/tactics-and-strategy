@@ -8,8 +8,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -17,6 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import pl.tactics.terrain.TerrainMapDefinition;
+import pl.tactics.terrain.TerrainTileAtlas;
 
 public class BattlefieldScreen extends ScreenAdapter {
     private static final Color BG = Color.valueOf("1E232B");
@@ -30,6 +36,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     private Stage stage;
     private BitmapFont font;
     private Texture whiteTexture;
+    private MapPanel mapPanel;
 
     @Override
     public void show() {
@@ -49,8 +56,10 @@ public class BattlefieldScreen extends ScreenAdapter {
         Table root = new Table();
         root.setFillParent(true);
 
+        mapPanel = new MapPanel(whiteTexture);
+
         Table topArea = new Table();
-        topArea.add(new MapPanel(whiteTexture)).grow().pad(8f);
+        topArea.add(mapPanel).grow().pad(8f);
         topArea.add(createCommandPanel(labelStyle, buttonStyle, base.tint(PANEL_BG))).width(300f).growY().pad(8f, 0f, 8f, 8f);
 
         Label status = new Label("Status: Jednostka Alpha gotowa | Paliwo 100% | Łączność OK", labelStyle);
@@ -100,6 +109,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     public void dispose() {
         stage.dispose();
         font.dispose();
+        mapPanel.dispose();
         whiteTexture.dispose();
     }
 
@@ -113,10 +123,71 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     private static final class MapPanel extends Actor {
+        private static final float DRAW_TILE_SIZE = 16f;
+        private static final float UNIT_SIZE_IN_TILES = 2f;
+
         private final Texture pixel;
+        private final TerrainMapDefinition mapDefinition;
+        private final TerrainTileAtlas tileAtlas;
+
+        private boolean debugGridOverlay;
+        private float cameraX;
+        private float cameraY;
+        private float lastDragX;
+        private float lastDragY;
+
+        private final int mapWidthTiles;
+        private final int mapHeightTiles;
+        private final float mapWorldWidth;
+        private final float mapWorldHeight;
 
         private MapPanel(Texture pixel) {
             this.pixel = pixel;
+            this.mapDefinition = new TerrainMapDefinition();
+            this.tileAtlas = new TerrainTileAtlas(mapDefinition);
+            this.mapWidthTiles = mapDefinition.getWidthTiles();
+            this.mapHeightTiles = mapDefinition.getHeightTiles();
+            this.mapWorldWidth = mapWidthTiles * DRAW_TILE_SIZE;
+            this.mapWorldHeight = mapHeightTiles * DRAW_TILE_SIZE;
+
+            setTouchable(Touchable.enabled);
+            this.debugGridOverlay = false;
+            addInputHandling();
+        }
+
+        private void addInputHandling() {
+            addListener(new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    lastDragX = x;
+                    lastDragY = y;
+                    if (getStage() != null) {
+                        getStage().setKeyboardFocus(MapPanel.this);
+                    }
+                    return true;
+                }
+
+                @Override
+                public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                    float dx = x - lastDragX;
+                    float dy = y - lastDragY;
+                    cameraX -= dx;
+                    cameraY -= dy;
+                    clampCamera();
+
+                    lastDragX = x;
+                    lastDragY = y;
+                }
+
+                @Override
+                public boolean keyDown(InputEvent event, int keycode) {
+                    if (keycode == com.badlogic.gdx.Input.Keys.G) {
+                        debugGridOverlay = !debugGridOverlay;
+                        return true;
+                    }
+                    return false;
+                }
+            });
         }
 
         @Override
@@ -126,24 +197,83 @@ public class BattlefieldScreen extends ScreenAdapter {
             float w = getWidth();
             float h = getHeight();
 
+            clampCamera();
+
             batch.setColor(MAP_BG);
             batch.draw(pixel, x, y, w, h);
 
-            float cell = Math.max(24f, Math.min(w, h) / 16f);
-            batch.setColor(GRID);
-            for (float xx = x; xx <= x + w; xx += cell) {
-                batch.draw(pixel, xx, y, 1f, h);
-            }
-            for (float yy = y; yy <= y + h; yy += cell) {
-                batch.draw(pixel, x, yy, w, 1f);
+            drawTerrain(batch, x, y, w, h);
+
+            if (debugGridOverlay) {
+                drawDebugGrid(batch, x, y, w, h);
             }
 
-            float unitSize = cell * 2f;
-            float unitX = x + cell * 3f;
-            float unitY = y + cell * 3f;
-            drawUnitIcon(batch, unitX, unitY, unitSize);
+            drawUnit(batch, x, y);
 
             batch.setColor(Color.WHITE);
+        }
+
+        private void drawTerrain(Batch batch, float panelX, float panelY, float panelW, float panelH) {
+            int startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
+            int endCol = MathUtils.clamp((int) Math.ceil((cameraX + panelW) / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
+
+            batch.setColor(Color.WHITE);
+            for (int rowTop = 0; rowTop < mapHeightTiles; rowTop++) {
+                float worldY = (mapHeightTiles - rowTop - 1) * DRAW_TILE_SIZE;
+                float screenY = panelY + worldY - cameraY;
+                if (screenY + DRAW_TILE_SIZE < panelY || screenY > panelY + panelH) {
+                    continue;
+                }
+
+                for (int col = startCol; col <= endCol; col++) {
+                    float worldX = col * DRAW_TILE_SIZE;
+                    float screenX = panelX + worldX - cameraX;
+
+                    int tileId = mapDefinition.getMapTileId(col, rowTop);
+                    batch.draw(tileAtlas.getRegion(tileId), screenX, screenY, DRAW_TILE_SIZE, DRAW_TILE_SIZE);
+                }
+            }
+        }
+
+        private void drawDebugGrid(Batch batch, float panelX, float panelY, float panelW, float panelH) {
+            batch.setColor(GRID);
+
+            int startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
+            int endCol = MathUtils.clamp((int) Math.ceil((cameraX + panelW) / DRAW_TILE_SIZE), 0, mapWidthTiles);
+            for (int col = startCol; col <= endCol; col++) {
+                float lineX = panelX + col * DRAW_TILE_SIZE - cameraX;
+                batch.draw(pixel, lineX, panelY, 1f, panelH);
+            }
+
+            for (int rowTop = 0; rowTop <= mapHeightTiles; rowTop++) {
+                float worldY = (mapHeightTiles - rowTop) * DRAW_TILE_SIZE;
+                float lineY = panelY + worldY - cameraY;
+                if (lineY < panelY || lineY > panelY + panelH) {
+                    continue;
+                }
+                batch.draw(pixel, panelX, lineY, panelW, 1f);
+            }
+        }
+
+        private void drawUnit(Batch batch, float panelX, float panelY) {
+            float unitWorldX = mapWorldWidth * 0.5f;
+            float unitWorldY = mapWorldHeight * 0.5f;
+            float unitDrawSize = DRAW_TILE_SIZE * UNIT_SIZE_IN_TILES;
+            float unitX = panelX + unitWorldX - cameraX;
+            float unitY = panelY + unitWorldY - cameraY;
+
+            drawUnitIcon(batch, unitX, unitY, unitDrawSize);
+        }
+
+        private void clampCamera() {
+            float maxCameraX = Math.max(0f, mapWorldWidth - getWidth());
+            float maxCameraY = Math.max(0f, mapWorldHeight - getHeight());
+            cameraX = MathUtils.clamp(cameraX, 0f, maxCameraX);
+            cameraY = MathUtils.clamp(cameraY, 0f, maxCameraY);
+        }
+
+        public void dispose() {
+            tileAtlas.dispose();
         }
 
         private void drawUnitIcon(Batch batch, float x, float y, float size) {

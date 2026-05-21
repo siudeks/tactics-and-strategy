@@ -52,7 +52,7 @@
 - Failure Conditions:
   - Supply corridor interrupted beyond allowed tolerance.
 - Operational Constraints:
-  - Multi-hex control dependency.
+  - Multi-box control dependency.
 - Completion Trigger:
   - Corridor continuity preserved through scenario duration.
 - Requirements Trace IDs:
