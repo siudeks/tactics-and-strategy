@@ -270,6 +270,18 @@ public class BattlefieldScreen extends ScreenAdapter {
             : new UnitIconPalette(ALLIES_UNIT_FILL, ALLIES_UNIT_OUTLINE);
     }
 
+    static String unitIdAtScreenPoint(List<UnitRenderPlacement> placements,
+                                      float sx, float sy, Side activeSide) {
+        for (UnitRenderPlacement p : placements) {
+            if (p.unit().side() != activeSide) continue;
+            if (sx >= p.screenX() && sx < p.screenX() + p.drawSize()
+                    && sy >= p.screenY() && sy < p.screenY() + p.drawSize()) {
+                return p.unit().id();
+            }
+        }
+        return null;
+    }
+
     static String nextSelectedUnitId(List<Unit> activeUnits, String currentId) {
         if (activeUnits.isEmpty()) return null;
         int idx = -1;
@@ -364,6 +376,19 @@ public class BattlefieldScreen extends ScreenAdapter {
                 }
 
                 @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    float dx = x - lastDragX;
+                    float dy = y - lastDragY;
+                    if (dx * dx + dy * dy >= 100f) return; // drag, not a click
+                    float sx = x + getX();
+                    float sy = y + getY();
+                    CampaignState state = campaignStateSupplier.get();
+                    List<UnitRenderPlacement> placements = computeVisibleUnitPlacements(
+                        state, mapHeightTiles, getX(), getY(), getWidth(), getHeight(), cameraX, cameraY);
+                    selectedUnitId = unitIdAtScreenPoint(placements, sx, sy, state.activeSide());
+                }
+
+                @Override
                 public boolean keyDown(InputEvent event, int keycode) {
                     if (keycode == com.badlogic.gdx.Input.Keys.G) {
                         debugGridOverlay = !debugGridOverlay;
@@ -379,6 +404,10 @@ public class BattlefieldScreen extends ScreenAdapter {
                     }
                     if (keycode == com.badlogic.gdx.Input.Keys.TAB) {
                         cycleSelectedUnit();
+                        return true;
+                    }
+                    if (keycode == com.badlogic.gdx.Input.Keys.ESCAPE) {
+                        selectedUnitId = null;
                         return true;
                     }
                     return false;

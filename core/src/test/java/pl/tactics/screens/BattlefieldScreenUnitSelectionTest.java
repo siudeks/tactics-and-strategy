@@ -67,7 +67,53 @@ class BattlefieldScreenUnitSelectionTest {
         assertEquals("A", result);
     }
 
+    @Test
+    void unitIdAtScreenPoint_returnsId_whenPointInsideBoundsAndSideMatches() {
+        var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
+        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
+        assertEquals("A", result);
+    }
+
+    @Test
+    void unitIdAtScreenPoint_returnsNull_whenPointInsideBoundsButWrongSide() {
+        var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.AXIS), 10f, 10f, 20f);
+        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
+        assertNull(result);
+    }
+
+    @Test
+    void unitIdAtScreenPoint_returnsNull_whenPointOutsideBounds() {
+        var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
+        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 31f, 15f, Side.ALLIES);
+        assertNull(result);
+    }
+
+    @Test
+    void unitIdAtScreenPoint_returnsNull_whenPlacementsEmpty() {
+        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(), 15f, 15f, Side.ALLIES);
+        assertNull(result);
+    }
+
+    @Test
+    void unitIdAtScreenPoint_returnsFirstMatch_whenMultipleOverlap() {
+        var p1 = new BattlefieldScreen.UnitRenderPlacement(unit("FIRST", Side.ALLIES), 10f, 10f, 20f);
+        var p2 = new BattlefieldScreen.UnitRenderPlacement(unit("SECOND", Side.ALLIES), 10f, 10f, 20f);
+        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p1, p2), 15f, 15f, Side.ALLIES);
+        assertEquals("FIRST", result);
+    }
+
+    @Test
+    void unitIdAtScreenPoint_returnsNull_whenPointOnExclusiveUpperBound() {
+        var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
+        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 30f, 15f, Side.ALLIES);
+        assertNull(result);
+    }
+
     private static Unit unit(String id) {
         return new Unit(id, Side.ALLIES, UnitType.ARMOR, UnitSize.BATTALION, 0, 0);
+    }
+
+    private static Unit unit(String id, Side side) {
+        return new Unit(id, side, UnitType.ARMOR, UnitSize.BATTALION, 0, 0);
     }
 }
