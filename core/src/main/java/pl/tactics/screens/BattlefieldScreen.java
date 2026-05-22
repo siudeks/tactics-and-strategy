@@ -60,6 +60,8 @@ public class BattlefieldScreen extends ScreenAdapter {
     private MapPanel mapPanel;
     private GameRuntime gameRuntime;
     private Label statusLabel;
+    private Label unitNameLabel;
+    private Table unitInfoSection;
 
     public BattlefieldScreen(Game game, LoadedScenario loadedScenario) {
         this.game = game;
@@ -129,7 +131,11 @@ public class BattlefieldScreen extends ScreenAdapter {
         });
 
         panel.add(new Label("Panel rozkazow", labelStyle)).left().padTop(10f).row();
-        panel.add(new Label("Jednostka: Alpha", labelStyle)).left().row();
+        unitNameLabel = new Label("", labelStyle);
+        unitInfoSection = new Table();
+        unitInfoSection.add(unitNameLabel).left();
+        unitInfoSection.setVisible(false);
+        panel.add(unitInfoSection).growX().left().row();
         panel.add(paletteButton).row();
         panel.add(new TextButton("Ruch", buttonStyle)).row();
         panel.add(new TextButton("Atak", buttonStyle)).row();
@@ -191,6 +197,17 @@ public class BattlefieldScreen extends ScreenAdapter {
     public void render(float delta) {
         ScreenUtils.clear(BG);
         stage.act(delta);
+        if (unitNameLabel != null && unitInfoSection != null) {
+            syncUnitInfoPanel(mapPanel.getSelectedUnitId(), new UnitInfoView() {
+                public void showUnit(String id) {
+                    unitNameLabel.setText(id);
+                    unitInfoSection.setVisible(true);
+                }
+                public void hide() {
+                    unitInfoSection.setVisible(false);
+                }
+            });
+        }
         stage.draw();
     }
 
@@ -292,6 +309,19 @@ public class BattlefieldScreen extends ScreenAdapter {
             }
         }
         return activeUnits.get((idx + 1) % activeUnits.size()).id();
+    }
+
+    interface UnitInfoView {
+        void showUnit(String unitId);
+        void hide();
+    }
+
+    static void syncUnitInfoPanel(String selectedUnitId, UnitInfoView view) {
+        if (selectedUnitId != null) {
+            view.showUnit(selectedUnitId);
+        } else {
+            view.hide();
+        }
     }
 
     static record UnitRenderPlacement(Unit unit, float screenX, float screenY, float drawSize) {
@@ -535,6 +565,10 @@ public class BattlefieldScreen extends ScreenAdapter {
             float maxCameraY = Math.max(0f, mapWorldHeight - getHeight());
             cameraX = MathUtils.clamp(cameraX, 0f, maxCameraX);
             cameraY = MathUtils.clamp(cameraY, 0f, maxCameraY);
+        }
+
+        public String getSelectedUnitId() {
+            return selectedUnitId;
         }
 
         void resetSelection() {
