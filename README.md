@@ -29,6 +29,7 @@ Run in devcontainer (headless smoke run):
 
 ## Documentation
 - [Project Docs Index](docs/README.md)
+- [Game Implementation Plan v0 (Desert Rats)](docs/implementation/game-implementation-plan-v0.md)
 - [Game Requirements v0](docs/requirements/game-requirements-v0.md)
 - [Scenario Pack v0](docs/scenarios/scenarios-v0.md)
 - [Graphics Asset Register v0](docs/assets/graphics-assets-register-v0.md)
