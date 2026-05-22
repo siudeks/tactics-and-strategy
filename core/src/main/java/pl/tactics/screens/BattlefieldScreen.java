@@ -45,6 +45,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     private Texture whiteTexture;
     private MapPanel mapPanel;
     private GameRuntime gameRuntime;
+    private Label statusLabel;
 
     @Override
     public void show() {
@@ -65,17 +66,17 @@ public class BattlefieldScreen extends ScreenAdapter {
         Table root = new Table();
         root.setFillParent(true);
 
-        mapPanel = new MapPanel(whiteTexture);
+        mapPanel = new MapPanel(whiteTexture, this::endTurn);
 
         Table topArea = new Table();
         topArea.add(mapPanel).grow().pad(8f);
         topArea.add(createCommandPanel(labelStyle, buttonStyle, base.tint(PANEL_BG), mapPanel)).width(300f).growY().pad(8f, 0f, 8f, 8f);
 
-        Label status = new Label(runtimeStatusSummary(), labelStyle);
-        status.setAlignment(1);
+        statusLabel = new Label(runtimeStatusSummary(), labelStyle);
+        statusLabel.setAlignment(1);
         Table statusBar = new Table();
         statusBar.setBackground(base.tint(STATUS_BG));
-        statusBar.add(status).left().padLeft(12f);
+        statusBar.add(statusLabel).left().padLeft(12f);
 
         root.add(topArea).grow().row();
         root.add(statusBar).growX().height(42f);
@@ -111,6 +112,15 @@ public class BattlefieldScreen extends ScreenAdapter {
         panel.add(new TextButton("Patrol", buttonStyle)).row();
         panel.add().growY().row();
 
+        TextButton endTurnButton = new TextButton("Zakoncz ture  [Enter]", buttonStyle);
+        endTurnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                endTurn();
+            }
+        });
+        panel.add(endTurnButton).padBottom(10f).row();
+
         return panel;
     }
 
@@ -119,6 +129,13 @@ public class BattlefieldScreen extends ScreenAdapter {
             "desert-rats-bootstrap",
             gameRuntime.getTurnNumber(),
             gameRuntime.getActiveSideCode());
+    }
+
+    private void endTurn() {
+        gameRuntime.simulateOneTurn();
+        if (statusLabel != null) {
+            statusLabel.setText(runtimeStatusSummary());
+        }
     }
 
     public String runtimePaletteLabel() {
@@ -171,6 +188,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final Texture pixel;
         private final TerrainMapDefinition mapDefinition;
         private final TerrainTileAtlas tileAtlas;
+        private final Runnable onEndTurn;
 
         private boolean debugGridOverlay;
         private float cameraX;
@@ -183,8 +201,9 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final float mapWorldWidth;
         private final float mapWorldHeight;
 
-        private MapPanel(Texture pixel) {
+        private MapPanel(Texture pixel, Runnable onEndTurn) {
             this.pixel = pixel;
+            this.onEndTurn = onEndTurn;
             this.mapDefinition = new TerrainMapDefinition();
             this.tileAtlas = new TerrainTileAtlas(mapDefinition);
             this.mapWidthTiles = mapDefinition.getWidthTiles();
@@ -229,6 +248,10 @@ public class BattlefieldScreen extends ScreenAdapter {
                     }
                     if (keycode == com.badlogic.gdx.Input.Keys.P) {
                         togglePalette();
+                        return true;
+                    }
+                    if (keycode == com.badlogic.gdx.Input.Keys.ENTER) {
+                        onEndTurn.run();
                         return true;
                     }
                     return false;
