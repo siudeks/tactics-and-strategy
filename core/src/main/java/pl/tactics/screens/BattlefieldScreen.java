@@ -22,10 +22,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import pl.tactics.engine.GameRuntime;
+import pl.tactics.scenario.ScenarioLoader;
 import pl.tactics.terrain.TerrainMapDefinition;
 import pl.tactics.terrain.TerrainTileAtlas;
 
 public class BattlefieldScreen extends ScreenAdapter {
+
+    public interface PaletteSurface {
+        void setPaletteMode(TerrainMapDefinition.PaletteMode mode);
+    }
     private static final Color BG = Color.valueOf("1E232B");
     private static final Color MAP_BG = Color.valueOf("181814");
     private static final Color PANEL_BG = Color.valueOf("2C3038");
@@ -38,9 +44,11 @@ public class BattlefieldScreen extends ScreenAdapter {
     private BitmapFont font;
     private Texture whiteTexture;
     private MapPanel mapPanel;
+    private GameRuntime gameRuntime;
 
     @Override
     public void show() {
+        gameRuntime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
         stage = new Stage(new ScreenViewport());
         font = new BitmapFont();
         whiteTexture = createWhiteTexture();
@@ -63,7 +71,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         topArea.add(mapPanel).grow().pad(8f);
         topArea.add(createCommandPanel(labelStyle, buttonStyle, base.tint(PANEL_BG), mapPanel)).width(300f).growY().pad(8f, 0f, 8f, 8f);
 
-        Label status = new Label("Status: Jednostka Alpha gotowa | Paliwo 100% | Łączność OK", labelStyle);
+        Label status = new Label(runtimeStatusSummary(), labelStyle);
         status.setAlignment(1);
         Table statusBar = new Table();
         statusBar.setBackground(base.tint(STATUS_BG));
@@ -89,6 +97,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mapPanel.togglePalette();
+                gameRuntime.togglePaletteMode();
                 paletteButton.setText("Paleta: " + mapPanel.getPaletteLabel());
             }
         });
@@ -103,6 +112,27 @@ public class BattlefieldScreen extends ScreenAdapter {
         panel.add().growY().row();
 
         return panel;
+    }
+
+    public String runtimeStatusSummary() {
+        return String.format("Scenariusz: %s | Tura: %d | Strona aktywna: %s",
+            "desert-rats-bootstrap",
+            gameRuntime.getTurnNumber(),
+            gameRuntime.getActiveSideCode());
+    }
+
+    public String runtimePaletteLabel() {
+        return gameRuntime.getPaletteMode() == TerrainMapDefinition.PaletteMode.ORIGINAL
+            ? "Oryginalna" : "Poprawiona";
+    }
+
+    public void togglePaletteThroughRuntime() {
+        gameRuntime.togglePaletteMode();
+        mapPanel.setPaletteMode(gameRuntime.getPaletteMode());
+    }
+
+    public void attachRuntimeBridgeForPaletteSurface(PaletteSurface surface) {
+        surface.setPaletteMode(gameRuntime.getPaletteMode());
     }
 
     @Override
@@ -219,6 +249,11 @@ public class BattlefieldScreen extends ScreenAdapter {
                 ? TerrainMapDefinition.PaletteMode.IMPROVED
                 : TerrainMapDefinition.PaletteMode.ORIGINAL;
             mapDefinition.setPaletteMode(nextMode);
+            tileAtlas.rebuild(mapDefinition);
+        }
+
+        public void setPaletteMode(TerrainMapDefinition.PaletteMode mode) {
+            mapDefinition.setPaletteMode(mode);
             tileAtlas.rebuild(mapDefinition);
         }
 
