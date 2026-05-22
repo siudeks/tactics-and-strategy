@@ -1,0 +1,25 @@
+{
+  "scenario": {
+    "id": "desert-rats-el-alamein",
+    "name": "El Alamein",
+    "map": { "width": 20, "height": 10, "defaultTerrain": "SAND" },
+    "units": [
+      {"id": "allies-armor-1",  "side": "ALLIES", "type": "ARMOR",    "size": "BRIGADE",  "tileX": 13, "tileY": 4},
+      {"id": "allies-armor-2",  "side": "ALLIES", "type": "ARMOR",    "size": "BRIGADE",  "tileX": 13, "tileY": 6},
+      {"id": "allies-inf-1",    "side": "ALLIES", "type": "INFANTRY", "size": "BRIGADE",  "tileX": 14, "tileY": 5},
+      {"id": "allies-inf-2",    "side": "ALLIES", "type": "INFANTRY", "size": "BRIGADE",  "tileX": 14, "tileY": 3},
+      {"id": "allies-armor-3",  "side": "ALLIES", "type": "ARMOR",    "size": "BATTALION","tileX": 12, "tileY": 7},
+      {"id": "axis-armor-1",    "side": "AXIS",   "type": "ARMOR",    "size": "BRIGADE",  "tileX": 8,  "tileY": 4},
+      {"id": "axis-armor-2",    "side": "AXIS",   "type": "ARMOR",    "size": "BATTALION","tileX": 8,  "tileY": 6},
+      {"id": "axis-inf-1",      "side": "AXIS",   "type": "INFANTRY", "size": "BRIGADE",  "tileX": 7,  "tileY": 5},
+      {"id": "axis-inf-2",      "side": "AXIS",   "type": "INFANTRY", "size": "BRIGADE",  "tileX": 7,  "tileY": 3}
+    ]
+  },
+  "campaignState": {
+    "campaignId": "desert-rats",
+    "scenarioId": "desert-rats-el-alamein",
+    "turnNumber": 1,
+    "activeSide": "ALLIES",
+    "pendingOrders": []
+  }
+}

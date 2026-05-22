@@ -1,0 +1,22 @@
+{
+  "scenario": {
+    "id": "desert-rats-op-compass",
+    "name": "Operation Compass",
+    "map": { "width": 20, "height": 10, "defaultTerrain": "SAND" },
+    "units": [
+      {"id": "allies-armor-1",  "side": "ALLIES", "type": "ARMOR",    "size": "BRIGADE",  "tileX": 17, "tileY": 5},
+      {"id": "allies-inf-1",    "side": "ALLIES", "type": "INFANTRY", "size": "BRIGADE",  "tileX": 16, "tileY": 4},
+      {"id": "allies-armor-2",  "side": "ALLIES", "type": "ARMOR",    "size": "BATTALION","tileX": 16, "tileY": 6},
+      {"id": "axis-inf-1",      "side": "AXIS",   "type": "INFANTRY", "size": "BRIGADE",  "tileX": 4,  "tileY": 4},
+      {"id": "axis-inf-2",      "side": "AXIS",   "type": "INFANTRY", "size": "BRIGADE",  "tileX": 5,  "tileY": 6},
+      {"id": "axis-inf-3",      "side": "AXIS",   "type": "INFANTRY", "size": "BATTALION","tileX": 3,  "tileY": 5}
+    ]
+  },
+  "campaignState": {
+    "campaignId": "desert-rats",
+    "scenarioId": "desert-rats-op-compass",
+    "turnNumber": 1,
+    "activeSide": "ALLIES",
+    "pendingOrders": []
+  }
+}

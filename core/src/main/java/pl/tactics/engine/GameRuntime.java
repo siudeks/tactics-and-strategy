@@ -1,7 +1,6 @@
 package pl.tactics.engine;
 
 import pl.tactics.domain.CampaignState;
-import pl.tactics.domain.Side;
 import pl.tactics.scenario.LoadedScenario;
 import pl.tactics.terrain.TerrainMapDefinition;
 
@@ -49,6 +48,10 @@ public final class GameRuntime {
 
     public int getTurnNumber() {
         return loadedScenario.campaignState().turnNumber();
+    }
+
+    public CampaignState getCurrentCampaignState() {
+        return loadedScenario.campaignState();
     }
 
     public String getActiveSideCode() {

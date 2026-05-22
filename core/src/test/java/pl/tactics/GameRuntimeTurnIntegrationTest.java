@@ -2,6 +2,7 @@ package pl.tactics;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.tactics.domain.CampaignState;
 import pl.tactics.engine.GameRuntime;
 import pl.tactics.scenario.ScenarioLoader;
 import pl.tactics.terrain.TerrainMapDefinition;
@@ -37,6 +38,19 @@ class GameRuntimeTurnIntegrationTest {
     void gameRuntime_simulateOneTurn_flipsActiveSide() {
         runtime.simulateOneTurn();
         assertEquals("AXIS", runtime.getActiveSideCode());
+    }
+
+    @Test
+    void gameRuntime_currentCampaignState_reflectsPostSimulationState() {
+        CampaignState initialState = runtime.getCurrentCampaignState();
+
+        runtime.simulateOneTurn();
+
+        CampaignState updatedState = runtime.getCurrentCampaignState();
+        assertEquals(1, initialState.turnNumber());
+        assertEquals(2, updatedState.turnNumber());
+        assertEquals("AXIS", updatedState.activeSide().name());
+        assertIterableEquals(initialState.units(), updatedState.units());
     }
 
     @Test

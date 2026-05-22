@@ -115,3 +115,39 @@
 - REQ-CBT-001: Contextual combat resolution
 - REQ-SCEN-001: Scenario objective/failure model
 - REQ-HUD-001: Operational readability and HUD state
+
+---
+
+## Runtime And Validation Notes (T07, 2026-05-22)
+
+### Runtime source of truth for rendered units
+- Jednostki widoczne na polu bitwy pochodzą z runtime `CampaignState` (nie z hardcoded pozycji i nie z jednorazowej kopii konstruktora ekranu).
+- Render pobiera stan przez `GameRuntime.getCurrentCampaignState()`, więc po zakończeniu tury widok odzwierciedla aktualny stan kampanii.
+
+### Coordinate mapping used by renderer
+- Scenariusze definiują pozycje jako `tileX`, `tileY` (top-origin dla osi Y).
+- Przeliczenie pozycji ikony 2x2 tile odbywa się przez tile -> world -> screen:
+  - `iconWorldX = tileX * 16`
+  - `iconWorldY = (mapHeight - tileY - 2) * 16`
+  - `iconScreenX = panelX + iconWorldX - cameraX`
+  - `iconScreenY = panelY + iconWorldY - cameraY`
+- Szczegółowy kontrakt i przykłady: `docs/plan/20260522-scenario-unit-rendering/T04-rendering-coordinate-spec.md`.
+
+### Fail-fast scenario bounds validation
+- Loader waliduje współrzędne wszystkich jednostek względem `map.width` i `map.height` podczas ładowania.
+- Współrzędne poza zakresem powodują natychmiastowy wyjątek (`IllegalArgumentException`) z kontekstem:
+  - `Scenario <scenarioId> has unit <unitId> at tile (<x>,<y>) outside bounds [0..%d] x [0..%d]`
+  - gdzie `%d` to inkluzywne górne granice: `maxX = mapWidth - 1`, `maxY = mapHeight - 1`
+  - przykład: `Scenario invalid-coordinates has unit bad-unit at tile (5,-1) outside bounds [0..4] x [0..3]`
+- Dzięki temu błędne scenariusze są odrzucane na etapie load, a nie dopiero podczas runtime.
+
+### Preserved flow contract
+- Zachowany kontrakt uruchomienia scenariusza: `MainMenuScreen -> ScenarioLoader.loadFromResource(...) -> BattlefieldScreen(Game, LoadedScenario)`.
+- Brak zmian w publicznych kontraktach konstruktorów i rekordów domenowych dla tego przepływu.
+
+### Verification commands
+- `./gradlew test`
+- `./gradlew headless:run`
+
+### Known residual test risk
+- Istnieje nadal ograniczone pokrycie wizualnego E2E dla `lwjgl3` (pixel-level assertions); obecne testy weryfikują kontrakty i obliczenia renderingu, ale nie pełny rendering desktopowy przy wielu konfiguracjach viewportu.

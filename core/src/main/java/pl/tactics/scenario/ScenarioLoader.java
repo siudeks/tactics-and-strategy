@@ -14,6 +14,25 @@ import java.util.Objects;
 public final class ScenarioLoader {
 
     private static final String BOOTSTRAP_RESOURCE = "scenarios/desert-rats-bootstrap.json";
+    private static final String INDEX_RESOURCE = "scenarios/scenarios-index.json";
+
+    public static List<ScenarioEntry> listAvailableScenarios() {
+        InputStream is = ScenarioLoader.class.getClassLoader().getResourceAsStream(INDEX_RESOURCE);
+        if (is == null) {
+            throw new IllegalStateException("Scenario index not found: " + INDEX_RESOURCE);
+        }
+        try {
+            String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            JsonValue root = new JsonReader().parse(json);
+            List<ScenarioEntry> entries = new ArrayList<>();
+            for (JsonValue entry = root.get("scenarios").child; entry != null; entry = entry.next) {
+                entries.add(new ScenarioEntry(entry.getString("name"), entry.getString("resource")));
+            }
+            return entries;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read scenario index", e);
+        }
+    }
 
     public static LoadedScenario loadBootstrapScenario() {
         return loadFromResource(BOOTSTRAP_RESOURCE);
@@ -58,6 +77,7 @@ public final class ScenarioLoader {
                 scenarioUnits.add(parseUnit(unitJson));
             }
         }
+        validateUnitCoordinates(scenarioId, mapWidth, mapHeight, scenarioUnits);
 
         ScenarioDefinition scenarioDefinition = new ScenarioDefinition(
             scenarioId, scenarioName, mapWidth, mapHeight, defaultTerrain, scenarioUnits
@@ -104,5 +124,16 @@ public final class ScenarioLoader {
         int targetX = orderJson.getInt("targetX");
         int targetY = orderJson.getInt("targetY");
         return new Order(id, unitId, side, type, targetX, targetY);
+    }
+
+    private static void validateUnitCoordinates(String scenarioId, int mapWidth, int mapHeight, List<Unit> units) {
+        for (Unit unit : units) {
+            if (unit.tileX() < 0 || unit.tileX() >= mapWidth || unit.tileY() < 0 || unit.tileY() >= mapHeight) {
+                throw new IllegalArgumentException(
+                    "Scenario %s has unit %s at tile (%d,%d) outside bounds [0..%d] x [0..%d]"
+                        .formatted(scenarioId, unit.id(), unit.tileX(), unit.tileY(), mapWidth - 1, mapHeight - 1)
+                );
+            }
+        }
     }
 }

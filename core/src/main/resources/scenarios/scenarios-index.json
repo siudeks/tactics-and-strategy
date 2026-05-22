@@ -1,0 +1,12 @@
+{
+  "scenarios": [
+    { "name": "Operation Compass",    "resource": "scenarios/desert-rats-op-compass.json" },
+    { "name": "Beda Fomm",            "resource": "scenarios/desert-rats-beda-fomm.json" },
+    { "name": "Enter Rommel",         "resource": "scenarios/desert-rats-enter-rommel.json" },
+    { "name": "Battleaxe",            "resource": "scenarios/desert-rats-battleaxe.json" },
+    { "name": "Operation Crusader",   "resource": "scenarios/desert-rats-op-crusader.json" },
+    { "name": "The Battle of Gazala", "resource": "scenarios/desert-rats-gazala.json" },
+    { "name": "El Alamein",           "resource": "scenarios/desert-rats-el-alamein.json" },
+    { "name": "The Desert War",       "resource": "scenarios/desert-rats-desert-war.json" }
+  ]
+}

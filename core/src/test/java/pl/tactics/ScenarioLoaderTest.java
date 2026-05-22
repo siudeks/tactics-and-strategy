@@ -3,8 +3,13 @@ package pl.tactics;
 import org.junit.jupiter.api.Test;
 import pl.tactics.domain.Side;
 import pl.tactics.domain.TerrainType;
+import pl.tactics.scenario.ScenarioEntry;
 import pl.tactics.scenario.LoadedScenario;
 import pl.tactics.scenario.ScenarioLoader;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,4 +63,82 @@ class ScenarioLoaderTest {
         LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(1, loaded.campaignState().turnNumber());
     }
+
+        @Test
+        void load_rejectsUnitCoordinatesOutsideScenarioBounds() {
+                String json = scenarioJson("invalid-coordinates", 5, 4, 5, -1);
+
+                IllegalArgumentException exception = assertThrows(
+                        IllegalArgumentException.class,
+                        () -> ScenarioLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)))
+                );
+
+                assertEquals(
+                        "Scenario invalid-coordinates has unit bad-unit at tile (5,-1) outside bounds [0..4] x [0..3]",
+                        exception.getMessage()
+                );
+        }
+
+        @Test
+        void load_acceptsUnitCoordinatesWithinScenarioBounds() {
+                String json = scenarioJson("valid-coordinates", 5, 4, 4, 3);
+
+                LoadedScenario loaded = ScenarioLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+
+                assertEquals("valid-coordinates", loaded.scenarioDefinition().id());
+                assertEquals(1, loaded.scenarioDefinition().units().size());
+                assertEquals(4, loaded.scenarioDefinition().units().getFirst().tileX());
+                assertEquals(3, loaded.scenarioDefinition().units().getFirst().tileY());
+        }
+
+            @Test
+            void load_rejectsUnitCoordinatesAtUpperYBoundOverflow() {
+                String json = scenarioJson("invalid-upper-y", 5, 4, 0, 4);
+
+                IllegalArgumentException exception = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> ScenarioLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)))
+                );
+
+                assertEquals(
+                    "Scenario invalid-upper-y has unit bad-unit at tile (0,4) outside bounds [0..4] x [0..3]",
+                    exception.getMessage()
+                );
+            }
+
+        @Test
+        void listAvailableScenarios_allBundledScenarioResourcesLoad() {
+                List<ScenarioEntry> entries = ScenarioLoader.listAvailableScenarios();
+
+                assertFalse(entries.isEmpty());
+                for (ScenarioEntry entry : entries) {
+                        assertDoesNotThrow(() -> ScenarioLoader.loadFromResource(entry.resourcePath()), entry.resourcePath());
+                }
+        }
+
+        private static String scenarioJson(String scenarioId, int mapWidth, int mapHeight, int tileX, int tileY) {
+                return """
+                        {
+                            "scenario": {
+                                "id": "%s",
+                                "name": "Test Scenario",
+                                "map": {
+                                    "width": %d,
+                                    "height": %d,
+                                    "defaultTerrain": "SAND"
+                                },
+                                "units": [
+                                    {"id": "bad-unit", "side": "ALLIES", "type": "INFANTRY", "size": "BRIGADE", "tileX": %d, "tileY": %d}
+                                ]
+                            },
+                            "campaignState": {
+                                "campaignId": "test-campaign",
+                                "scenarioId": "%s",
+                                "turnNumber": 1,
+                                "activeSide": "ALLIES",
+                                "pendingOrders": []
+                            }
+                        }
+                        """.formatted(scenarioId, mapWidth, mapHeight, tileX, tileY, scenarioId);
+        }
 }

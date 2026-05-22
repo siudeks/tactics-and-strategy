@@ -1,5 +1,6 @@
 package pl.tactics.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
@@ -22,10 +23,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import pl.tactics.domain.CampaignState;
+import pl.tactics.domain.Side;
+import pl.tactics.domain.Unit;
 import pl.tactics.engine.GameRuntime;
-import pl.tactics.scenario.ScenarioLoader;
+import pl.tactics.scenario.LoadedScenario;
 import pl.tactics.terrain.TerrainMapDefinition;
 import pl.tactics.terrain.TerrainTileAtlas;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 public class BattlefieldScreen extends ScreenAdapter {
 
@@ -37,8 +46,13 @@ public class BattlefieldScreen extends ScreenAdapter {
     private static final Color PANEL_BG = Color.valueOf("2C3038");
     private static final Color STATUS_BG = Color.valueOf("1F242B");
     private static final Color GRID = Color.valueOf("4E5D4A");
-    private static final Color UNIT_FILL = Color.valueOf("E5D44E");
-    private static final Color UNIT_OUTLINE = Color.valueOf("243B8F");
+    private static final Color ALLIES_UNIT_FILL = Color.valueOf("E5D44E");
+    private static final Color ALLIES_UNIT_OUTLINE = Color.valueOf("243B8F");
+    private static final Color AXIS_UNIT_FILL = Color.valueOf("C97B3E");
+    private static final Color AXIS_UNIT_OUTLINE = Color.valueOf("4A2210");
+
+    private final Game game;
+    private final LoadedScenario loadedScenario;
 
     private Stage stage;
     private BitmapFont font;
@@ -47,9 +61,14 @@ public class BattlefieldScreen extends ScreenAdapter {
     private GameRuntime gameRuntime;
     private Label statusLabel;
 
+    public BattlefieldScreen(Game game, LoadedScenario loadedScenario) {
+        this.game = game;
+        this.loadedScenario = loadedScenario;
+    }
+
     @Override
     public void show() {
-        gameRuntime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
+        gameRuntime = new GameRuntime(loadedScenario);
         stage = new Stage(new ScreenViewport());
         font = new BitmapFont();
         whiteTexture = createWhiteTexture();
@@ -66,7 +85,12 @@ public class BattlefieldScreen extends ScreenAdapter {
         Table root = new Table();
         root.setFillParent(true);
 
-        mapPanel = new MapPanel(whiteTexture, this::endTurn);
+        mapPanel = new MapPanel(
+            whiteTexture,
+            this::endTurn,
+            gameRuntime::getCurrentCampaignState,
+            loadedScenario.scenarioDefinition().mapHeight()
+        );
 
         Table topArea = new Table();
         topArea.add(mapPanel).grow().pad(8f);
@@ -119,14 +143,23 @@ public class BattlefieldScreen extends ScreenAdapter {
                 endTurn();
             }
         });
-        panel.add(endTurnButton).padBottom(10f).row();
+        panel.add(endTurnButton).padBottom(4f).row();
+
+        TextButton menuButton = new TextButton("Menu", buttonStyle);
+        menuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new MainMenuScreen(game));
+            }
+        });
+        panel.add(menuButton).padBottom(10f).row();
 
         return panel;
     }
 
     public String runtimeStatusSummary() {
         return String.format("Scenariusz: %s | Tura: %d | Strona aktywna: %s",
-            "desert-rats-bootstrap",
+            loadedScenario.scenarioDefinition().name(),
             gameRuntime.getTurnNumber(),
             gameRuntime.getActiveSideCode());
     }
@@ -181,6 +214,73 @@ public class BattlefieldScreen extends ScreenAdapter {
         return texture;
     }
 
+    static List<UnitRenderPlacement> computeVisibleUnitPlacements(CampaignState campaignState,
+                                                                  int scenarioMapHeightTiles,
+                                                                  float panelX,
+                                                                  float panelY,
+                                                                  float panelWidth,
+                                                                  float panelHeight,
+                                                                  float cameraX,
+                                                                  float cameraY) {
+        Objects.requireNonNull(campaignState, "campaignState must not be null");
+
+        float unitDrawSize = MapPanel.DRAW_TILE_SIZE * MapPanel.UNIT_SIZE_IN_TILES;
+        List<UnitRenderPlacement> placements = new ArrayList<>();
+        for (Unit unit : campaignState.units()) {
+            float iconWorldX = unit.tileX() * MapPanel.DRAW_TILE_SIZE;
+            float iconWorldY = (scenarioMapHeightTiles - unit.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
+            float iconScreenX = panelX + iconWorldX - cameraX;
+            float iconScreenY = panelY + iconWorldY - cameraY;
+
+            if (isUnitOutsideViewport(iconScreenX, iconScreenY, unitDrawSize, panelX, panelY, panelWidth, panelHeight)) {
+                continue;
+            }
+
+            placements.add(new UnitRenderPlacement(unit, iconScreenX, iconScreenY, unitDrawSize));
+        }
+        return List.copyOf(placements);
+    }
+
+    private static boolean isUnitOutsideViewport(float iconScreenX,
+                                                 float iconScreenY,
+                                                 float unitDrawSize,
+                                                 float panelX,
+                                                 float panelY,
+                                                 float panelWidth,
+                                                 float panelHeight) {
+        float visibleLeft = panelX;
+        float visibleRight = panelX + panelWidth;
+        float visibleBottom = panelY;
+        float visibleTop = panelY + panelHeight;
+
+        float iconRight = iconScreenX + unitDrawSize;
+        float iconTop = iconScreenY + unitDrawSize;
+
+        return iconRight <= visibleLeft
+            || iconScreenX >= visibleRight
+            || iconTop <= visibleBottom
+            || iconScreenY >= visibleTop;
+    }
+
+    static UnitIconPalette paletteFor(Side side) {
+        return side == Side.AXIS
+            ? new UnitIconPalette(AXIS_UNIT_FILL, AXIS_UNIT_OUTLINE)
+            : new UnitIconPalette(ALLIES_UNIT_FILL, ALLIES_UNIT_OUTLINE);
+    }
+
+    static record UnitRenderPlacement(Unit unit, float screenX, float screenY, float drawSize) {
+        UnitRenderPlacement {
+            Objects.requireNonNull(unit, "unit must not be null");
+        }
+    }
+
+    static record UnitIconPalette(Color fill, Color outline) {
+        UnitIconPalette {
+            Objects.requireNonNull(fill, "fill must not be null");
+            Objects.requireNonNull(outline, "outline must not be null");
+        }
+    }
+
     private static final class MapPanel extends Actor {
         private static final float DRAW_TILE_SIZE = 16f;
         private static final float UNIT_SIZE_IN_TILES = 2f;
@@ -189,6 +289,8 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final TerrainMapDefinition mapDefinition;
         private final TerrainTileAtlas tileAtlas;
         private final Runnable onEndTurn;
+        private final Supplier<CampaignState> campaignStateSupplier;
+        private final int scenarioMapHeightTiles;
 
         private boolean debugGridOverlay;
         private float cameraX;
@@ -201,9 +303,14 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final float mapWorldWidth;
         private final float mapWorldHeight;
 
-        private MapPanel(Texture pixel, Runnable onEndTurn) {
+        private MapPanel(Texture pixel,
+                         Runnable onEndTurn,
+                         Supplier<CampaignState> campaignStateSupplier,
+                         int scenarioMapHeightTiles) {
             this.pixel = pixel;
             this.onEndTurn = onEndTurn;
+            this.campaignStateSupplier = Objects.requireNonNull(campaignStateSupplier, "campaignStateSupplier must not be null");
+            this.scenarioMapHeightTiles = scenarioMapHeightTiles;
             this.mapDefinition = new TerrainMapDefinition();
             this.tileAtlas = new TerrainTileAtlas(mapDefinition);
             this.mapWidthTiles = mapDefinition.getWidthTiles();
@@ -298,7 +405,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                 drawDebugGrid(batch, x, y, w, h);
             }
 
-            drawUnit(batch, x, y);
+            drawUnits(batch, x, y, w, h);
 
             batch.setColor(Color.WHITE);
         }
@@ -345,14 +452,21 @@ public class BattlefieldScreen extends ScreenAdapter {
             }
         }
 
-        private void drawUnit(Batch batch, float panelX, float panelY) {
-            float unitWorldX = mapWorldWidth * 0.5f;
-            float unitWorldY = mapWorldHeight * 0.5f;
-            float unitDrawSize = DRAW_TILE_SIZE * UNIT_SIZE_IN_TILES;
-            float unitX = panelX + unitWorldX - cameraX;
-            float unitY = panelY + unitWorldY - cameraY;
-
-            drawUnitIcon(batch, unitX, unitY, unitDrawSize);
+        private void drawUnits(Batch batch, float panelX, float panelY, float panelWidth, float panelHeight) {
+            List<UnitRenderPlacement> placements = computeVisibleUnitPlacements(
+                campaignStateSupplier.get(),
+                scenarioMapHeightTiles,
+                panelX,
+                panelY,
+                panelWidth,
+                panelHeight,
+                cameraX,
+                cameraY
+            );
+            for (UnitRenderPlacement placement : placements) {
+                UnitIconPalette palette = paletteFor(placement.unit().side());
+                drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline());
+            }
         }
 
         private void clampCamera() {
@@ -366,7 +480,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             tileAtlas.dispose();
         }
 
-        private void drawUnitIcon(Batch batch, float x, float y, float size) {
+        private void drawUnitIcon(Batch batch, float x, float y, float size, Color fillColor, Color outlineColor) {
             float pixel = size / 16f;
             // 16x16 grid, 0=border, 1=fill, 2=diagonal, 3=side square, 4=center
             int[][] pattern = {
@@ -391,19 +505,19 @@ public class BattlefieldScreen extends ScreenAdapter {
                 for (int gx = 0; gx < 16; gx++) {
                     int v = pattern[gy][gx];
                     if (v == 0) {
-                        batch.setColor(UNIT_OUTLINE);
+                        batch.setColor(outlineColor);
                         drawCell(batch, x, y, pixel, gx, gy);
                     } else if (v == 1) {
-                        batch.setColor(UNIT_FILL);
+                        batch.setColor(fillColor);
                         drawCell(batch, x, y, pixel, gx, gy);
                     } else if (v == 2) {
-                        batch.setColor(UNIT_OUTLINE);
+                        batch.setColor(outlineColor);
                         drawCell(batch, x, y, pixel, gx, gy);
                     } else if (v == 3) {
-                        batch.setColor(UNIT_OUTLINE);
+                        batch.setColor(outlineColor);
                         drawCell(batch, x, y, pixel, gx, gy);
                     } else if (v == 4) {
-                        batch.setColor(UNIT_OUTLINE);
+                        batch.setColor(outlineColor);
                         drawCell(batch, x, y, pixel, gx, gy);
                     }
                 }
