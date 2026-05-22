@@ -106,6 +106,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         root.add(statusBar).growX().height(42f);
 
         stage.addActor(root);
+        stage.setKeyboardFocus(mapPanel);
         Gdx.input.setInputProcessor(stage);
     }
 
@@ -166,6 +167,7 @@ public class BattlefieldScreen extends ScreenAdapter {
 
     private void endTurn() {
         gameRuntime.simulateOneTurn();
+        mapPanel.resetSelection();
         if (statusLabel != null) {
             statusLabel.setText(runtimeStatusSummary());
         }
@@ -268,6 +270,18 @@ public class BattlefieldScreen extends ScreenAdapter {
             : new UnitIconPalette(ALLIES_UNIT_FILL, ALLIES_UNIT_OUTLINE);
     }
 
+    static String nextSelectedUnitId(List<Unit> activeUnits, String currentId) {
+        if (activeUnits.isEmpty()) return null;
+        int idx = -1;
+        for (int i = 0; i < activeUnits.size(); i++) {
+            if (activeUnits.get(i).id().equals(currentId)) {
+                idx = i;
+                break;
+            }
+        }
+        return activeUnits.get((idx + 1) % activeUnits.size()).id();
+    }
+
     static record UnitRenderPlacement(Unit unit, float screenX, float screenY, float drawSize) {
         UnitRenderPlacement {
             Objects.requireNonNull(unit, "unit must not be null");
@@ -293,6 +307,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final int scenarioMapHeightTiles;
 
         private boolean debugGridOverlay;
+        private String selectedUnitId;
         private float cameraX;
         private float cameraY;
         private float lastDragX;
@@ -321,6 +336,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             setTouchable(Touchable.enabled);
             this.debugGridOverlay = false;
             addInputHandling();
+            resetSelection();
         }
 
         private void addInputHandling() {
@@ -359,6 +375,10 @@ public class BattlefieldScreen extends ScreenAdapter {
                     }
                     if (keycode == com.badlogic.gdx.Input.Keys.ENTER) {
                         onEndTurn.run();
+                        return true;
+                    }
+                    if (keycode == com.badlogic.gdx.Input.Keys.TAB) {
+                        cycleSelectedUnit();
                         return true;
                     }
                     return false;
@@ -464,6 +484,18 @@ public class BattlefieldScreen extends ScreenAdapter {
                 cameraY
             );
             for (UnitRenderPlacement placement : placements) {
+                if (placement.unit().id().equals(selectedUnitId)) {
+                    float border = 2f;
+                    batch.setColor(Color.WHITE);
+                    drawBlock(batch, placement.screenX() - border, placement.screenY() - border,
+                        placement.drawSize() + border * 2, border);
+                    drawBlock(batch, placement.screenX() - border, placement.screenY() + placement.drawSize(),
+                        placement.drawSize() + border * 2, border);
+                    drawBlock(batch, placement.screenX() - border, placement.screenY() - border,
+                        border, placement.drawSize() + border * 2);
+                    drawBlock(batch, placement.screenX() + placement.drawSize(), placement.screenY() - border,
+                        border, placement.drawSize() + border * 2);
+                }
                 UnitIconPalette palette = paletteFor(placement.unit().side());
                 drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline());
             }
@@ -474,6 +506,22 @@ public class BattlefieldScreen extends ScreenAdapter {
             float maxCameraY = Math.max(0f, mapWorldHeight - getHeight());
             cameraX = MathUtils.clamp(cameraX, 0f, maxCameraX);
             cameraY = MathUtils.clamp(cameraY, 0f, maxCameraY);
+        }
+
+        void resetSelection() {
+            CampaignState state = campaignStateSupplier.get();
+            List<Unit> active = state.units().stream()
+                .filter(u -> u.side() == state.activeSide())
+                .toList();
+            selectedUnitId = active.isEmpty() ? null : active.getFirst().id();
+        }
+
+        private void cycleSelectedUnit() {
+            CampaignState state = campaignStateSupplier.get();
+            List<Unit> active = state.units().stream()
+                .filter(u -> u.side() == state.activeSide())
+                .toList();
+            selectedUnitId = nextSelectedUnitId(active, selectedUnitId);
         }
 
         public void dispose() {
