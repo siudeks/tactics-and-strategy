@@ -109,6 +109,7 @@ public class BattlefieldScreen extends ScreenAdapter {
 
         stage.addActor(root);
         stage.setKeyboardFocus(mapPanel);
+        stage.setScrollFocus(mapPanel);
         Gdx.input.setInputProcessor(stage);
     }
 
@@ -240,16 +241,18 @@ public class BattlefieldScreen extends ScreenAdapter {
                                                                   float panelWidth,
                                                                   float panelHeight,
                                                                   float cameraX,
-                                                                  float cameraY) {
+                                                                  float cameraY,
+                                                                  float zoomLevel) {
         Objects.requireNonNull(campaignState, "campaignState must not be null");
 
-        float unitDrawSize = MapPanel.DRAW_TILE_SIZE * MapPanel.UNIT_SIZE_IN_TILES;
+        float scaledTileSize = MapPanel.DRAW_TILE_SIZE * zoomLevel;
+        float unitDrawSize = scaledTileSize * MapPanel.UNIT_SIZE_IN_TILES;
         List<UnitRenderPlacement> placements = new ArrayList<>();
         for (Unit unit : campaignState.units()) {
             float iconWorldX = unit.tileX() * MapPanel.DRAW_TILE_SIZE;
             float iconWorldY = (scenarioMapHeightTiles - unit.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
-            float iconScreenX = panelX + iconWorldX - cameraX;
-            float iconScreenY = panelY + iconWorldY - cameraY;
+            float iconScreenX = panelX + (iconWorldX - cameraX) * zoomLevel;
+            float iconScreenY = panelY + (iconWorldY - cameraY) * zoomLevel;
 
             if (isUnitOutsideViewport(iconScreenX, iconScreenY, unitDrawSize, panelX, panelY, panelWidth, panelHeight)) {
                 continue;
@@ -311,6 +314,22 @@ public class BattlefieldScreen extends ScreenAdapter {
         return activeUnits.get((idx + 1) % activeUnits.size()).id();
     }
 
+    static float clampZoomLevel(float zoomLevel, float minZoomLevel, float maxZoomLevel) {
+        return MathUtils.clamp(zoomLevel, minZoomLevel, maxZoomLevel);
+    }
+
+    static float zoomStepFactor(float amountY, float zoomStepPercent) {
+        return (float) Math.pow(1f + zoomStepPercent, -amountY);
+    }
+
+    static float cameraAfterZoom(float cameraPosition,
+                                 float pointerPositionInPanel,
+                                 float oldZoomLevel,
+                                 float newZoomLevel) {
+        float worldAtPointer = cameraPosition + pointerPositionInPanel / oldZoomLevel;
+        return worldAtPointer - pointerPositionInPanel / newZoomLevel;
+    }
+
     interface UnitInfoView {
         void showUnit(String unitId);
         void hide();
@@ -340,6 +359,9 @@ public class BattlefieldScreen extends ScreenAdapter {
     private static final class MapPanel extends Actor {
         private static final float DRAW_TILE_SIZE = 16f;
         private static final float UNIT_SIZE_IN_TILES = 2f;
+        private static final float MIN_ZOOM_LEVEL = 0.5f;
+        private static final float MAX_ZOOM_LEVEL = 3.0f;
+        private static final float ZOOM_STEP_PERCENT = 0.1f;
 
         private final Texture pixel;
         private final TerrainMapDefinition mapDefinition;
@@ -352,6 +374,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         private String selectedUnitId;
         private float cameraX;
         private float cameraY;
+        private float zoomLevel;
         private float lastDragX;
         private float lastDragY;
 
@@ -374,6 +397,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             this.mapHeightTiles = mapDefinition.getHeightTiles();
             this.mapWorldWidth = mapWidthTiles * DRAW_TILE_SIZE;
             this.mapWorldHeight = mapHeightTiles * DRAW_TILE_SIZE;
+            this.zoomLevel = 1f;
 
             setTouchable(Touchable.enabled);
             this.debugGridOverlay = false;
@@ -389,6 +413,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                     lastDragY = y;
                     if (getStage() != null) {
                         getStage().setKeyboardFocus(MapPanel.this);
+                        getStage().setScrollFocus(MapPanel.this);
                     }
                     return true;
                 }
@@ -414,8 +439,30 @@ public class BattlefieldScreen extends ScreenAdapter {
                     float sy = y + getY();
                     CampaignState state = campaignStateSupplier.get();
                     List<UnitRenderPlacement> placements = computeVisibleUnitPlacements(
-                        state, mapHeightTiles, getX(), getY(), getWidth(), getHeight(), cameraX, cameraY);
+                        state, mapHeightTiles, getX(), getY(), getWidth(), getHeight(), cameraX, cameraY, zoomLevel);
                     selectedUnitId = unitIdAtScreenPoint(placements, sx, sy, state.activeSide());
+                }
+
+                @Override
+                public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                    boolean ctrlPressed = Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.CONTROL_LEFT)
+                        || Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.CONTROL_RIGHT);
+                    if (!ctrlPressed || amountY == 0f) {
+                        return false;
+                    }
+
+                    float oldZoomLevel = zoomLevel;
+                    float factor = zoomStepFactor(amountY, ZOOM_STEP_PERCENT);
+                    float newZoomLevel = clampZoomLevel(oldZoomLevel * factor, MIN_ZOOM_LEVEL, MAX_ZOOM_LEVEL);
+                    if (newZoomLevel == oldZoomLevel) {
+                        return true;
+                    }
+
+                    cameraX = cameraAfterZoom(cameraX, x, oldZoomLevel, newZoomLevel);
+                    cameraY = cameraAfterZoom(cameraY, y, oldZoomLevel, newZoomLevel);
+                    zoomLevel = newZoomLevel;
+                    clampCamera();
+                    return true;
                 }
 
                 @Override
@@ -490,23 +537,25 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
 
         private void drawTerrain(Batch batch, float panelX, float panelY, float panelW, float panelH) {
+            float scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
+            float visibleWorldWidth = panelW / zoomLevel;
             int startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
-            int endCol = MathUtils.clamp((int) Math.ceil((cameraX + panelW) / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
+            int endCol = MathUtils.clamp((int) Math.ceil((cameraX + visibleWorldWidth) / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
 
             batch.setColor(Color.WHITE);
             for (int rowTop = 0; rowTop < mapHeightTiles; rowTop++) {
                 float worldY = (mapHeightTiles - rowTop - 1) * DRAW_TILE_SIZE;
-                float screenY = panelY + worldY - cameraY;
-                if (screenY + DRAW_TILE_SIZE < panelY || screenY > panelY + panelH) {
+                float screenY = panelY + (worldY - cameraY) * zoomLevel;
+                if (screenY + scaledTileSize < panelY || screenY > panelY + panelH) {
                     continue;
                 }
 
                 for (int col = startCol; col <= endCol; col++) {
                     float worldX = col * DRAW_TILE_SIZE;
-                    float screenX = panelX + worldX - cameraX;
+                    float screenX = panelX + (worldX - cameraX) * zoomLevel;
 
                     int tileId = mapDefinition.getMapTileId(col, rowTop);
-                    batch.draw(tileAtlas.getRegion(tileId), screenX, screenY, DRAW_TILE_SIZE, DRAW_TILE_SIZE);
+                    batch.draw(tileAtlas.getRegion(tileId), screenX, screenY, scaledTileSize, scaledTileSize);
                 }
             }
         }
@@ -514,16 +563,17 @@ public class BattlefieldScreen extends ScreenAdapter {
         private void drawDebugGrid(Batch batch, float panelX, float panelY, float panelW, float panelH) {
             batch.setColor(GRID);
 
+            float visibleWorldWidth = panelW / zoomLevel;
             int startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
-            int endCol = MathUtils.clamp((int) Math.ceil((cameraX + panelW) / DRAW_TILE_SIZE), 0, mapWidthTiles);
+            int endCol = MathUtils.clamp((int) Math.ceil((cameraX + visibleWorldWidth) / DRAW_TILE_SIZE), 0, mapWidthTiles);
             for (int col = startCol; col <= endCol; col++) {
-                float lineX = panelX + col * DRAW_TILE_SIZE - cameraX;
+                float lineX = panelX + (col * DRAW_TILE_SIZE - cameraX) * zoomLevel;
                 batch.draw(pixel, lineX, panelY, 1f, panelH);
             }
 
             for (int rowTop = 0; rowTop <= mapHeightTiles; rowTop++) {
                 float worldY = (mapHeightTiles - rowTop) * DRAW_TILE_SIZE;
-                float lineY = panelY + worldY - cameraY;
+                float lineY = panelY + (worldY - cameraY) * zoomLevel;
                 if (lineY < panelY || lineY > panelY + panelH) {
                     continue;
                 }
@@ -540,7 +590,8 @@ public class BattlefieldScreen extends ScreenAdapter {
                 panelWidth,
                 panelHeight,
                 cameraX,
-                cameraY
+                cameraY,
+                zoomLevel
             );
             for (UnitRenderPlacement placement : placements) {
                 if (placement.unit().id().equals(selectedUnitId)) {
@@ -561,8 +612,10 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
 
         private void clampCamera() {
-            float maxCameraX = Math.max(0f, mapWorldWidth - getWidth());
-            float maxCameraY = Math.max(0f, mapWorldHeight - getHeight());
+            float visibleWorldWidth = getWidth() / zoomLevel;
+            float visibleWorldHeight = getHeight() / zoomLevel;
+            float maxCameraX = Math.max(0f, mapWorldWidth - visibleWorldWidth);
+            float maxCameraY = Math.max(0f, mapWorldHeight - visibleWorldHeight);
             cameraX = MathUtils.clamp(cameraX, 0f, maxCameraX);
             cameraY = MathUtils.clamp(cameraY, 0f, maxCameraY);
         }

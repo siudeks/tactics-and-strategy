@@ -36,7 +36,8 @@ class BattlefieldScreenRenderingTest {
             200f,
             200f,
             0f,
-            0f
+            0f,
+            1f
         );
 
         Map<String, BattlefieldScreen.UnitRenderPlacement> placementsById = placements.stream()
@@ -73,7 +74,8 @@ class BattlefieldScreenRenderingTest {
             80f,
             80f,
             32f,
-            16f
+            16f,
+            1f
         );
 
         assertEquals(1, placements.size());
@@ -92,7 +94,8 @@ class BattlefieldScreenRenderingTest {
             200f,
             200f,
             0f,
-            0f
+            0f,
+            1f
         ).getFirst();
 
         runtime.simulateOneTurn();
@@ -105,7 +108,8 @@ class BattlefieldScreenRenderingTest {
             200f,
             200f,
             0f,
-            0f
+            0f,
+            1f
         ).getFirst();
 
         assertAll(
@@ -113,6 +117,63 @@ class BattlefieldScreenRenderingTest {
             () -> assertPlacement(updatedPlacement, 48f, 64f, Side.ALLIES),
             () -> assertEquals("moving-unit", updatedPlacement.unit().id())
         );
+    }
+
+    @Test
+    void computeVisibleUnitPlacements_scalesCoordinatesAndSizeForZoom() {
+        CampaignState campaignState = new CampaignState(
+            "test-campaign",
+            "test-scenario",
+            1,
+            Side.ALLIES,
+            List.of(unit("zoomed", Side.ALLIES, 2, 3)),
+            List.of()
+        );
+
+        BattlefieldScreen.UnitRenderPlacement placement = BattlefieldScreen.computeVisibleUnitPlacements(
+            campaignState,
+            10,
+            10f,
+            20f,
+            300f,
+            300f,
+            16f,
+            32f,
+            2f
+        ).getFirst();
+
+        assertAll(
+            () -> assertEquals(42f, placement.screenX()),
+            () -> assertEquals(116f, placement.screenY()),
+            () -> assertEquals(64f, placement.drawSize())
+        );
+    }
+
+    @Test
+    void clampZoomLevel_clampsToBounds() {
+        assertAll(
+            () -> assertEquals(0.5f, BattlefieldScreen.clampZoomLevel(0.2f, 0.5f, 3f)),
+            () -> assertEquals(3f, BattlefieldScreen.clampZoomLevel(4f, 0.5f, 3f)),
+            () -> assertEquals(1.2f, BattlefieldScreen.clampZoomLevel(1.2f, 0.5f, 3f))
+        );
+    }
+
+    @Test
+    void zoomStepFactor_matchesScrollDirection() {
+        assertAll(
+            () -> assertEquals(1f, BattlefieldScreen.zoomStepFactor(0f, 0.1f), 0.0001f),
+            () -> assertEquals(1f / 1.1f, BattlefieldScreen.zoomStepFactor(1f, 0.1f), 0.0001f),
+            () -> assertEquals(1.1f, BattlefieldScreen.zoomStepFactor(-1f, 0.1f), 0.0001f)
+        );
+    }
+
+    @Test
+    void cameraAfterZoom_keepsWorldPointUnderCursorStable() {
+        float cameraAfterZoom = BattlefieldScreen.cameraAfterZoom(40f, 100f, 1f, 2f);
+        float worldBefore = 40f + 100f / 1f;
+        float worldAfter = cameraAfterZoom + 100f / 2f;
+
+        assertEquals(worldBefore, worldAfter, 0.0001f);
     }
 
     private static void assertPlacement(BattlefieldScreen.UnitRenderPlacement placement,
