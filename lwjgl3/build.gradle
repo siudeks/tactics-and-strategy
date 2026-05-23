@@ -20,7 +20,9 @@ def releaseAppDir = layout.buildDirectory.dir('release/app')
 def releaseRootDir = layout.buildDirectory.dir('release/root')
 def jpackageInputDir = layout.buildDirectory.dir('release/jpackage-input')
 def jpackageDistDir = layout.buildDirectory.dir('distributions/portable')
+def jpackageInstallerDir = layout.buildDirectory.dir('distributions/installer')
 def portableAppImageName = 'tactics-and-strategy'
+def installerArtifactName = 'tactics-and-strategy-windows-x64-installer.exe'
 def isWindowsHost = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
 
 tasks.register('prepareBundledAppLayout') {
@@ -144,6 +146,71 @@ tasks.register('createWindowsPortableAppImage', Exec) {
             '--vendor', 'tactics-and-strategy',
             '--description', 'Turn-based tactical strategy game'
         )
+    }
+}
+
+tasks.register('createWindowsInstallerExe', Exec) {
+    description = 'Create a single-file Windows installer EXE via jpackage.'
+    dependsOn tasks.named('prepareJpackageInput'), tasks.named('createBundledRuntime')
+    onlyIf { isWindowsHost }
+
+    doFirst {
+        def javaHome = System.getenv('JAVA_HOME') ?: System.getProperty('java.home')
+        if (javaHome == null || javaHome.isBlank()) {
+            throw new GradleException('JAVA_HOME is not set and java.home is unavailable.')
+        }
+
+        def jpackageExecutable = file("${javaHome}/bin/jpackage.exe")
+        if (!jpackageExecutable.exists()) {
+            throw new GradleException("jpackage executable not found at ${jpackageExecutable}.")
+        }
+
+        def inputDir = jpackageInputDir.get().asFile
+        def installerDir = jpackageInstallerDir.get().asFile
+        project.delete(installerDir)
+        installerDir.mkdirs()
+
+        def mainJarFile = tasks.named('jar').get().archiveFile.get().asFile
+
+        commandLine(
+            jpackageExecutable.absolutePath,
+            '--type', 'exe',
+            '--dest', installerDir.absolutePath,
+            '--name', portableAppImageName,
+            '--input', inputDir.absolutePath,
+            '--main-jar', mainJarFile.name,
+            '--main-class', application.mainClass.get(),
+            '--runtime-image', releaseRuntimeDir.get().asFile.absolutePath,
+            '--vendor', 'tactics-and-strategy',
+            '--description', 'Turn-based tactical strategy game',
+            '--win-dir-chooser',
+            '--win-shortcut',
+            '--win-menu'
+        )
+    }
+}
+
+tasks.register('stageWindowsInstallerArtifact') {
+    description = 'Copy the generated installer EXE to a stable release artifact filename.'
+    group = 'distribution'
+    dependsOn tasks.named('createWindowsInstallerExe')
+    onlyIf { isWindowsHost }
+
+    doLast {
+        def installerDir = jpackageInstallerDir.get().asFile
+        def outputDir = layout.buildDirectory.dir('distributions').get().asFile
+        outputDir.mkdirs()
+
+        def generatedInstaller = installerDir.listFiles()?.find { it.name.toLowerCase(Locale.ROOT).endsWith('.exe') }
+        if (generatedInstaller == null) {
+            throw new GradleException("No installer EXE generated in ${installerDir}")
+        }
+
+        copy {
+            from(generatedInstaller)
+            into(outputDir)
+            rename { installerArtifactName }
+        }
     }
 }
 
