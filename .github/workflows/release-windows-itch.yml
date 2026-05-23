@@ -1,0 +1,51 @@
+name: Release Windows Build to itch.io
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: itch.io channel
+        required: true
+        default: windows
+      version:
+        description: User-visible build version
+        required: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Build Windows bundle with embedded runtime
+        shell: pwsh
+        run: .\gradlew.bat lwjgl3:packageWindowsBundledRelease
+
+      - name: Install butler
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
+          Expand-Archive -Path butler.zip -DestinationPath butler
+          Add-Content -Path $env:GITHUB_PATH -Value "$PWD/butler"
+
+      - name: Upload to itch.io
+        shell: pwsh
+        env:
+          BUTLER_API_KEY: ${{ secrets.ITCH_IO_API_KEY }}
+          ITCH_IO_GAME_ID: ${{ secrets.ITCH_IO_GAME_ID }}
+        run: |
+          if (-not $env:BUTLER_API_KEY) { throw "Missing secret ITCH_IO_API_KEY" }
+          if (-not $env:ITCH_IO_GAME_ID) { throw "Missing secret ITCH_IO_GAME_ID" }
+          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip "$env:ITCH_IO_GAME_ID:${{ github.event.inputs.channel }}" --userversion "${{ github.event.inputs.version }}"
+
+      - name: Show published artifact details
+        shell: pwsh
+        run: Get-ChildItem lwjgl3/build/distributions | Format-Table Name,Length

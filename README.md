@@ -30,6 +30,22 @@ Run in devcontainer (headless smoke run):
 ./gradlew headless:run
 ```
 
+Build a Windows release package with bundled Java runtime (run on Windows host/runner):
+```bash
+./gradlew lwjgl3:packageWindowsBundledRelease
+```
+
+Output package:
+- `lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip`
+
+The release ZIP includes:
+- `runtime/` - embedded Java runtime
+- `app/` - game libraries and launcher
+- `start-game.bat` - top-level Windows starter script
+
+Automated upload to itch.io is available via GitHub Actions workflow:
+- `.github/workflows/release-windows-itch.yml` (manual `workflow_dispatch` trigger)
+
 ## Documentation
 - [Project Docs Index](docs/README.md)
 - [Engine Specification Package v1](docs/engine/README.md)

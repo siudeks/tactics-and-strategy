@@ -2,6 +2,9 @@ plugins {
     id 'application'
 }
 
+import org.gradle.api.tasks.bundling.Zip
+import java.util.Locale
+
 dependencies {
     implementation project(':core')
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
@@ -10,4 +13,110 @@ dependencies {
 
 application {
     mainClass = 'pl.tactics.lwjgl3.Lwjgl3Launcher'
+}
+
+def releaseRuntimeDir = layout.buildDirectory.dir('release/runtime')
+def releaseAppDir = layout.buildDirectory.dir('release/app')
+def releaseRootDir = layout.buildDirectory.dir('release/root')
+def isWindowsHost = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+
+tasks.register('prepareBundledAppLayout') {
+    description = 'Assemble app files for a release package with an embedded runtime.'
+    dependsOn tasks.named('jar')
+
+    doLast {
+        def appDir = releaseAppDir.get().asFile
+        def libDir = new File(appDir, 'lib')
+        def binDir = new File(appDir, 'bin')
+
+        project.delete(appDir)
+        libDir.mkdirs()
+        binDir.mkdirs()
+
+        copy {
+            from(tasks.named('jar').flatMap { it.archiveFile })
+            into(libDir)
+        }
+
+        copy {
+            from(configurations.runtimeClasspath)
+            into(libDir)
+        }
+
+        def launcherFile = new File(binDir, 'tactics-and-strategy.bat')
+        launcherFile.text = """@echo off
+setlocal
+set SCRIPT_DIR=%~dp0
+set APP_HOME=%SCRIPT_DIR%..\
+\"%APP_HOME%runtime\\bin\\java.exe\" -cp \"%APP_HOME%app\\lib\\*\" pl.tactics.lwjgl3.Lwjgl3Launcher %*
+endlocal
+"""
+    }
+}
+
+tasks.register('createBundledRuntime', Exec) {
+    description = 'Create a minimized Java runtime image for bundled desktop distribution.'
+    onlyIf { isWindowsHost }
+
+    doFirst {
+        def javaHome = System.getenv('JAVA_HOME') ?: System.getProperty('java.home')
+        if (javaHome == null || javaHome.isBlank()) {
+            throw new GradleException('JAVA_HOME is not set and java.home is unavailable.')
+        }
+
+        def jlinkExecutable = file("${javaHome}/bin/jlink.exe")
+        if (!jlinkExecutable.exists()) {
+            throw new GradleException("jlink executable not found at ${jlinkExecutable}.")
+        }
+
+        def runtimeOutput = releaseRuntimeDir.get().asFile
+        project.delete(runtimeOutput)
+
+        commandLine(
+            jlinkExecutable.absolutePath,
+            '--module-path', file("${javaHome}/jmods").absolutePath,
+            '--add-modules', 'java.base,java.desktop,jdk.unsupported',
+            '--strip-debug',
+            '--compress', '2',
+            '--no-header-files',
+            '--no-man-pages',
+            '--output', runtimeOutput.absolutePath
+        )
+    }
+}
+
+tasks.register('packageWindowsBundledRelease', Zip) {
+    description = 'Create a Windows ZIP release with a bundled Java runtime.'
+    group = 'distribution'
+    dependsOn tasks.named('prepareBundledAppLayout'), tasks.named('createBundledRuntime')
+    onlyIf { isWindowsHost }
+
+    archiveBaseName = 'tactics-and-strategy-windows-x64'
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+
+    from(releaseAppDir) {
+        into('app')
+    }
+
+    from(releaseRuntimeDir) {
+        into('runtime')
+    }
+
+    doFirst {
+        def rootDir = releaseRootDir.get().asFile
+        project.delete(rootDir)
+        rootDir.mkdirs()
+
+        def startFile = new File(rootDir, 'start-game.bat')
+        startFile.text = """@echo off
+setlocal
+set ROOT_DIR=%~dp0
+call \"%ROOT_DIR%app\\bin\\tactics-and-strategy.bat\" %*
+endlocal
+"""
+    }
+
+    from(releaseRootDir) {
+        include('start-game.bat')
+    }
 }
