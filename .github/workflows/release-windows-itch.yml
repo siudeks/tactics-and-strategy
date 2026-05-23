@@ -114,4 +114,12 @@ jobs:
 
       - name: Show published artifact details
         shell: pwsh
-        run: Get-ChildItem lwjgl3/build/distributions | Format-Table Name,Length
+        run: |
+          if (Test-Path 'lwjgl3/build/libs') {
+            Get-ChildItem lwjgl3/build/libs | Format-Table Name,Length
+          } else {
+            Write-Host 'Expected output directory missing: lwjgl3/build/libs'
+            Write-Host 'Workspace tree preview:'
+            Get-ChildItem lwjgl3/build -Recurse -Depth 2 | Format-Table FullName
+            throw 'Artifact directory not found.'
+          }
