@@ -31,9 +31,9 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - name: Build Windows bundle with embedded runtime
+      - name: Build Windows portable package with native EXE launcher
         shell: pwsh
-        run: .\gradlew.bat lwjgl3:packageWindowsBundledRelease
+        run: .\gradlew.bat lwjgl3:packageWindowsPortableRelease
 
       - name: Install butler
         shell: pwsh
@@ -104,7 +104,7 @@ jobs:
 
           Write-Host "Publishing game '$gameId' to channel '$channel'"
           Write-Host "Butler target: $publishTarget"
-          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip "$publishTarget" --userversion "$env:RELEASE_VERSION"
+          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-portable-x64.zip "$publishTarget" --userversion "$env:RELEASE_VERSION"
 
       - name: Show published artifact details
         shell: pwsh

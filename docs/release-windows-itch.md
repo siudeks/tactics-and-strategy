@@ -1,6 +1,6 @@
 # Windows Release to itch.io
 
-This runbook describes how to produce and upload a Windows build that includes a bundled Java runtime, so testers do not need to install Java.
+This runbook describes how to produce and upload a portable Windows build with a native EXE launcher and bundled Java runtime, so testers do not need to install Java.
 
 ## Prerequisites
 - GitHub repository secrets:
@@ -12,17 +12,17 @@ This runbook describes how to produce and upload a Windows build that includes a
 From repository root:
 
 ```bash
-./gradlew lwjgl3:packageWindowsBundledRelease
+./gradlew lwjgl3:packageWindowsPortableRelease
 ```
 
 Generated file:
-- `lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip`
+- `lwjgl3/build/distributions/tactics-and-strategy-windows-portable-x64.zip`
 
 ZIP layout:
-- `runtime/` embedded Java runtime
-- `app/lib/` application jars and dependencies
-- `app/bin/tactics-and-strategy.bat` app launcher
-- `start-game.bat` convenience starter
+- `tactics-and-strategy/` app image root
+- `tactics-and-strategy/tactics-and-strategy.exe` native app launcher
+- `tactics-and-strategy/runtime/` embedded Java runtime
+- `tactics-and-strategy/app/` application jars and dependencies
 
 ## Publish Through GitHub Actions
 1. Open Actions and run workflow `Release Windows Build to itch.io`.
@@ -35,5 +35,5 @@ The workflow runs on `windows-latest`, builds the bundled ZIP, and uploads it us
 ## Tester Verification
 1. Tester downloads the ZIP from itch.io page.
 2. Tester extracts archive.
-3. Tester runs `start-game.bat`.
+3. Tester runs `tactics-and-strategy.exe`.
 4. Game starts without any system Java installation.
