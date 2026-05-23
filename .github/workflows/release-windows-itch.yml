@@ -42,42 +42,41 @@ jobs:
           $installDir = Join-Path $PWD 'butler-bin'
           New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 
-          $urls = @(
-            'https://broth.itch.ovh/butler/windows-amd64/LATEST/butler.zip',
-            'https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default'
-          )
-
           $installed = $false
-          foreach ($url in $urls) {
-            try {
-              Write-Host "Trying to download butler from $url"
-              $downloadPath = Join-Path $PWD 'butler-download.bin'
-              Invoke-WebRequest -Uri $url -OutFile $downloadPath
 
-              try {
-                Expand-Archive -Path $downloadPath -DestinationPath $installDir -Force
-                if (Test-Path (Join-Path $installDir 'butler.exe')) {
-                  $installed = $true
-                  break
-                }
-              } catch {
-                # Not a zip archive, try treating it as a raw executable.
-              }
+          try {
+            Write-Host 'Resolving latest butler release from GitHub API'
+            $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/itchio/butler/releases/latest'
+            $asset = $release.assets | Where-Object { $_.name -eq 'butler-windows-amd64.zip' } | Select-Object -First 1
 
-              Copy-Item $downloadPath (Join-Path $installDir 'butler.exe') -Force
-              & (Join-Path $installDir 'butler.exe') -V | Out-Null
-              $installed = $true
-              break
-            } catch {
-              Write-Host "Failed download/validation from ${url}: $($_.Exception.Message)"
+            if ($null -eq $asset) {
+              throw 'Asset butler-windows-amd64.zip not found in latest release.'
             }
+
+            $zipPath = Join-Path $PWD 'butler.zip'
+            Write-Host "Downloading butler from $($asset.browser_download_url)"
+            Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath
+            Expand-Archive -Path $zipPath -DestinationPath $installDir -Force
+
+            if (-not (Test-Path (Join-Path $installDir 'butler.exe'))) {
+              throw 'Downloaded archive did not contain butler.exe'
+            }
+
+            $installed = $true
+          } catch {
+            Write-Host "GitHub release download failed: $($_.Exception.Message)"
           }
 
           if (-not $installed) {
-            throw 'Unable to install butler from known download URLs.'
+            Write-Host 'Falling back to Chocolatey installation'
+            choco install butler -y --no-progress
+            $installed = $true
+            $installDir = ''
           }
 
-          Add-Content -Path $env:GITHUB_PATH -Value $installDir
+          if ($installDir -ne '') {
+            Add-Content -Path $env:GITHUB_PATH -Value $installDir
+          }
           butler -V
 
       - name: Upload to itch.io
