@@ -87,7 +87,16 @@ jobs:
         run: |
           if (-not $env:BUTLER_API_KEY) { throw "Missing secret ITCH_IO_API_KEY" }
           if (-not $env:ITCH_IO_GAME_ID) { throw "Missing secret ITCH_IO_GAME_ID" }
-          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip "$env:ITCH_IO_GAME_ID:$env:RELEASE_CHANNEL" --userversion "$env:RELEASE_VERSION"
+          if ($env:ITCH_IO_GAME_ID -notmatch '^[^/]+/[^/]+$') {
+            throw "Invalid ITCH_IO_GAME_ID format. Expected username/game-slug, got: $($env:ITCH_IO_GAME_ID)"
+          }
+          if (-not $env:RELEASE_CHANNEL) {
+            throw "RELEASE_CHANNEL is empty"
+          }
+
+          $publishTarget = "${env:ITCH_IO_GAME_ID}:${env:RELEASE_CHANNEL}"
+          Write-Host "Publishing to $publishTarget"
+          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip $publishTarget --userversion "$env:RELEASE_VERSION"
 
       - name: Show published artifact details
         shell: pwsh
