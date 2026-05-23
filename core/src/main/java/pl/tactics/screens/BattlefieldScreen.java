@@ -442,7 +442,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                     CampaignState state = campaignStateSupplier.get();
                     List<UnitRenderPlacement> placements = computeVisibleUnitPlacements(
                         state, mapHeightTiles, getX(), getY(), getWidth(), getHeight(), cameraX, cameraY, zoomLevel);
-                    selectedUnitId = unitIdAtScreenPoint(placements, sx, sy, state.activeSide());
+                    selectUnit(unitIdAtScreenPoint(placements, sx, sy, state.activeSide()));
                 }
 
                 @Override
@@ -486,7 +486,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                         return true;
                     }
                     if (keycode == com.badlogic.gdx.Input.Keys.ESCAPE) {
-                        selectedUnitId = null;
+                        selectUnit(null);
                         return true;
                     }
                     return false;
@@ -626,12 +626,18 @@ public class BattlefieldScreen extends ScreenAdapter {
             return selectedUnitId;
         }
 
+        private void selectUnit(String unitId) {
+            selectedUnitId = unitId;
+            selectorBlinkTimer = 0f;
+            selectorVisible = true;
+        }
+
         void resetSelection() {
             CampaignState state = campaignStateSupplier.get();
             List<Unit> active = state.units().stream()
                 .filter(u -> u.side() == state.activeSide())
                 .toList();
-            selectedUnitId = active.isEmpty() ? null : active.getFirst().id();
+            selectUnit(active.isEmpty() ? null : active.getFirst().id());
         }
 
         private void cycleSelectedUnit() {
@@ -639,7 +645,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             List<Unit> active = state.units().stream()
                 .filter(u -> u.side() == state.activeSide())
                 .toList();
-            selectedUnitId = nextSelectedUnitId(active, selectedUnitId);
+            selectUnit(nextSelectedUnitId(active, selectedUnitId));
         }
 
         @Override
