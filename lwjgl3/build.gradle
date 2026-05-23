@@ -263,3 +263,27 @@ endlocal
         include('start-game.bat')
     }
 }
+
+tasks.register('fatJar', Jar) {
+    description = 'Create a single runnable JAR that requires local Java 21.'
+    group = 'distribution'
+    dependsOn tasks.named('classes')
+
+    archiveBaseName = 'tactics-and-strategy'
+    archiveClassifier = 'all'
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes('Main-Class': application.mainClass.get())
+    }
+
+    from(sourceSets.main.output)
+    from {
+        configurations.runtimeClasspath.collect { dependency ->
+            dependency.isDirectory() ? dependency : zipTree(dependency)
+        }
+    }
+
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}

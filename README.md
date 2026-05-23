@@ -30,18 +30,16 @@ Run in devcontainer (headless smoke run):
 ./gradlew headless:run
 ```
 
-Build a Windows portable app image (run on Windows host/runner):
+Build a single runnable JAR release (requires Java 21 on user machine):
 ```bash
-./gradlew lwjgl3:createWindowsPortableAppImage
+./gradlew lwjgl3:fatJar
 ```
 
-Output directory:
-- `lwjgl3/build/distributions/portable/tactics-and-strategy/`
+Output file:
+- `lwjgl3/build/libs/tactics-and-strategy-all.jar`
 
-Portable output includes:
-- `tactics-and-strategy.exe` - native launcher
-- `runtime/` - bundled Java runtime
-- `app/` - game jars and dependencies
+Run command:
+- `java -jar lwjgl3/build/libs/tactics-and-strategy-all.jar`
 
 Automated upload to itch.io is available via GitHub Actions workflow:
 - `.github/workflows/release-windows-itch.yml` (manual `workflow_dispatch` trigger)
