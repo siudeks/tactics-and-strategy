@@ -31,9 +31,9 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - name: Build Windows installer EXE
+      - name: Build Windows portable app image
         shell: pwsh
-        run: .\gradlew.bat lwjgl3:stageWindowsInstallerArtifact
+        run: .\gradlew.bat lwjgl3:createWindowsPortableAppImage
 
       - name: Install butler
         shell: pwsh
@@ -110,7 +110,7 @@ jobs:
             Write-Host "Unpublish did not complete cleanly (possibly empty channel). Continuing with push."
           }
 
-          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-x64-installer.exe "$publishTarget" --userversion "$env:RELEASE_VERSION"
+          butler push lwjgl3/build/distributions/portable/tactics-and-strategy "$publishTarget" --userversion "$env:RELEASE_VERSION"
 
       - name: Show published artifact details
         shell: pwsh
