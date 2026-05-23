@@ -69,7 +69,7 @@ jobs:
               $installed = $true
               break
             } catch {
-              Write-Host "Failed download/validation from $url: $($_.Exception.Message)"
+              Write-Host "Failed download/validation from ${url}: $($_.Exception.Message)"
             }
           }
 
