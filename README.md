@@ -32,7 +32,12 @@ Run in devcontainer (headless smoke run):
 
 ## Documentation
 - [Project Docs Index](docs/README.md)
-- [Game Implementation Plan v0 (Desert Rats)](docs/implementation/game-implementation-plan-v0.md)
+- [Engine Specification Package v1](docs/engine/README.md)
+- [Engine Mechanics Specification v1](docs/engine/engine-spec-v1.md)
+- [Turn Semantics v1](docs/engine/turn-semantics-v1.md)
+- [Scenario Runtime Contract v1](docs/engine/scenario-runtime-contract-v1.md)
+- [Determinism Contract v1](docs/engine/determinism-contract-v1.md)
+- [Traceability Matrix v1](docs/engine/traceability-matrix-v1.md)
 - [Game Requirements v0](docs/requirements/game-requirements-v0.md)
 - [Scenario Pack v0](docs/scenarios/scenarios-v0.md)
 - [Graphics Asset Register v0](docs/assets/graphics-assets-register-v0.md)
