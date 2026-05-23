@@ -372,6 +372,8 @@ public class BattlefieldScreen extends ScreenAdapter {
 
         private boolean debugGridOverlay;
         private String selectedUnitId;
+        private float selectorBlinkTimer;
+        private boolean selectorVisible = true;
         private float cameraX;
         private float cameraY;
         private float zoomLevel;
@@ -594,7 +596,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                 zoomLevel
             );
             for (UnitRenderPlacement placement : placements) {
-                if (placement.unit().id().equals(selectedUnitId)) {
+                if (placement.unit().id().equals(selectedUnitId) && selectorVisible) {
                     float border = 2f;
                     batch.setColor(Color.WHITE);
                     drawBlock(batch, placement.screenX() - border, placement.screenY() - border,
@@ -638,6 +640,16 @@ public class BattlefieldScreen extends ScreenAdapter {
                 .filter(u -> u.side() == state.activeSide())
                 .toList();
             selectedUnitId = nextSelectedUnitId(active, selectedUnitId);
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+            selectorBlinkTimer += delta;
+            if (selectorBlinkTimer >= 0.5f) {
+                selectorBlinkTimer -= 0.5f;
+                selectorVisible = !selectorVisible;
+            }
         }
 
         public void dispose() {
