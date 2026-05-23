@@ -17,6 +17,9 @@ on:
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      RELEASE_CHANNEL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.channel || 'windows' }}
+      RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,7 +38,7 @@ jobs:
       - name: Install butler
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
+          Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/butler.zip -OutFile butler.zip
           Expand-Archive -Path butler.zip -DestinationPath butler
           Add-Content -Path $env:GITHUB_PATH -Value "$PWD/butler"
 
@@ -47,7 +50,7 @@ jobs:
         run: |
           if (-not $env:BUTLER_API_KEY) { throw "Missing secret ITCH_IO_API_KEY" }
           if (-not $env:ITCH_IO_GAME_ID) { throw "Missing secret ITCH_IO_GAME_ID" }
-          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip "$env:ITCH_IO_GAME_ID:${{ github.event.inputs.channel }}" --userversion "${{ github.event.inputs.version }}"
+          butler push lwjgl3/build/distributions/tactics-and-strategy-windows-x64.zip "$env:ITCH_IO_GAME_ID:$env:RELEASE_CHANNEL" --userversion "$env:RELEASE_VERSION"
 
       - name: Show published artifact details
         shell: pwsh
