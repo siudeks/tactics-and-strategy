@@ -1,6 +1,9 @@
 name: Release Windows Build to itch.io
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       channel:
