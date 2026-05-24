@@ -20,10 +20,6 @@ public enum UnitType {
             .replace(' ', '_')
             .replace('-', '_');
 
-        return switch (normalized) {
-            case "ARMOR" -> MEDIUM_TANK;
-            case "INFANTRY", "FOOT_INFANTRY" -> FOOT_INFANTRY;
-            default -> UnitType.valueOf(normalized);
-        };
+        return UnitType.valueOf(normalized);
     }
 }
