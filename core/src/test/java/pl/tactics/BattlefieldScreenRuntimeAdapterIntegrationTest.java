@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import pl.tactics.engine.GameRuntime;
 import pl.tactics.scenario.ScenarioLoader;
-import pl.tactics.terrain.TerrainMapDefinition;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,19 +17,6 @@ class BattlefieldScreenRuntimeAdapterIntegrationTest {
         HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
         config.updatesPerSecond = -1;
         new HeadlessApplication(new ApplicationAdapter() {}, config);
-    }
-
-    @Test
-    void runtimeAdapter_paletteMode_defaultIsImproved() {
-        GameRuntime runtime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
-        assertEquals(TerrainMapDefinition.PaletteMode.IMPROVED, runtime.getPaletteMode());
-    }
-
-    @Test
-    void runtimeAdapter_togglePaletteMode_changesMode() {
-        GameRuntime runtime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
-        runtime.togglePaletteMode();
-        assertEquals(TerrainMapDefinition.PaletteMode.ORIGINAL, runtime.getPaletteMode());
     }
 
     @Test

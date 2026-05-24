@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import pl.tactics.domain.CampaignState;
 import pl.tactics.engine.GameRuntime;
 import pl.tactics.scenario.ScenarioLoader;
-import pl.tactics.terrain.TerrainMapDefinition;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,10 +52,4 @@ class GameRuntimeTurnIntegrationTest {
         assertIterableEquals(initialState.units(), updatedState.units());
     }
 
-    @Test
-    void gameRuntime_togglePaletteMode_changesMode() {
-        TerrainMapDefinition.PaletteMode initial = runtime.getPaletteMode();
-        runtime.togglePaletteMode();
-        assertNotEquals(initial, runtime.getPaletteMode());
-    }
 }

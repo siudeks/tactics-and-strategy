@@ -38,9 +38,6 @@ import java.util.function.Supplier;
 
 public class BattlefieldScreen extends ScreenAdapter {
 
-    public interface PaletteSurface {
-        void setPaletteMode(TerrainMapDefinition.PaletteMode mode);
-    }
     private static final Color BG = Color.valueOf("1E232B");
     private static final Color MAP_BG = Color.valueOf("181814");
     private static final Color PANEL_BG = Color.valueOf("2C3038");
@@ -121,23 +118,12 @@ public class BattlefieldScreen extends ScreenAdapter {
         panel.setBackground(background);
         panel.defaults().growX().pad(8f);
 
-        TextButton paletteButton = new TextButton("Paleta: " + mapPanel.getPaletteLabel(), buttonStyle);
-        paletteButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                mapPanel.togglePalette();
-                gameRuntime.togglePaletteMode();
-                paletteButton.setText("Paleta: " + mapPanel.getPaletteLabel());
-            }
-        });
-
         panel.add(new Label("Panel rozkazow", labelStyle)).left().padTop(10f).row();
         unitNameLabel = new Label("", labelStyle);
         unitInfoSection = new Table();
         unitInfoSection.add(unitNameLabel).left();
         unitInfoSection.setVisible(false);
         panel.add(unitInfoSection).growX().left().row();
-        panel.add(paletteButton).row();
         panel.add(new TextButton("Ruch", buttonStyle)).row();
         panel.add(new TextButton("Atak", buttonStyle)).row();
         panel.add(new TextButton("Obrona", buttonStyle)).row();
@@ -178,20 +164,6 @@ public class BattlefieldScreen extends ScreenAdapter {
         if (statusLabel != null) {
             statusLabel.setText(runtimeStatusSummary());
         }
-    }
-
-    public String runtimePaletteLabel() {
-        return gameRuntime.getPaletteMode() == TerrainMapDefinition.PaletteMode.ORIGINAL
-            ? "Oryginalna" : "Poprawiona";
-    }
-
-    public void togglePaletteThroughRuntime() {
-        gameRuntime.togglePaletteMode();
-        mapPanel.setPaletteMode(gameRuntime.getPaletteMode());
-    }
-
-    public void attachRuntimeBridgeForPaletteSurface(PaletteSurface surface) {
-        surface.setPaletteMode(gameRuntime.getPaletteMode());
     }
 
     @Override
@@ -473,10 +445,6 @@ public class BattlefieldScreen extends ScreenAdapter {
                         debugGridOverlay = !debugGridOverlay;
                         return true;
                     }
-                    if (keycode == com.badlogic.gdx.Input.Keys.P) {
-                        togglePalette();
-                        return true;
-                    }
                     if (keycode == com.badlogic.gdx.Input.Keys.ENTER) {
                         onEndTurn.run();
                         return true;
@@ -492,27 +460,6 @@ public class BattlefieldScreen extends ScreenAdapter {
                     return false;
                 }
             });
-        }
-
-        public String getPaletteLabel() {
-            if (mapDefinition.getPaletteMode() == TerrainMapDefinition.PaletteMode.ORIGINAL) {
-                return "Oryginalna";
-            }
-            return "Poprawiona";
-        }
-
-        public void togglePalette() {
-            TerrainMapDefinition.PaletteMode currentMode = mapDefinition.getPaletteMode();
-            TerrainMapDefinition.PaletteMode nextMode = currentMode == TerrainMapDefinition.PaletteMode.ORIGINAL
-                ? TerrainMapDefinition.PaletteMode.IMPROVED
-                : TerrainMapDefinition.PaletteMode.ORIGINAL;
-            mapDefinition.setPaletteMode(nextMode);
-            tileAtlas.rebuild(mapDefinition);
-        }
-
-        public void setPaletteMode(TerrainMapDefinition.PaletteMode mode) {
-            mapDefinition.setPaletteMode(mode);
-            tileAtlas.rebuild(mapDefinition);
         }
 
         @Override
