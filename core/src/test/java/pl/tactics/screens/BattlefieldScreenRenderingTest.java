@@ -189,7 +189,7 @@ class BattlefieldScreenRenderingTest {
     }
 
     private static Unit unit(String id, Side side, int tileX, int tileY) {
-        return new Unit(id, side, UnitType.ARMOR, UnitSize.BATTALION, tileX, tileY);
+        return new Unit(id, side, UnitType.MEDIUM_TANK, UnitSize.BATTALION, tileX, tileY);
     }
 
     private static LoadedScenario loadedScenarioWithPendingMove(String unitId,

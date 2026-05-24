@@ -3,6 +3,7 @@ package pl.tactics;
 import org.junit.jupiter.api.Test;
 import pl.tactics.domain.Side;
 import pl.tactics.domain.TerrainType;
+import pl.tactics.domain.UnitType;
 import pl.tactics.scenario.ScenarioEntry;
 import pl.tactics.scenario.LoadedScenario;
 import pl.tactics.scenario.ScenarioLoader;
@@ -50,6 +51,24 @@ class ScenarioLoaderTest {
     void loadBootstrapScenario_parsesUnitCount() {
         LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(4, loaded.scenarioDefinition().units().size());
+    }
+
+    @Test
+    void loadBootstrapScenario_mapsBattalionArmorTypeToLightTank() {
+        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        assertEquals(UnitType.LIGHT_TANK, loaded.scenarioDefinition().units().getFirst().type());
+    }
+
+    @Test
+    void loadBootstrapScenario_mapsInfantryTypeToFootInfantry() {
+        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        assertEquals(UnitType.FOOT_INFANTRY, loaded.scenarioDefinition().units().get(1).type());
+    }
+
+    @Test
+    void loadOperationCompass_mapsBattalionInfantryTypeToMotorisedInfantry() {
+        LoadedScenario loaded = ScenarioLoader.loadFromResource("scenarios/desert-rats-op-compass.json");
+        assertEquals(UnitType.MOTORISED_INFANTRY, loaded.scenarioDefinition().units().getLast().type());
     }
 
     @Test
@@ -128,7 +147,7 @@ class ScenarioLoaderTest {
                                     "defaultTerrain": "SAND"
                                 },
                                 "units": [
-                                    {"id": "bad-unit", "side": "ALLIES", "type": "INFANTRY", "size": "BRIGADE", "tileX": %d, "tileY": %d}
+                                    {"id": "bad-unit", "side": "ALLIES", "type": "FOOT_INFANTRY", "size": "BRIGADE", "tileX": %d, "tileY": %d}
                                 ]
                             },
                             "campaignState": {

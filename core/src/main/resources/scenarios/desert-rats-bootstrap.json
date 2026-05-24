@@ -8,10 +8,10 @@
       "defaultTerrain": "SAND"
     },
     "units": [
-      {"id": "allies-armor-1", "side": "ALLIES", "type": "ARMOR", "size": "BATTALION", "tileX": 1, "tileY": 1},
-      {"id": "allies-inf-1",   "side": "ALLIES", "type": "INFANTRY", "size": "BRIGADE", "tileX": 2, "tileY": 1},
-      {"id": "axis-armor-1",   "side": "AXIS",   "type": "ARMOR", "size": "BATTALION", "tileX": 8, "tileY": 8},
-      {"id": "axis-inf-1",     "side": "AXIS",   "type": "INFANTRY", "size": "BRIGADE", "tileX": 7, "tileY": 8}
+      {"id": "allies-armor-1", "side": "ALLIES", "type": "LIGHT_TANK", "size": "BATTALION", "tileX": 1, "tileY": 1},
+      {"id": "allies-inf-1",   "side": "ALLIES", "type": "FOOT_INFANTRY", "size": "BRIGADE", "tileX": 2, "tileY": 1},
+        {"id": "axis-armor-1",   "side": "AXIS",   "type": "LIGHT_TANK", "size": "BATTALION", "tileX": 8, "tileY": 8},
+      {"id": "axis-inf-1",     "side": "AXIS",   "type": "FOOT_INFANTRY", "size": "BRIGADE", "tileX": 7, "tileY": 8}
     ]
   },
   "campaignState": {

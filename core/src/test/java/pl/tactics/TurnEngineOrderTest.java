@@ -26,7 +26,7 @@ class TurnEngineOrderTest {
 
     @Test
     void moveOrder_movesUnitToTarget() {
-        Unit unit = new Unit("u1", Side.ALLIES, UnitType.ARMOR, UnitSize.BATTALION, 1, 1);
+        Unit unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         Order order = new Order("o1", "u1", Side.ALLIES, OrderType.MOVE, 3, 4);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
@@ -44,7 +44,7 @@ class TurnEngineOrderTest {
 
     @Test
     void moveOrder_outOfBounds_unitStaysInPlace() {
-        Unit unit = new Unit("u1", Side.ALLIES, UnitType.ARMOR, UnitSize.BATTALION, 1, 1);
+        Unit unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         Order order = new Order("o1", "u1", Side.ALLIES, OrderType.MOVE, -1, 0);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
@@ -62,7 +62,7 @@ class TurnEngineOrderTest {
 
     @Test
     void moveOrder_toVoidTile_unitStaysInPlace() {
-        Unit unit = new Unit("u1", Side.ALLIES, UnitType.ARMOR, UnitSize.BATTALION, 1, 1);
+        Unit unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         Order order = new Order("o1", "u1", Side.ALLIES, OrderType.MOVE, 3, 3);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
@@ -81,7 +81,7 @@ class TurnEngineOrderTest {
 
     @Test
     void holdOrder_unitDoesNotMove() {
-        Unit unit = new Unit("u1", Side.ALLIES, UnitType.INFANTRY, UnitSize.BRIGADE, 5, 5);
+        Unit unit = new Unit("u1", Side.ALLIES, UnitType.FOOT_INFANTRY, UnitSize.BRIGADE, 5, 5);
         Order order = new Order("o1", "u1", Side.ALLIES, OrderType.HOLD, 0, 0);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)

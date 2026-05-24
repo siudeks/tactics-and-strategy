@@ -4,12 +4,12 @@
     "name": "Enter Rommel",
     "map": { "width": 20, "height": 10, "defaultTerrain": "SAND" },
     "units": [
-      {"id": "allies-armor-1",  "side": "ALLIES", "type": "ARMOR",    "size": "BRIGADE",  "tileX": 14, "tileY": 5},
-      {"id": "allies-inf-1",    "side": "ALLIES", "type": "INFANTRY", "size": "BRIGADE",  "tileX": 13, "tileY": 4},
-      {"id": "allies-inf-2",    "side": "ALLIES", "type": "INFANTRY", "size": "BATTALION","tileX": 13, "tileY": 6},
-      {"id": "axis-armor-1",    "side": "AXIS",   "type": "ARMOR",    "size": "BRIGADE",  "tileX": 4,  "tileY": 5},
-      {"id": "axis-armor-2",    "side": "AXIS",   "type": "ARMOR",    "size": "BATTALION","tileX": 3,  "tileY": 4},
-      {"id": "axis-inf-1",      "side": "AXIS",   "type": "INFANTRY", "size": "BRIGADE",  "tileX": 3,  "tileY": 6}
+      {"id": "allies-armor-1",  "side": "ALLIES", "type": "MEDIUM_TANK",    "size": "BRIGADE",  "tileX": 14, "tileY": 5},
+      {"id": "allies-inf-1",    "side": "ALLIES", "type": "FOOT_INFANTRY", "size": "BRIGADE",  "tileX": 13, "tileY": 4},
+      {"id": "allies-inf-2",    "side": "ALLIES", "type": "FOOT_INFANTRY", "size": "BATTALION","tileX": 13, "tileY": 6},
+      {"id": "axis-armor-1",    "side": "AXIS",   "type": "MEDIUM_TANK",    "size": "BRIGADE",  "tileX": 4,  "tileY": 5},
+        {"id": "axis-armor-2",    "side": "AXIS",   "type": "LIGHT_TANK",    "size": "BATTALION","tileX": 3,  "tileY": 4},
+      {"id": "axis-inf-1",      "side": "AXIS",   "type": "FOOT_INFANTRY", "size": "BRIGADE",  "tileX": 3,  "tileY": 6}
     ]
   },
   "campaignState": {

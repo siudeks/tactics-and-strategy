@@ -110,10 +110,10 @@ class BattlefieldScreenUnitSelectionTest {
     }
 
     private static Unit unit(String id) {
-        return new Unit(id, Side.ALLIES, UnitType.ARMOR, UnitSize.BATTALION, 0, 0);
+        return new Unit(id, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 0, 0);
     }
 
     private static Unit unit(String id, Side side) {
-        return new Unit(id, side, UnitType.ARMOR, UnitSize.BATTALION, 0, 0);
+        return new Unit(id, side, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 0, 0);
     }
 }

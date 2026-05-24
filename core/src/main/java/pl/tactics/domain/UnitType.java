@@ -1,5 +1,29 @@
 package pl.tactics.domain;
 
+import java.util.Locale;
+
 public enum UnitType {
-    ARMOR, INFANTRY
+    MEDIUM_TANK,
+    LIGHT_TANK,
+    INFANTRY_TANK,
+    RECCE,
+    MOTORISED_INFANTRY,
+    FOOT_INFANTRY,
+    SUPPORT_GROUP,
+    ANTI_TANK,
+    ARTILLERY,
+    HQ;
+
+    public static UnitType fromScenarioValue(String value) {
+        String normalized = value.trim()
+            .toUpperCase(Locale.ROOT)
+            .replace(' ', '_')
+            .replace('-', '_');
+
+        return switch (normalized) {
+            case "ARMOR" -> MEDIUM_TANK;
+            case "INFANTRY", "FOOT_INFANTRY" -> FOOT_INFANTRY;
+            default -> UnitType.valueOf(normalized);
+        };
+    }
 }

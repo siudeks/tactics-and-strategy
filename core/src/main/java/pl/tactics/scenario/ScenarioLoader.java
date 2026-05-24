@@ -109,7 +109,7 @@ public final class ScenarioLoader {
     private static Unit parseUnit(JsonValue unitJson) {
         String id = unitJson.getString("id");
         Side side = Side.valueOf(unitJson.getString("side").toUpperCase());
-        UnitType type = UnitType.valueOf(unitJson.getString("type").toUpperCase());
+        UnitType type = UnitType.fromScenarioValue(unitJson.getString("type"));
         UnitSize size = UnitSize.valueOf(unitJson.getString("size").toUpperCase());
         int tileX = unitJson.getInt("tileX");
         int tileY = unitJson.getInt("tileY");
