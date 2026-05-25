@@ -12,7 +12,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'pl.tactics.lwjgl3.Lwjgl3Launcher'
+    mainClass = 'game.lwjgl3.Lwjgl3Launcher'
 }
 
 def releaseRuntimeDir = layout.buildDirectory.dir('release/runtime')
@@ -53,7 +53,7 @@ tasks.register('prepareBundledAppLayout') {
 setlocal
 set SCRIPT_DIR=%~dp0
 set APP_HOME=%SCRIPT_DIR%..\
-\"%APP_HOME%runtime\\bin\\java.exe\" -cp \"%APP_HOME%app\\lib\\*\" pl.tactics.lwjgl3.Lwjgl3Launcher %*
+\"%APP_HOME%runtime\\bin\\java.exe\" -cp \"%APP_HOME%app\\lib\\*\" game.lwjgl3.Lwjgl3Launcher %*
 endlocal
 """
     }

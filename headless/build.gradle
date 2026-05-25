@@ -9,5 +9,5 @@ dependencies {
 }
 
 application {
-    mainClass = 'pl.tactics.headless.HeadlessLauncher'
+    mainClass = 'game.headless.HeadlessLauncher'
 }

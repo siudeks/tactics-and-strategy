@@ -57,10 +57,10 @@ See [docs/README.md](../docs/README.md) for full documentation index.
 | `headless` | Devcontainer-safe launcher (no GUI) |
 
 Key packages in `core`:
-- `pl.tactics.domain` — immutable value types (`Unit`, `Order`, `CampaignState`, etc.)
-- `pl.tactics.engine` — `TurnEngine`, `GameRuntime`, determinism context
-- `pl.tactics.scenario` — `ScenarioLoader`, `LoadedScenario`
-- `pl.tactics.screens` — libGDX screen implementations
+- `game.domain` — immutable value types (`Unit`, `Order`, `CampaignState`, etc.)
+- `game.engine` — `TurnEngine`, `GameRuntime`, determinism context
+- `game.scenario` — `ScenarioLoader`, `LoadedScenario`
+- `game.screens` — libGDX screen implementations
 
 Prefer **immutable records** for domain objects. `CampaignState` is the canonical game state passed between turns.
 
