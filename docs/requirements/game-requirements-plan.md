@@ -1,4 +1,4 @@
-# Game Requirements v0
+# Game Requirements Plan
 
 ## Scope
 This document defines functional requirements for a turn-based tactical strategy game inspired by classic North Africa campaign design patterns.

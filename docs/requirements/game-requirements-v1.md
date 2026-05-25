@@ -24,14 +24,15 @@ The engine executes a fixed five-phase sequence:
 5. END_TURN
 
 v1 behavior notes:
-- ISSUE_ORDERS is currently a structural phase (orders are read from campaign state).
-- COMBAT and RETREAT are currently structural placeholders (no domain resolution yet).
+- ISSUE_ORDERS is a structural phase (orders are read from campaign state).
+- COMBAT and RETREAT phases are executed as structural phases in the turn pipeline.
 - END_TURN always increments turn number by 1, flips side ALLIES <-> AXIS, and clears pending orders.
 - NEUTRAL is not a valid active turn side for side flipping.
 
 ## Map and Terrain
-- Battlefield model uses hex-tile coordinates from scenario definitions.
-- Scenario map defines width, height, and default terrain type.
+- Unit placement uses hex-tile coordinates from scenario definitions.
+- Scenario map metadata (width, height, default terrain type) is loaded and used for engine-side validation and movement bounds checks.
+- Terrain rendering uses the generated terrain map baseline in the current UI implementation.
 - Movement validation enforces map bounds.
 - Movement into impassable terrain is blocked for default terrain VOID and WATER.
 - Invalid movement orders are ignored silently (unit remains in place).
@@ -41,7 +42,6 @@ v1 behavior notes:
 - Unit identity and placement are represented by immutable domain records.
 - Order model currently supports two order types only: MOVE and HOLD.
 - Unit and order data are loaded from scenario/campaign JSON.
-- v1 does not implement operational unit states (active/disrupted/eliminated) in runtime logic.
 
 ## Scenario Loading and Initialization
 - Scenario resources are loaded from bundled JSON files.
@@ -67,16 +67,8 @@ v1 behavior notes:
   - Status bar with scenario name, turn number, and active side
   - End turn action wired to runtime turn simulation
 
-## Non-Goals / Not In v1 Scope
-The following areas are intentionally out of scope for this implemented baseline:
-- Combat resolution mechanics beyond structural phase placeholder.
-- Retreat/regroup mechanics beyond structural phase placeholder.
-- Supply continuity model and penalties.
-- Stacking limit enforcement per hex.
-- Objective runtime model (primary/secondary objective evaluation).
-- Failure condition runtime model.
-- Control point ownership system.
-- Campaign chaining with cumulative scenario effects.
+## Deferred Scope Reference
+Features planned beyond this implemented baseline are tracked in docs/requirements/game-requirements-plan.md.
 
 ## Traceability Note
 For executable evidence mapping (tests and code anchors), see docs/engine/traceability-matrix-v1.md.
