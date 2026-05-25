@@ -118,19 +118,24 @@ public class BattlefieldScreen extends ScreenAdapter {
         panel.setBackground(background);
         panel.defaults().growX().pad(8f);
 
-        panel.add(new Label("Panel rozkazow", labelStyle)).left().padTop(10f).row();
+        panel.add(new Label("Command Panel", labelStyle)).left().padTop(10f).row();
         unitNameLabel = new Label("", labelStyle);
         unitInfoSection = new Table();
         unitInfoSection.add(unitNameLabel).left();
         unitInfoSection.setVisible(false);
         panel.add(unitInfoSection).growX().left().row();
-        panel.add(new TextButton("Ruch", buttonStyle)).row();
-        panel.add(new TextButton("Atak", buttonStyle)).row();
-        panel.add(new TextButton("Obrona", buttonStyle)).row();
-        panel.add(new TextButton("Patrol", buttonStyle)).row();
+        TextButton moveButton = new TextButton("Move", buttonStyle);
+        moveButton.setDisabled(true);
+        moveButton.setTouchable(Touchable.disabled);
+        panel.add(moveButton).row();
+
+        TextButton holdButton = new TextButton("Hold", buttonStyle);
+        holdButton.setDisabled(true);
+        holdButton.setTouchable(Touchable.disabled);
+        panel.add(holdButton).row();
         panel.add().growY().row();
 
-        TextButton endTurnButton = new TextButton("Zakoncz ture  [Enter]", buttonStyle);
+        TextButton endTurnButton = new TextButton("End Turn  [Enter]", buttonStyle);
         endTurnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
