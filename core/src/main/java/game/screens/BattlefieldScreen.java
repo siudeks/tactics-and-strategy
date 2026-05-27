@@ -26,13 +26,16 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import game.domain.CampaignState;
 import game.domain.Side;
 import game.domain.Unit;
+import game.domain.UnitType;
 import game.engine.GameRuntime;
 import game.scenario.LoadedScenario;
 import game.terrain.TerrainMapDefinition;
 import game.terrain.TerrainTileAtlas;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -47,6 +50,17 @@ public class BattlefieldScreen extends ScreenAdapter {
     private static final Color ALLIES_UNIT_OUTLINE = Color.valueOf("243B8F");
     private static final Color AXIS_UNIT_FILL = Color.valueOf("C97B3E");
     private static final Color AXIS_UNIT_OUTLINE = Color.valueOf("4A2210");
+    private static final String ICON_MEDIUM_TANK_FILE = "ui/icon_medium_tank_64x64.png";
+    private static final String ICON_LIGHT_TANK_FILE = "ui/icon_light_tank_64x64.png";
+    private static final String ICON_INFANTRY_TANK_FILE = "ui/icon_infantry_tank_64x64.png";
+    private static final String ICON_RECCE_FILE = "ui/icon_recce_64x64.png";
+    private static final String ICON_MOTORISED_INFANTRY_FILE = "ui/icon_motorised_infantry_64x64.png";
+    private static final String ICON_FOOT_INFANTRY_FILE = "ui/infantry_rifle_64x64.png";
+    private static final String ICON_SUPPORT_GROUP_FILE = "ui/icon_support_group_64x64.png";
+    private static final String ICON_ANTI_TANK_FILE = "ui/icon_anti_tank_64x64.png";
+    private static final String ICON_ARTILLERY_FILE = "ui/icon_artillery_64x64.png";
+    private static final String ICON_HQ_FILE = "ui/icon_hq_64x64.png";
+    private static final String ICON_UNIDENTIFIED_FILE = "ui/icon_unidentified_64x64.png";
 
     private final Game game;
     private final LoadedScenario loadedScenario;
@@ -59,6 +73,8 @@ public class BattlefieldScreen extends ScreenAdapter {
     private Label statusLabel;
     private Label unitNameLabel;
     private Table unitInfoSection;
+    private Map<UnitType, Texture> unitIconTextures;
+    private Texture unidentifiedIconTexture;
 
     public BattlefieldScreen(Game game, LoadedScenario loadedScenario) {
         this.game = game;
@@ -71,6 +87,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         stage = new Stage(new ScreenViewport());
         font = new BitmapFont();
         whiteTexture = createWhiteTexture();
+        loadUnitIcons();
 
         TextureRegionDrawable base = new TextureRegionDrawable(new TextureRegion(whiteTexture));
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
@@ -88,7 +105,9 @@ public class BattlefieldScreen extends ScreenAdapter {
             whiteTexture,
             this::endTurn,
             gameRuntime::getCurrentCampaignState,
-            loadedScenario.scenarioDefinition().mapHeight()
+            loadedScenario.scenarioDefinition().mapHeight(),
+            unitIconTextures,
+            unidentifiedIconTexture
         );
 
         Table topArea = new Table();
@@ -200,6 +219,36 @@ public class BattlefieldScreen extends ScreenAdapter {
         font.dispose();
         mapPanel.dispose();
         whiteTexture.dispose();
+        disposeUnitIcons();
+    }
+
+    private void loadUnitIcons() {
+        unitIconTextures = new EnumMap<>(UnitType.class);
+        unitIconTextures.put(UnitType.MEDIUM_TANK, new Texture(Gdx.files.internal(ICON_MEDIUM_TANK_FILE)));
+        unitIconTextures.put(UnitType.LIGHT_TANK, new Texture(Gdx.files.internal(ICON_LIGHT_TANK_FILE)));
+        unitIconTextures.put(UnitType.INFANTRY_TANK, new Texture(Gdx.files.internal(ICON_INFANTRY_TANK_FILE)));
+        unitIconTextures.put(UnitType.RECCE, new Texture(Gdx.files.internal(ICON_RECCE_FILE)));
+        unitIconTextures.put(UnitType.MOTORISED_INFANTRY, new Texture(Gdx.files.internal(ICON_MOTORISED_INFANTRY_FILE)));
+        unitIconTextures.put(UnitType.FOOT_INFANTRY, new Texture(Gdx.files.internal(ICON_FOOT_INFANTRY_FILE)));
+        unitIconTextures.put(UnitType.SUPPORT_GROUP, new Texture(Gdx.files.internal(ICON_SUPPORT_GROUP_FILE)));
+        unitIconTextures.put(UnitType.ANTI_TANK, new Texture(Gdx.files.internal(ICON_ANTI_TANK_FILE)));
+        unitIconTextures.put(UnitType.ARTILLERY, new Texture(Gdx.files.internal(ICON_ARTILLERY_FILE)));
+        unitIconTextures.put(UnitType.HQ, new Texture(Gdx.files.internal(ICON_HQ_FILE)));
+        unidentifiedIconTexture = new Texture(Gdx.files.internal(ICON_UNIDENTIFIED_FILE));
+    }
+
+    private void disposeUnitIcons() {
+        if (unitIconTextures != null) {
+            for (Texture texture : unitIconTextures.values()) {
+                texture.dispose();
+            }
+            unitIconTextures.clear();
+            unitIconTextures = null;
+        }
+        if (unidentifiedIconTexture != null) {
+            unidentifiedIconTexture.dispose();
+            unidentifiedIconTexture = null;
+        }
     }
 
     private Texture createWhiteTexture() {
@@ -265,6 +314,12 @@ public class BattlefieldScreen extends ScreenAdapter {
         return side == Side.AXIS
             ? new UnitIconPalette(AXIS_UNIT_FILL, AXIS_UNIT_OUTLINE)
             : new UnitIconPalette(ALLIES_UNIT_FILL, ALLIES_UNIT_OUTLINE);
+    }
+
+    static UnitType visibleUnitType(Unit unit, Side activeSide) {
+        Objects.requireNonNull(unit, "unit must not be null");
+        Objects.requireNonNull(activeSide, "activeSide must not be null");
+        return unit.side() == activeSide ? unit.type() : null;
     }
 
     static String unitIdAtScreenPoint(List<UnitRenderPlacement> placements,
@@ -346,6 +401,8 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final Runnable onEndTurn;
         private final Supplier<CampaignState> campaignStateSupplier;
         private final int scenarioMapHeightTiles;
+        private final Map<UnitType, Texture> unitIcons;
+        private final Texture unidentifiedIcon;
 
         private boolean debugGridOverlay;
         private String selectedUnitId;
@@ -365,11 +422,15 @@ public class BattlefieldScreen extends ScreenAdapter {
         private MapPanel(Texture pixel,
                          Runnable onEndTurn,
                          Supplier<CampaignState> campaignStateSupplier,
-                         int scenarioMapHeightTiles) {
+                         int scenarioMapHeightTiles,
+                         Map<UnitType, Texture> unitIcons,
+                         Texture unidentifiedIcon) {
             this.pixel = pixel;
             this.onEndTurn = onEndTurn;
             this.campaignStateSupplier = Objects.requireNonNull(campaignStateSupplier, "campaignStateSupplier must not be null");
             this.scenarioMapHeightTiles = scenarioMapHeightTiles;
+            this.unitIcons = Objects.requireNonNull(unitIcons, "unitIcons must not be null");
+            this.unidentifiedIcon = Objects.requireNonNull(unidentifiedIcon, "unidentifiedIcon must not be null");
             this.mapDefinition = new TerrainMapDefinition();
             this.tileAtlas = new TerrainTileAtlas(mapDefinition);
             this.mapWidthTiles = mapDefinition.getWidthTiles();
@@ -536,8 +597,9 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
 
         private void drawUnits(Batch batch, float panelX, float panelY, float panelWidth, float panelHeight) {
+            CampaignState campaignState = campaignStateSupplier.get();
             List<UnitRenderPlacement> placements = computeVisibleUnitPlacements(
-                campaignStateSupplier.get(),
+                campaignState,
                 scenarioMapHeightTiles,
                 panelX,
                 panelY,
@@ -561,7 +623,8 @@ public class BattlefieldScreen extends ScreenAdapter {
                         border, placement.drawSize() + border * 2);
                 }
                 UnitIconPalette palette = paletteFor(placement.unit().side());
-                drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline());
+                UnitType visibleType = visibleUnitType(placement.unit(), campaignState.activeSide());
+                drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline(), visibleType);
             }
         }
 
@@ -614,56 +677,34 @@ public class BattlefieldScreen extends ScreenAdapter {
             tileAtlas.dispose();
         }
 
-        private void drawUnitIcon(Batch batch, float x, float y, float size, Color fillColor, Color outlineColor) {
+        private void drawUnitIcon(Batch batch,
+                                  float x,
+                                  float y,
+                                  float size,
+                                  Color fillColor,
+                                  Color outlineColor,
+                                  UnitType visibleType) {
             float pixel = size / 16f;
-            // 16x16 grid, 0=border, 1=fill, 2=diagonal, 3=side square, 4=center
-            int[][] pattern = {
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {0,2,1,1,1,1,1,1,1,1,1,1,1,1,2,0},
-                {0,1,2,1,1,1,1,3,3,1,1,1,1,2,1,0},
-                {0,1,1,2,1,1,1,3,3,1,1,1,2,1,1,0},
-                {0,1,1,1,2,1,1,1,1,1,1,2,1,1,1,0},
-                {0,1,1,1,1,2,1,1,1,1,2,1,1,1,1,0},
-                {0,1,1,1,1,1,2,1,1,2,1,1,1,1,1,0},
-                {0,1,3,3,1,1,1,3,3,1,1,1,3,3,1,0},
-                {0,1,3,3,1,1,1,3,3,1,1,1,3,3,1,0},
-                {0,1,1,1,1,1,3,1,1,2,1,1,1,1,1,0},
-                {0,1,1,1,1,2,1,1,1,1,2,1,1,1,1,0},
-                {0,1,1,1,2,1,1,1,1,1,1,2,1,1,1,0},
-                {0,1,1,2,1,1,1,3,3,1,1,1,2,1,1,0},
-                {0,1,2,1,1,1,1,3,3,1,1,1,1,2,1,0},
-                {0,2,1,1,1,1,1,1,1,1,1,1,1,1,2,0},
-                {0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0},
-            };
-            for (int gy = 0; gy < 16; gy++) {
-                for (int gx = 0; gx < 16; gx++) {
-                    int v = pattern[gy][gx];
-                    if (v == 0) {
-                        batch.setColor(outlineColor);
-                        drawCell(batch, x, y, pixel, gx, gy);
-                    } else if (v == 1) {
-                        batch.setColor(fillColor);
-                        drawCell(batch, x, y, pixel, gx, gy);
-                    } else if (v == 2) {
-                        batch.setColor(outlineColor);
-                        drawCell(batch, x, y, pixel, gx, gy);
-                    } else if (v == 3) {
-                        batch.setColor(outlineColor);
-                        drawCell(batch, x, y, pixel, gx, gy);
-                    } else if (v == 4) {
-                        batch.setColor(outlineColor);
-                        drawCell(batch, x, y, pixel, gx, gy);
-                    }
-                }
+            batch.setColor(outlineColor);
+            drawBlock(batch, x, y, size, size);
+
+            float innerSize = Math.max(0f, size - (pixel * 2f));
+            batch.setColor(fillColor);
+            drawBlock(batch, x + pixel, y + pixel, innerSize, innerSize);
+
+            batch.setColor(outlineColor);
+            batch.draw(iconTexture(visibleType), x, y, size, size);
+        }
+
+        private Texture iconTexture(UnitType visibleType) {
+            if (visibleType == null) {
+                return unidentifiedIcon;
             }
+            return unitIcons.getOrDefault(visibleType, unidentifiedIcon);
         }
 
         private void drawBlock(Batch batch, float x, float y, float width, float height) {
             batch.draw(pixel, x, y, width, height);
-        }
-
-        private void drawCell(Batch batch, float baseX, float baseY, float pixelSize, int gridX, int gridY) {
-            drawBlock(batch, baseX + gridX * pixelSize, baseY + gridY * pixelSize, pixelSize, pixelSize);
         }
     }
 }

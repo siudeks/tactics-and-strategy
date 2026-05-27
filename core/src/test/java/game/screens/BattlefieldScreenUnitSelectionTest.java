@@ -109,6 +109,24 @@ class BattlefieldScreenUnitSelectionTest {
         assertNull(result);
     }
 
+    @Test
+    void visibleUnitType_returnsActualType_forOwnUnit() {
+        Unit unit = new Unit("A", Side.ALLIES, UnitType.ARTILLERY, UnitSize.BATTALION, 0, 0);
+
+        UnitType result = BattlefieldScreen.visibleUnitType(unit, Side.ALLIES);
+
+        assertEquals(UnitType.ARTILLERY, result);
+    }
+
+    @Test
+    void visibleUnitType_returnsNull_forEnemyUnit() {
+        Unit unit = new Unit("A", Side.AXIS, UnitType.HQ, UnitSize.BATTALION, 0, 0);
+
+        UnitType result = BattlefieldScreen.visibleUnitType(unit, Side.ALLIES);
+
+        assertNull(result);
+    }
+
     private static Unit unit(String id) {
         return new Unit(id, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 0, 0);
     }
