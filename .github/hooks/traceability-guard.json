@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": ".github/hooks/traceability-guard.sh",
+        "timeout": 10
+      }
+    ]
+  }
+}
