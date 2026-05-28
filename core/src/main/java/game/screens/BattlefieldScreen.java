@@ -610,21 +610,19 @@ public class BattlefieldScreen extends ScreenAdapter {
                 zoomLevel
             );
             for (UnitRenderPlacement placement : placements) {
-                if (placement.unit().id().equals(selectedUnitId) && selectorVisible) {
-                    float border = 2f;
-                    batch.setColor(Color.WHITE);
-                    drawBlock(batch, placement.screenX() - border, placement.screenY() - border,
-                        placement.drawSize() + border * 2, border);
-                    drawBlock(batch, placement.screenX() - border, placement.screenY() + placement.drawSize(),
-                        placement.drawSize() + border * 2, border);
-                    drawBlock(batch, placement.screenX() - border, placement.screenY() - border,
-                        border, placement.drawSize() + border * 2);
-                    drawBlock(batch, placement.screenX() + placement.drawSize(), placement.screenY() - border,
-                        border, placement.drawSize() + border * 2);
-                }
+                float border = placement.drawSize() / 16f;
+                float borderX = placement.screenX() - border;
+                float borderY = placement.screenY() - border;
                 UnitIconPalette palette = paletteFor(placement.unit().side());
                 UnitType visibleType = visibleUnitType(placement.unit(), campaignState.activeSide());
                 drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline(), visibleType);
+                if (placement.unit().id().equals(selectedUnitId) && selectorVisible) {
+                    batch.setColor(Color.WHITE);
+                    drawBlock(batch, borderX, borderY, placement.drawSize() + border * 2f, border);
+                    drawBlock(batch, borderX, placement.screenY() + placement.drawSize(), placement.drawSize() + border * 2f, border);
+                    drawBlock(batch, borderX, placement.screenY(), border, placement.drawSize());
+                    drawBlock(batch, placement.screenX() + placement.drawSize(), placement.screenY(), border, placement.drawSize());
+                }
             }
         }
 
@@ -686,11 +684,13 @@ public class BattlefieldScreen extends ScreenAdapter {
                                   UnitType visibleType) {
             float pixel = size / 16f;
             batch.setColor(outlineColor);
-            drawBlock(batch, x, y, size, size);
+            drawBlock(batch, x - pixel, y - pixel, size + pixel * 2f, pixel);
+            drawBlock(batch, x - pixel, y + size, size + pixel * 2f, pixel);
+            drawBlock(batch, x - pixel, y, pixel, size);
+            drawBlock(batch, x + size, y, pixel, size);
 
-            float innerSize = Math.max(0f, size - (pixel * 2f));
             batch.setColor(fillColor);
-            drawBlock(batch, x + pixel, y + pixel, innerSize, innerSize);
+            drawBlock(batch, x, y, size, size);
 
             batch.setColor(outlineColor);
             batch.draw(iconTexture(visibleType), x, y, size, size);
