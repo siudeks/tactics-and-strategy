@@ -176,6 +176,49 @@ class BattlefieldScreenRenderingTest {
         assertEquals(worldBefore, worldAfter, 0.0001f);
     }
 
+    @Test
+    void isUnitFullyVisibleInViewport_returnsTrue_whenUnitFitsInWorldViewport() {
+        Unit unit = unit("visible", Side.ALLIES, 2, 3);
+
+        boolean fullyVisible = BattlefieldScreen.isUnitFullyVisibleInViewport(
+            unit,
+            10,
+            0f,
+            0f,
+            300f,
+            300f,
+            1f
+        );
+
+        assertEquals(true, fullyVisible);
+    }
+
+    @Test
+    void isUnitFullyVisibleInViewport_returnsFalse_whenUnitExceedsViewportEdge() {
+        Unit unit = unit("edge", Side.ALLIES, 0, 8);
+
+        boolean fullyVisible = BattlefieldScreen.isUnitFullyVisibleInViewport(
+            unit,
+            10,
+            5f,
+            5f,
+            20f,
+            20f,
+            1f
+        );
+
+        assertEquals(false, fullyVisible);
+    }
+
+    @Test
+    void centeredCameraPosition_centersUnitAndClampsToMapBounds() {
+        assertAll(
+            () -> assertEquals(74f, BattlefieldScreen.centeredCameraPosition(124f, 100f, 1f, 300f)),
+            () -> assertEquals(0f, BattlefieldScreen.centeredCameraPosition(20f, 100f, 1f, 300f)),
+            () -> assertEquals(200f, BattlefieldScreen.centeredCameraPosition(280f, 100f, 1f, 300f))
+        );
+    }
+
     private static void assertPlacement(BattlefieldScreen.UnitRenderPlacement placement,
                                         float expectedX,
                                         float expectedY,

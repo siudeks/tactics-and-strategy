@@ -362,6 +362,43 @@ public class BattlefieldScreen extends ScreenAdapter {
         return worldAtPointer - pointerPositionInPanel / newZoomLevel;
     }
 
+    static boolean isUnitFullyVisibleInViewport(Unit unit,
+                                                int scenarioMapHeightTiles,
+                                                float cameraX,
+                                                float cameraY,
+                                                float panelWidth,
+                                                float panelHeight,
+                                                float zoomLevel) {
+        Objects.requireNonNull(unit, "unit must not be null");
+
+        float visibleLeft = cameraX;
+        float visibleBottom = cameraY;
+        float visibleRight = cameraX + panelWidth / zoomLevel;
+        float visibleTop = cameraY + panelHeight / zoomLevel;
+
+        float unitWorldX = unit.tileX() * MapPanel.DRAW_TILE_SIZE;
+        float unitWorldY = (scenarioMapHeightTiles - unit.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
+        float unitWorldSize = MapPanel.DRAW_TILE_SIZE * MapPanel.UNIT_SIZE_IN_TILES;
+
+        float unitRight = unitWorldX + unitWorldSize;
+        float unitTop = unitWorldY + unitWorldSize;
+
+        return unitWorldX >= visibleLeft
+            && unitRight <= visibleRight
+            && unitWorldY >= visibleBottom
+            && unitTop <= visibleTop;
+    }
+
+    static float centeredCameraPosition(float unitCenter,
+                                        float panelSize,
+                                        float zoomLevel,
+                                        float mapWorldSize) {
+        float visibleWorldSize = panelSize / zoomLevel;
+        float unclamped = unitCenter - visibleWorldSize / 2f;
+        float maxCamera = Math.max(0f, mapWorldSize - visibleWorldSize);
+        return MathUtils.clamp(unclamped, 0f, maxCamera);
+    }
+
     interface UnitInfoView {
         void showUnit(String unitId);
         void hide();
@@ -609,20 +646,32 @@ public class BattlefieldScreen extends ScreenAdapter {
                 cameraY,
                 zoomLevel
             );
+            UnitRenderPlacement selectedPlacement = null;
             for (UnitRenderPlacement placement : placements) {
-                float border = placement.drawSize() / 16f;
-                float borderX = placement.screenX() - border;
-                float borderY = placement.screenY() - border;
-                UnitIconPalette palette = paletteFor(placement.unit().side());
-                UnitType visibleType = visibleUnitType(placement.unit(), campaignState.activeSide());
-                drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline(), visibleType);
-                if (placement.unit().id().equals(selectedUnitId) && selectorVisible) {
-                    batch.setColor(Color.WHITE);
-                    drawBlock(batch, borderX, borderY, placement.drawSize() + border * 2f, border);
-                    drawBlock(batch, borderX, placement.screenY() + placement.drawSize(), placement.drawSize() + border * 2f, border);
-                    drawBlock(batch, borderX, placement.screenY(), border, placement.drawSize());
-                    drawBlock(batch, placement.screenX() + placement.drawSize(), placement.screenY(), border, placement.drawSize());
+                if (placement.unit().id().equals(selectedUnitId)) {
+                    selectedPlacement = placement;
+                    continue;
                 }
+                drawUnitPlacement(batch, placement, campaignState.activeSide());
+            }
+            if (selectedPlacement != null) {
+                drawUnitPlacement(batch, selectedPlacement, campaignState.activeSide());
+            }
+        }
+
+        private void drawUnitPlacement(Batch batch, UnitRenderPlacement placement, Side activeSide) {
+            float border = placement.drawSize() / 16f;
+            float borderX = placement.screenX() - border;
+            float borderY = placement.screenY() - border;
+            UnitIconPalette palette = paletteFor(placement.unit().side());
+            UnitType visibleType = visibleUnitType(placement.unit(), activeSide);
+            drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline(), visibleType);
+            if (placement.unit().id().equals(selectedUnitId) && selectorVisible) {
+                batch.setColor(Color.WHITE);
+                drawBlock(batch, borderX, borderY, placement.drawSize() + border * 2f, border);
+                drawBlock(batch, borderX, placement.screenY() + placement.drawSize(), placement.drawSize() + border * 2f, border);
+                drawBlock(batch, borderX, placement.screenY(), border, placement.drawSize());
+                drawBlock(batch, placement.screenX() + placement.drawSize(), placement.screenY(), border, placement.drawSize());
             }
         }
 
@@ -643,6 +692,32 @@ public class BattlefieldScreen extends ScreenAdapter {
             selectedUnitId = unitId;
             selectorBlinkTimer = 0f;
             selectorVisible = true;
+            centerCameraOnSelectedUnitIfNeeded();
+        }
+
+        private void centerCameraOnSelectedUnitIfNeeded() {
+            if (selectedUnitId == null) {
+                return;
+            }
+            CampaignState state = campaignStateSupplier.get();
+            Unit selectedUnit = state.units().stream()
+                .filter(unit -> unit.id().equals(selectedUnitId))
+                .findFirst()
+                .orElse(null);
+            if (selectedUnit == null) {
+                return;
+            }
+
+            if (isUnitFullyVisibleInViewport(selectedUnit, scenarioMapHeightTiles, cameraX, cameraY, getWidth(), getHeight(), zoomLevel)) {
+                return;
+            }
+
+            float unitWorldCenterX = selectedUnit.tileX() * DRAW_TILE_SIZE + (UNIT_SIZE_IN_TILES * DRAW_TILE_SIZE) / 2f;
+            float unitWorldCenterY = (scenarioMapHeightTiles - selectedUnit.tileY() - UNIT_SIZE_IN_TILES / 2f) * DRAW_TILE_SIZE;
+
+            cameraX = centeredCameraPosition(unitWorldCenterX, getWidth(), zoomLevel, mapWorldWidth);
+            cameraY = centeredCameraPosition(unitWorldCenterY, getHeight(), zoomLevel, mapWorldHeight);
+            clampCamera();
         }
 
         void resetSelection() {

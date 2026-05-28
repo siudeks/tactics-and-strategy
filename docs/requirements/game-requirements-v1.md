@@ -67,6 +67,23 @@ v1 behavior notes:
   - Status bar with scenario name, turn number, and active side
   - End turn action wired to runtime turn simulation
 
+## Additional Implemented UI Behaviors (Discovered in Code)
+The following functional behaviors are implemented in v1 code and are now part of this baseline.
+
+- REQ-UI-CAM-001: The map camera is draggable with pointer drag and is clamped to map bounds.
+- REQ-UI-CAM-002: Zoom is applied only with CTRL + mouse wheel, clamped to range 0.5-3.0.
+- REQ-UI-CAM-003: During zoom, camera offset is recalculated so the world point under cursor remains stable.
+- REQ-UI-CAM-004: On unit selection, if the selected unit is not fully visible, camera recenters to make the unit fully visible, then clamps to map bounds.
+- REQ-UI-SEL-001: Unit selection is click-based and limited to units of active side.
+- REQ-UI-SEL-002: TAB cycles selection across active-side units in stable list order with wrap-around.
+- REQ-UI-SEL-003: ESC clears current unit selection.
+- REQ-UI-SEL-004: A pointer gesture is treated as selection click only when drag distance threshold is below 10 px (squared threshold < 100).
+- REQ-UI-SEL-005: When selection changes, selector blink state is reset and selected unit border starts visible.
+- REQ-UI-SEL-006: Selected unit is rendered last (on top of other units) and uses blinking highlight.
+- REQ-UI-FOG-001: Enemy unit type is hidden in the map icon layer and rendered as unidentified icon.
+- REQ-UI-DBG-001: Debug grid overlay can be toggled on/off with G key.
+- REQ-UI-PANEL-001: Unit info panel visibility is synchronized with selection state (show when selected, hide when no selection).
+
 ## Deferred Scope Reference
 Features planned beyond this implemented baseline are tracked in docs/requirements/game-requirements-plan.md.
 
