@@ -362,6 +362,10 @@ public class BattlefieldScreen extends ScreenAdapter {
         return worldAtPointer - pointerPositionInPanel / newZoomLevel;
     }
 
+    static boolean isViewportReadyForCameraCentering(float panelWidth, float panelHeight) {
+        return panelWidth > 0f && panelHeight > 0f;
+    }
+
     static boolean isUnitFullyVisibleInViewport(Unit unit,
                                                 int scenarioMapHeightTiles,
                                                 float cameraX,
@@ -448,6 +452,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         private float cameraX;
         private float cameraY;
         private float zoomLevel;
+        private boolean pendingSelectionCameraCenter;
         private float lastDragX;
         private float lastDragY;
 
@@ -697,6 +702,11 @@ public class BattlefieldScreen extends ScreenAdapter {
 
         private void centerCameraOnSelectedUnitIfNeeded() {
             if (selectedUnitId == null) {
+                pendingSelectionCameraCenter = false;
+                return;
+            }
+            if (!isViewportReadyForCameraCentering(getWidth(), getHeight())) {
+                pendingSelectionCameraCenter = true;
                 return;
             }
             CampaignState state = campaignStateSupplier.get();
@@ -705,10 +715,12 @@ public class BattlefieldScreen extends ScreenAdapter {
                 .findFirst()
                 .orElse(null);
             if (selectedUnit == null) {
+                pendingSelectionCameraCenter = false;
                 return;
             }
 
             if (isUnitFullyVisibleInViewport(selectedUnit, scenarioMapHeightTiles, cameraX, cameraY, getWidth(), getHeight(), zoomLevel)) {
+                pendingSelectionCameraCenter = false;
                 return;
             }
 
@@ -718,6 +730,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             cameraX = centeredCameraPosition(unitWorldCenterX, getWidth(), zoomLevel, mapWorldWidth);
             cameraY = centeredCameraPosition(unitWorldCenterY, getHeight(), zoomLevel, mapWorldHeight);
             clampCamera();
+            pendingSelectionCameraCenter = false;
         }
 
         void resetSelection() {
@@ -739,6 +752,9 @@ public class BattlefieldScreen extends ScreenAdapter {
         @Override
         public void act(float delta) {
             super.act(delta);
+            if (pendingSelectionCameraCenter) {
+                centerCameraOnSelectedUnitIfNeeded();
+            }
             selectorBlinkTimer += delta;
             if (selectorBlinkTimer >= 0.5f) {
                 selectorBlinkTimer -= 0.5f;

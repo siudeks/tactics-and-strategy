@@ -177,6 +177,16 @@ class BattlefieldScreenRenderingTest {
     }
 
     @Test
+    void isViewportReadyForCameraCentering_requiresPositivePanelSize() {
+        assertAll(
+            () -> assertEquals(false, BattlefieldScreen.isViewportReadyForCameraCentering(0f, 300f)),
+            () -> assertEquals(false, BattlefieldScreen.isViewportReadyForCameraCentering(300f, 0f)),
+            () -> assertEquals(false, BattlefieldScreen.isViewportReadyForCameraCentering(-1f, 300f)),
+            () -> assertEquals(true, BattlefieldScreen.isViewportReadyForCameraCentering(300f, 200f))
+        );
+    }
+
+    @Test
     void isUnitFullyVisibleInViewport_returnsTrue_whenUnitFitsInWorldViewport() {
         Unit unit = unit("visible", Side.ALLIES, 2, 3);
 
