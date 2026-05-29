@@ -9,6 +9,16 @@
       "version": "1.8.0",
       "resolved": "ghcr.io/devcontainers/features/python@sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511",
       "integrity": "sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511"
+    },
+    "ghcr.io/jsburckhardt/devcontainer-features/fd:1": {
+      "version": "1.0.0",
+      "resolved": "ghcr.io/jsburckhardt/devcontainer-features/fd@sha256:ad1a09751358ab1528fb2d2796170c2279dc80aa69cbdd9826fb9678ed04c30f",
+      "integrity": "sha256:ad1a09751358ab1528fb2d2796170c2279dc80aa69cbdd9826fb9678ed04c30f"
+    },
+    "ghcr.io/jsburckhardt/devcontainer-features/ripgrep:1": {
+      "version": "1.0.0",
+      "resolved": "ghcr.io/jsburckhardt/devcontainer-features/ripgrep@sha256:e24c026e6c06d7d2ccbc802ca0f788d57af6105e929f92270c206dfd8b296669",
+      "integrity": "sha256:e24c026e6c06d7d2ccbc802ca0f788d57af6105e929f92270c206dfd8b296669"
     }
   }
 }
