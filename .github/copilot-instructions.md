@@ -76,8 +76,12 @@ Prefer **immutable records** for domain objects. `CampaignState` is the canonica
 Tests use **JUnit Jupiter 5**. Test class naming follows `*Test.java` and `*IntegrationTest.java`.  
 Engine determinism is verified by `EngineDeterminismSmokeTest` — do not break it.
 
-## Conventions
+## Java Style
+- Use `var` for local variable declarations when the type is clear from context.
+- Target Java 21 idioms: records, sealed classes, pattern matching, text blocks.
 - Java 21 records for all domain value types; no mutable state in domain layer.
+
+## Conventions
 - `DeterministicContext` carries the RNG seed — all randomness must flow through it to preserve replay determinism.
 - `TurnEngine.areSemanticallyEquivalent()` is the canonical equality check for turn results.
 - Implementation language: **English** for code and comments; planning docs may be in Polish.
