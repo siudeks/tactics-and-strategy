@@ -46,12 +46,12 @@ Automated upload to itch.io is available via GitHub Actions workflow:
 
 ## Documentation
 - [Project Docs Index](docs/README.md)
-- [Engine Specification Package v1](docs/engine/README.md)
-- [Engine Mechanics Specification v1](docs/engine/engine-spec-v1.md)
-- [Turn Semantics v1](docs/engine/turn-semantics-v1.md)
-- [Scenario Runtime Contract v1](docs/engine/scenario-runtime-contract-v1.md)
-- [Determinism Contract v1](docs/engine/determinism-contract-v1.md)
-- [Traceability Matrix v1](docs/engine/traceability-matrix-v1.md)
+- [Engine Specification Package](docs/engine/README.md)
+- [Engine Mechanics Specification](docs/engine/engine-spec.md)
+- [Turn Semantics](docs/engine/turn-semantics.md)
+- [Scenario Runtime Contract](docs/engine/scenario-runtime-contract.md)
+- [Determinism Contract](docs/engine/determinism-contract.md)
+- [Traceability Matrix](docs/engine/traceability-matrix.md)
 - [Game Requirements v0](docs/requirements/game-requirements-v0.md)
 - [Scenario Pack v0](docs/scenarios/scenarios-v0.md)
 - [Graphics Asset Register v0](docs/assets/graphics-assets-register-v0.md)

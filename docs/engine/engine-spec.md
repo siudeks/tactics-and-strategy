@@ -101,4 +101,4 @@ Behavior in this document is evidenced by:
 - `CampaignInitializationTest`
 - `ScenarioLoaderTest`
 
-See `traceability-matrix-v1.md` for direct mapping.
+See `traceability-matrix.md` for direct mapping.
