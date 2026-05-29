@@ -89,6 +89,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     private TextButton moveButton;
     private @Nullable Map<UnitType, Texture> unitIconTextures;
     private @Nullable Texture unidentifiedIconTexture;
+    private @Nullable AudioDevice moveConfirmAudioDevice;
 
     @SuppressWarnings("NullAway.Init")
     public BattlefieldScreen(Game game, LoadedScenario loadedScenario) {
@@ -123,6 +124,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             this::endTurn,
             gameRuntime::getCurrentCampaignState,
             loadedScenario.scenarioDefinition().mapHeight(),
+            this::playMoveConfirmationSound,
             icons,
             unidentifiedIcon
         );
@@ -250,6 +252,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         font.dispose();
         mapPanel.dispose();
         whiteTexture.dispose();
+        disposeMoveConfirmationAudio();
         disposeUnitIcons();
     }
 
@@ -514,24 +517,45 @@ public class BattlefieldScreen extends ScreenAdapter {
         return samples;
     }
 
-    private static void playMoveConfirmationSound() {
-        if (Gdx.audio == null) {
+    private void playMoveConfirmationSound() {
+        AudioDevice audioDevice = getMoveConfirmationAudioDevice();
+        if (audioDevice == null) {
             return;
         }
-        AudioDevice audioDevice = null;
         try {
-            audioDevice = Gdx.audio.newAudioDevice(MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ, false);
             audioDevice.setVolume(MOVE_CONFIRM_SOUND_VOLUME);
             audioDevice.writeSamples(MOVE_CONFIRM_SOUND_SAMPLES, 0, MOVE_CONFIRM_SOUND_SAMPLES.length);
         } catch (RuntimeException exception) {
             if (Gdx.app != null) {
                 Gdx.app.error("BattlefieldScreen", "Failed to play move confirmation sound", exception);
             }
-        } finally {
-            if (audioDevice != null) {
-                audioDevice.dispose();
-            }
         }
+    }
+
+    private @Nullable AudioDevice getMoveConfirmationAudioDevice() {
+        if (moveConfirmAudioDevice != null) {
+            return moveConfirmAudioDevice;
+        }
+        if (Gdx.audio == null) {
+            return null;
+        }
+        try {
+            moveConfirmAudioDevice = Gdx.audio.newAudioDevice(MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ, false);
+            return moveConfirmAudioDevice;
+        } catch (RuntimeException exception) {
+            if (Gdx.app != null) {
+                Gdx.app.error("BattlefieldScreen", "Failed to initialize move confirmation audio device", exception);
+            }
+            return null;
+        }
+    }
+
+    private void disposeMoveConfirmationAudio() {
+        if (moveConfirmAudioDevice == null) {
+            return;
+        }
+        moveConfirmAudioDevice.dispose();
+        moveConfirmAudioDevice = null;
     }
 
     static @Nullable TileCoord movePreviewTile(boolean moveModeActive,
@@ -611,6 +635,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final Runnable onEndTurn;
         private final Supplier<CampaignState> campaignStateSupplier;
         private final int scenarioMapHeightTiles;
+        private final Runnable onMoveTargetConfirmed;
         private final Map<UnitType, Texture> unitIcons;
         private final Texture unidentifiedIcon;
 
@@ -640,12 +665,14 @@ public class BattlefieldScreen extends ScreenAdapter {
                  Runnable onEndTurn,
                  Supplier<CampaignState> campaignStateSupplier,
                  int scenarioMapHeightTiles,
+                  Runnable onMoveTargetConfirmed,
                  Map<UnitType, Texture> unitIcons,
                  Texture unidentifiedIcon) {
             this.pixel = pixel;
             this.onEndTurn = onEndTurn;
             this.campaignStateSupplier = Objects.requireNonNull(campaignStateSupplier, "campaignStateSupplier must not be null");
             this.scenarioMapHeightTiles = scenarioMapHeightTiles;
+              this.onMoveTargetConfirmed = Objects.requireNonNull(onMoveTargetConfirmed, "onMoveTargetConfirmed must not be null");
             this.unitIcons = Objects.requireNonNull(unitIcons, "unitIcons must not be null");
             this.unidentifiedIcon = Objects.requireNonNull(unidentifiedIcon, "unidentifiedIcon must not be null");
             this.mapDefinition = new TerrainMapDefinition();
@@ -714,7 +741,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                     if (assignment != null) {
                         moveTargetsByUnit.put(assignment.unitId(), assignment.tile());
                         if (shouldPlayMoveConfirmationSound(assignment)) {
-                            playMoveConfirmationSound();
+                            onMoveTargetConfirmed.run();
                         }
                         moveModeActive = false;
                         clearMovePreview();

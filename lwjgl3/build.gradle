@@ -15,6 +15,16 @@ application {
     mainClass = 'game.lwjgl3.Lwjgl3Launcher'
 }
 
+tasks.named('run') {
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('linux')) {
+        def wslgPulseSocket = '/mnt/wslg/PulseServer'
+        if (file(wslgPulseSocket).exists()) {
+            environment 'PULSE_SERVER', "unix:${wslgPulseSocket}"
+            environment 'ALSOFT_DRIVERS', 'pulse'
+        }
+    }
+}
+
 def releaseRuntimeDir = layout.buildDirectory.dir('release/runtime')
 def releaseAppDir = layout.buildDirectory.dir('release/app')
 def releaseRootDir = layout.buildDirectory.dir('release/root')

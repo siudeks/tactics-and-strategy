@@ -13,8 +13,13 @@
     "ghcr.io/jsburckhardt/devcontainer-features/ripgrep:1": { }
   },
   // libGDX/LWJGL desktop needs GLX/OpenGL runtime libs inside container.
-  // Without these packages GLFW fails with: GLFW_API_UNAVAILABLE (GLX: Failed to load GLX).
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libgl1 libgl1-mesa-dri libglx-mesa0 mesa-utils xvfb && java -version && gradle -v && python --version",
+  // For audio diagnostics in WSL/remote display setups, install PulseAudio/ALSA tools as well.
+  // Without GLX packages GLFW fails with: GLFW_API_UNAVAILABLE (GLX: Failed to load GLX).
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libgl1 libgl1-mesa-dri libglx-mesa0 mesa-utils xvfb pulseaudio-utils alsa-utils && java -version && gradle -v && python --version",
+  "containerEnv": {
+    "PULSE_SERVER": "unix:/mnt/wslg/PulseServer",
+    "ALSOFT_DRIVERS": "pulse"
+  },
   "customizations": {
     "vscode": {
       "settings": {
@@ -44,6 +49,7 @@
     }
   },
   "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly"
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly",
+    "source=/mnt/wslg,target=/mnt/wslg,type=bind"
   ]
 }
