@@ -13,6 +13,7 @@ import game.scenario.ScenarioEntry;
 import game.scenario.ScenarioLoader;
 
 import java.util.List;
+import java.util.Locale;
 
 public class MainMenuScreen extends ScreenAdapter {
 
@@ -98,7 +99,7 @@ public class MainMenuScreen extends ScreenAdapter {
         y -= LINE_HEIGHT * 1.2f;
 
         for (int i = 0; i < entries.size(); i++) {
-            String line = (i + 1) + ") " + entries.get(i).name().toUpperCase();
+            String line = (i + 1) + ") " + entries.get(i).name().toUpperCase(Locale.ROOT);
             font.setColor(i == selectedIndex ? COLOR_HIGHLIGHT : COLOR_ITEM);
             font.draw(batch, line, MARGIN_LEFT, y);
             y -= LINE_HEIGHT;

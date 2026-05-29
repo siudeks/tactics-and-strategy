@@ -73,9 +73,9 @@ public final class TerrainMapDefinition {
 
     private int[][] resolvePaletteRgb(PaletteMode mode) {
         if (mode == PaletteMode.ORIGINAL) {
-            return GeneratedTerrainData.TERRAIN_COLORS_RGB_ORIGINAL;
+            return GeneratedTerrainData.terrainColorsRgbOriginal();
         }
-        return GeneratedTerrainData.TERRAIN_COLORS_RGB_IMPROVED;
+        return GeneratedTerrainData.terrainColorsRgbImproved();
     }
 
     private Color[] buildTerrainColors(int[][] rgb) {

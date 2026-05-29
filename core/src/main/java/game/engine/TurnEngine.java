@@ -2,7 +2,6 @@ package game.engine;
 
 import game.domain.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class TurnEngine {
     private final DeterministicContext context;
@@ -102,7 +101,7 @@ public final class TurnEngine {
     }
 
     public static boolean areSemanticallyEquivalent(TurnResult a, TurnResult b) {
-        if (a == b) return true;
+        if (Objects.equals(a, b)) return true;
         if (a == null || b == null) return false;
         return a.state().equals(b.state())
             && a.phaseTrace().equals(b.phaseTrace())

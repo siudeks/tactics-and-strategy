@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public final class ScenarioLoader {
@@ -67,7 +68,7 @@ public final class ScenarioLoader {
         JsonValue mapJson = scenarioJson.get("map");
         int mapWidth = mapJson.getInt("width");
         int mapHeight = mapJson.getInt("height");
-        TerrainType defaultTerrain = TerrainType.valueOf(mapJson.getString("defaultTerrain").toUpperCase());
+        TerrainType defaultTerrain = TerrainType.valueOf(mapJson.getString("defaultTerrain").toUpperCase(Locale.ROOT));
 
         // Parse units in scenario
         List<Unit> scenarioUnits = new ArrayList<>();
@@ -88,7 +89,7 @@ public final class ScenarioLoader {
         String campaignId = campaignJson.getString("campaignId");
         String campaignScenarioId = campaignJson.getString("scenarioId");
         int turnNumber = campaignJson.getInt("turnNumber");
-        Side activeSide = Side.valueOf(campaignJson.getString("activeSide").toUpperCase());
+        Side activeSide = Side.valueOf(campaignJson.getString("activeSide").toUpperCase(Locale.ROOT));
 
         List<Order> pendingOrders = new ArrayList<>();
         JsonValue ordersJson = campaignJson.get("pendingOrders");
@@ -108,9 +109,9 @@ public final class ScenarioLoader {
 
     private static Unit parseUnit(JsonValue unitJson) {
         String id = unitJson.getString("id");
-        Side side = Side.valueOf(unitJson.getString("side").toUpperCase());
+        Side side = Side.valueOf(unitJson.getString("side").toUpperCase(Locale.ROOT));
         UnitType type = UnitType.fromScenarioValue(unitJson.getString("type"));
-        UnitSize size = UnitSize.valueOf(unitJson.getString("size").toUpperCase());
+        UnitSize size = UnitSize.valueOf(unitJson.getString("size").toUpperCase(Locale.ROOT));
         int tileX = unitJson.getInt("tileX");
         int tileY = unitJson.getInt("tileY");
         return new Unit(id, side, type, size, tileX, tileY);
@@ -119,8 +120,8 @@ public final class ScenarioLoader {
     private static Order parseOrder(JsonValue orderJson) {
         String id = orderJson.getString("id");
         String unitId = orderJson.getString("unitId");
-        Side side = Side.valueOf(orderJson.getString("side").toUpperCase());
-        OrderType type = OrderType.valueOf(orderJson.getString("type").toUpperCase());
+        Side side = Side.valueOf(orderJson.getString("side").toUpperCase(Locale.ROOT));
+        OrderType type = OrderType.valueOf(orderJson.getString("type").toUpperCase(Locale.ROOT));
         int targetX = orderJson.getInt("targetX");
         int targetY = orderJson.getInt("targetY");
         return new Order(id, unitId, side, type, targetX, targetY);

@@ -18,7 +18,6 @@ public final class TerrainTileAtlas implements Disposable {
     public TerrainTileAtlas(TerrainMapDefinition mapDefinition) {
         tileCount = mapDefinition.getUniqueTileCount();
         columns = (int) Math.ceil(Math.sqrt(tileCount));
-        int rows = (tileCount + columns - 1) / columns;
 
         regionX = new int[tileCount];
         regionY = new int[tileCount];

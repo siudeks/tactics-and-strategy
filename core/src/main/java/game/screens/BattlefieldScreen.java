@@ -214,10 +214,13 @@ public class BattlefieldScreen extends ScreenAdapter {
         syncMoveButtonState();
         if (unitNameLabel != null && unitInfoSection != null) {
             syncUnitInfoPanel(mapPanel.getSelectedUnitId(), new UnitInfoView() {
+                @Override
                 public void showUnit(String id) {
                     unitNameLabel.setText(id);
                     unitInfoSection.setVisible(true);
                 }
+
+                @Override
                 public void hide() {
                     unitInfoSection.setVisible(false);
                 }
