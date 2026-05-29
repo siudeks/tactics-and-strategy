@@ -1,0 +1,44 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      gradle-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:15"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      github-actions-all:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
