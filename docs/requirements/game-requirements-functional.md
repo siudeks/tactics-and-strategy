@@ -80,11 +80,11 @@ The following functional behaviors are implemented and are part of this baseline
 - REQ-UI-MOVE-001: After selecting a unit and activating MOVE mode, the game immediately enters destination-selection state. While the cursor is over a valid destination hex, the map shows a blinking preview for that destination hex to indicate the unit's prospective arrival position. Invalid terrain does not show destination preview.
 - REQ-UI-MOVE-002: Clicking a valid destination hex confirms the target only when an active valid destination preview exists on that same hex, exits destination-selection state, removes the blinking preview, and shows a persistent small flag marker on the assigned target hex. Clicking without an active valid preview does not confirm a target and keeps destination-selection state active.
 - REQ-UI-MOVE-003: After target confirmation, selection focus moves to the next active-side unit that has no assigned target in current turn order. If no such unit remains, selection is cleared.
+- REQ-UI-AUDIO-001: Confirming a valid MOVE target plays a short confirmation sound as immediate interaction feedback.
 
 ## Planned Functional Requirements (Pending Implementation)
 The following functional requirements are approved for next implementation increment and are not part of implemented v1 baseline yet.
 
-- REQ-UI-AUDIO-001: Target confirmation triggers a short feedback sound.
 - REQ-ORD-MOVE-001: Confirmed target hex is persisted as unit-scoped movement target context for current turn.
 - REQ-ORD-MOVE-002: Movement phase consumes persisted movement target context and attempts movement toward assigned target.
 - REQ-ORD-MOVE-003: System supports assigning movement targets for multiple units in one command phase.

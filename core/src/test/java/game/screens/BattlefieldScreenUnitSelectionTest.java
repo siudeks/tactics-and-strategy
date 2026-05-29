@@ -292,6 +292,22 @@ class BattlefieldScreenUnitSelectionTest {
     }
 
     @Test
+    void shouldPlayMoveConfirmationSound_returnsTrue_whenAssignmentExists() {
+        boolean result = BattlefieldScreen.shouldPlayMoveConfirmationSound(
+            new BattlefieldScreen.MoveTargetAssignment("A", new BattlefieldScreen.TileCoord(3, 4))
+        );
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldPlayMoveConfirmationSound_returnsFalse_whenAssignmentMissing() {
+        boolean result = BattlefieldScreen.shouldPlayMoveConfirmationSound(null);
+
+        assertFalse(result);
+    }
+
+    @Test
     void movePreviewTile_returnsHoveredTile_whenMoveModeSelectionAndTerrainAreValid() {
         BattlefieldScreen.TileCoord previewTile = BattlefieldScreen.movePreviewTile(
             true,

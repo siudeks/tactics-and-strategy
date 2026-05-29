@@ -3,6 +3,7 @@ package game.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -64,6 +65,15 @@ public class BattlefieldScreen extends ScreenAdapter {
     private static final String ICON_ARTILLERY_FILE = "ui/icon_artillery_64x64.png";
     private static final String ICON_HQ_FILE = "ui/icon_hq_64x64.png";
     private static final String ICON_UNIDENTIFIED_FILE = "ui/icon_unidentified_64x64.png";
+    private static final int MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ = 22050;
+    private static final int MOVE_CONFIRM_SOUND_DURATION_MS = 120;
+    private static final float MOVE_CONFIRM_SOUND_FREQUENCY_HZ = 880f;
+    private static final float MOVE_CONFIRM_SOUND_VOLUME = 0.22f;
+    private static final short[] MOVE_CONFIRM_SOUND_SAMPLES = moveConfirmSoundSamples(
+        MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ,
+        MOVE_CONFIRM_SOUND_DURATION_MS,
+        MOVE_CONFIRM_SOUND_FREQUENCY_HZ
+    );
 
     private final Game game;
     private final LoadedScenario loadedScenario;
@@ -485,6 +495,45 @@ public class BattlefieldScreen extends ScreenAdapter {
         return new MoveTargetAssignment(selectedUnitId, clickedTile);
     }
 
+    static boolean shouldPlayMoveConfirmationSound(@Nullable MoveTargetAssignment assignment) {
+        return assignment != null;
+    }
+
+    private static short[] moveConfirmSoundSamples(int sampleRateHz,
+                                                   int durationMs,
+                                                   float frequencyHz) {
+        int sampleCount = Math.max(1, sampleRateHz * durationMs / 1000);
+        short[] samples = new short[sampleCount];
+        for (int i = 0; i < sampleCount; i++) {
+            float progress = (float) i / (float) sampleCount;
+            float envelope = 1f - progress;
+            double phase = 2d * Math.PI * frequencyHz * i / sampleRateHz;
+            float value = (float) Math.sin(phase) * envelope;
+            samples[i] = (short) (value * Short.MAX_VALUE);
+        }
+        return samples;
+    }
+
+    private static void playMoveConfirmationSound() {
+        if (Gdx.audio == null) {
+            return;
+        }
+        AudioDevice audioDevice = null;
+        try {
+            audioDevice = Gdx.audio.newAudioDevice(MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ, false);
+            audioDevice.setVolume(MOVE_CONFIRM_SOUND_VOLUME);
+            audioDevice.writeSamples(MOVE_CONFIRM_SOUND_SAMPLES, 0, MOVE_CONFIRM_SOUND_SAMPLES.length);
+        } catch (RuntimeException exception) {
+            if (Gdx.app != null) {
+                Gdx.app.error("BattlefieldScreen", "Failed to play move confirmation sound", exception);
+            }
+        } finally {
+            if (audioDevice != null) {
+                audioDevice.dispose();
+            }
+        }
+    }
+
     static @Nullable TileCoord movePreviewTile(boolean moveModeActive,
                                                @Nullable String selectedUnitId,
                                                @Nullable TileCoord hoveredTile,
@@ -664,6 +713,9 @@ public class BattlefieldScreen extends ScreenAdapter {
                     );
                     if (assignment != null) {
                         moveTargetsByUnit.put(assignment.unitId(), assignment.tile());
+                        if (shouldPlayMoveConfirmationSound(assignment)) {
+                            playMoveConfirmationSound();
+                        }
                         moveModeActive = false;
                         clearMovePreview();
                         CampaignState state = campaignStateSupplier.get();

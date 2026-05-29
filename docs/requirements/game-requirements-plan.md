@@ -72,12 +72,6 @@ This document defines functional requirements for a turn-based tactical strategy
 - Objective and unit-state readability has higher priority than decorative UI.
 
 ### MOVE Target Planning (next increment)
-Completed in current baseline (removed from to-do list):
-- REQ-UI-MOVE-001: After selecting a unit and activating MOVE mode, the game immediately enters destination-selection state. While the cursor is over a valid destination hex, the map shows a blinking preview for that destination hex to indicate the unit's prospective arrival position. Invalid terrain does not show destination preview.
-- REQ-UI-MOVE-003: After target confirmation, selection focus moves to the next active-side unit that has no target yet in current turn.
-
-Remaining next-increment items:
-- REQ-UI-AUDIO-001: Confirming a target plays a short confirmation sound.
 - REQ-ORD-MOVE-001: Confirming a target persists target context for the selected unit within the current turn.
 - REQ-ORD-MOVE-002: Movement phase consumes assigned targets and attempts movement toward them with movement-resolution validation.
 - REQ-ORD-MOVE-003: Multi-unit planning is supported with independent targets for multiple units in the same command phase.

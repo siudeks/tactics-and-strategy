@@ -56,6 +56,7 @@ This guide describes only behavior implemented in the current game baseline.
 - Valid destination hex shows blinking preview marker.
 - Invalid terrain does not show preview.
 - Click confirms destination only if active valid preview exists on that tile.
+- Valid target confirmation plays a short feedback sound.
 - After confirmation, preview is cleared and persistent flag marker is shown on target hex.
 - after target confirmation, selection focus moves to the next active-side unit without assigned target in current turn order.
 - If no such unit remains, selection is cleared.
