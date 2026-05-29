@@ -441,9 +441,15 @@ public class BattlefieldScreen extends ScreenAdapter {
 
     static @Nullable MoveTargetAssignment moveTargetAssignmentForClick(boolean moveModeActive,
                                                                        @Nullable String selectedUnitId,
+                                                                       @Nullable TileCoord activePreviewTile,
                                                                        @Nullable TileCoord clickedTile,
                                                                        boolean clickedTilePassable) {
-        if (!moveModeActive || selectedUnitId == null || clickedTile == null || !clickedTilePassable) {
+        if (!moveModeActive
+            || selectedUnitId == null
+            || activePreviewTile == null
+            || clickedTile == null
+            || !clickedTilePassable
+            || !clickedTile.equals(activePreviewTile)) {
             return null;
         }
         return new MoveTargetAssignment(selectedUnitId, clickedTile);
@@ -622,6 +628,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                     MoveTargetAssignment assignment = moveTargetAssignmentForClick(
                         moveModeActive,
                         selectedUnitId,
+                        movePreviewTile,
                         clickedTile,
                         clickedTilePassable
                     );
@@ -729,6 +736,8 @@ public class BattlefieldScreen extends ScreenAdapter {
 
             drawTerrain(batch, x, y, w, h);
 
+            drawAssignedMoveTargets(batch, x, y);
+
             drawMovePreview(batch, x, y);
 
             if (debugGridOverlay) {
@@ -804,6 +813,34 @@ public class BattlefieldScreen extends ScreenAdapter {
             drawBlock(batch, borderX, screenY + previewDrawSize, previewDrawSize + border * 2f, border);
             drawBlock(batch, borderX, screenY, border, previewDrawSize);
             drawBlock(batch, screenX + previewDrawSize, screenY, border, previewDrawSize);
+        }
+
+        private void drawAssignedMoveTargets(Batch batch, float panelX, float panelY) {
+            if (moveTargetsByUnit.isEmpty()) {
+                return;
+            }
+
+            float scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
+            float poleWidth = Math.max(1f, scaledTileSize / 10f);
+            float poleHeight = scaledTileSize * 0.75f;
+            float flagWidth = scaledTileSize * 0.45f;
+            float flagHeight = scaledTileSize * 0.3f;
+
+            for (TileCoord targetTile : moveTargetsByUnit.values()) {
+                float tileScreenX = panelX + (targetTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
+                float worldY = (mapHeightTiles - targetTile.tileY() - 1f) * DRAW_TILE_SIZE;
+                float tileScreenY = panelY + (worldY - cameraY) * zoomLevel;
+
+                float poleX = tileScreenX + scaledTileSize * 0.15f;
+                float poleY = tileScreenY + scaledTileSize * 0.1f;
+                float flagX = poleX + poleWidth;
+                float flagY = poleY + poleHeight - flagHeight;
+
+                batch.setColor(Color.WHITE);
+                drawBlock(batch, poleX, poleY, poleWidth, poleHeight);
+                batch.setColor(Color.valueOf("D9482B"));
+                drawBlock(batch, flagX, flagY, flagWidth, flagHeight);
+            }
         }
 
         private void drawUnits(Batch batch, float panelX, float panelY, float panelWidth, float panelHeight) {

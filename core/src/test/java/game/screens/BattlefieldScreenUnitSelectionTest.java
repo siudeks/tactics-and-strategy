@@ -166,6 +166,7 @@ class BattlefieldScreenUnitSelectionTest {
             true,
             "A",
             new BattlefieldScreen.TileCoord(3, 4),
+            new BattlefieldScreen.TileCoord(3, 4),
             true
         );
 
@@ -177,6 +178,7 @@ class BattlefieldScreenUnitSelectionTest {
         BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             false,
             "A",
+            new BattlefieldScreen.TileCoord(3, 4),
             new BattlefieldScreen.TileCoord(3, 4),
             true
         );
@@ -190,6 +192,7 @@ class BattlefieldScreenUnitSelectionTest {
             true,
             null,
             new BattlefieldScreen.TileCoord(3, 4),
+            new BattlefieldScreen.TileCoord(3, 4),
             true
         );
 
@@ -202,7 +205,34 @@ class BattlefieldScreenUnitSelectionTest {
             true,
             "A",
             new BattlefieldScreen.TileCoord(3, 4),
+            new BattlefieldScreen.TileCoord(3, 4),
             false
+        );
+
+        assertNull(assignment);
+    }
+
+    @Test
+    void moveTargetAssignmentForClick_returnsNull_whenPreviewIsMissing() {
+        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+            true,
+            "A",
+            null,
+            new BattlefieldScreen.TileCoord(3, 4),
+            true
+        );
+
+        assertNull(assignment);
+    }
+
+    @Test
+    void moveTargetAssignmentForClick_returnsNull_whenClickedTileDoesNotMatchPreview() {
+        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+            true,
+            "A",
+            new BattlefieldScreen.TileCoord(3, 4),
+            new BattlefieldScreen.TileCoord(4, 4),
+            true
         );
 
         assertNull(assignment);
