@@ -32,6 +32,7 @@ import game.scenario.LoadedScenario;
 import game.terrain.GeneratedTerrainData;
 import game.terrain.TerrainMapDefinition;
 import game.terrain.TerrainTileAtlas;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -76,9 +77,10 @@ public class BattlefieldScreen extends ScreenAdapter {
     private Label unitNameLabel;
     private Table unitInfoSection;
     private TextButton moveButton;
-    private Map<UnitType, Texture> unitIconTextures;
-    private Texture unidentifiedIconTexture;
+    private @Nullable Map<UnitType, Texture> unitIconTextures;
+    private @Nullable Texture unidentifiedIconTexture;
 
+    @SuppressWarnings("NullAway.Init")
     public BattlefieldScreen(Game game, LoadedScenario loadedScenario) {
         this.game = game;
         this.loadedScenario = loadedScenario;
@@ -91,6 +93,8 @@ public class BattlefieldScreen extends ScreenAdapter {
         font = new BitmapFont();
         whiteTexture = createWhiteTexture();
         loadUnitIcons();
+        var icons = Objects.requireNonNull(unitIconTextures, "unitIconTextures must be initialized");
+        var unidentifiedIcon = Objects.requireNonNull(unidentifiedIconTexture, "unidentifiedIconTexture must be initialized");
 
         TextureRegionDrawable base = new TextureRegionDrawable(new TextureRegion(whiteTexture));
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
@@ -109,8 +113,8 @@ public class BattlefieldScreen extends ScreenAdapter {
             this::endTurn,
             gameRuntime::getCurrentCampaignState,
             loadedScenario.scenarioDefinition().mapHeight(),
-            unitIconTextures,
-            unidentifiedIconTexture
+            icons,
+            unidentifiedIcon
         );
 
         Table topArea = new Table();
@@ -330,14 +334,14 @@ public class BattlefieldScreen extends ScreenAdapter {
             : new UnitIconPalette(ALLIES_UNIT_FILL, ALLIES_UNIT_OUTLINE);
     }
 
-    static UnitType visibleUnitType(Unit unit, Side activeSide) {
+    static @Nullable UnitType visibleUnitType(Unit unit, Side activeSide) {
         Objects.requireNonNull(unit, "unit must not be null");
         Objects.requireNonNull(activeSide, "activeSide must not be null");
         return unit.side() == activeSide ? unit.type() : null;
     }
 
-    static String unitIdAtScreenPoint(List<UnitRenderPlacement> placements,
-                                      float sx, float sy, Side activeSide) {
+    static @Nullable String unitIdAtScreenPoint(List<UnitRenderPlacement> placements,
+                                                float sx, float sy, Side activeSide) {
         for (UnitRenderPlacement p : placements) {
             if (p.unit().side() != activeSide) continue;
             if (sx >= p.screenX() && sx < p.screenX() + p.drawSize()
@@ -348,7 +352,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         return null;
     }
 
-    static String nextSelectedUnitId(List<Unit> activeUnits, String currentId) {
+    static @Nullable String nextSelectedUnitId(List<Unit> activeUnits, @Nullable String currentId) {
         if (activeUnits.isEmpty()) return null;
         int idx = -1;
         for (int i = 0; i < activeUnits.size(); i++) {
@@ -417,13 +421,13 @@ public class BattlefieldScreen extends ScreenAdapter {
         return MathUtils.clamp(unclamped, 0f, maxCamera);
     }
 
-    static TileCoord mapTileAtPanelPoint(float panelPointerX,
-                                         float panelPointerY,
-                                         float cameraX,
-                                         float cameraY,
-                                         float zoomLevel,
-                                         int mapWidthTiles,
-                                         int mapHeightTiles) {
+    static @Nullable TileCoord mapTileAtPanelPoint(float panelPointerX,
+                                                   float panelPointerY,
+                                                   float cameraX,
+                                                   float cameraY,
+                                                   float zoomLevel,
+                                                   int mapWidthTiles,
+                                                   int mapHeightTiles) {
         float worldX = cameraX + panelPointerX / zoomLevel;
         float worldY = cameraY + panelPointerY / zoomLevel;
         int tileX = (int) Math.floor(worldX / MapPanel.DRAW_TILE_SIZE);
@@ -435,20 +439,20 @@ public class BattlefieldScreen extends ScreenAdapter {
         return new TileCoord(tileX, tileY);
     }
 
-    static MoveTargetAssignment moveTargetAssignmentForClick(boolean moveModeActive,
-                                                             String selectedUnitId,
-                                                             TileCoord clickedTile,
-                                                             boolean clickedTilePassable) {
+    static @Nullable MoveTargetAssignment moveTargetAssignmentForClick(boolean moveModeActive,
+                                                                       @Nullable String selectedUnitId,
+                                                                       @Nullable TileCoord clickedTile,
+                                                                       boolean clickedTilePassable) {
         if (!moveModeActive || selectedUnitId == null || clickedTile == null || !clickedTilePassable) {
             return null;
         }
         return new MoveTargetAssignment(selectedUnitId, clickedTile);
     }
 
-    static TileCoord movePreviewTile(boolean moveModeActive,
-                                     String selectedUnitId,
-                                     TileCoord hoveredTile,
-                                     boolean hoveredTilePassable) {
+    static @Nullable TileCoord movePreviewTile(boolean moveModeActive,
+                                               @Nullable String selectedUnitId,
+                                               @Nullable TileCoord hoveredTile,
+                                               boolean hoveredTilePassable) {
         if (!moveModeActive || selectedUnitId == null || hoveredTile == null || !hoveredTilePassable) {
             return null;
         }
@@ -468,7 +472,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         void hide();
     }
 
-    static void syncUnitInfoPanel(String selectedUnitId, UnitInfoView view) {
+    static void syncUnitInfoPanel(@Nullable String selectedUnitId, UnitInfoView view) {
         if (selectedUnitId != null) {
             view.showUnit(selectedUnitId);
         } else {
@@ -526,7 +530,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final Texture unidentifiedIcon;
 
         private boolean debugGridOverlay;
-        private String selectedUnitId;
+        private @Nullable String selectedUnitId;
         private float selectorBlinkTimer;
         private boolean selectorVisible = true;
         private float cameraX;
@@ -537,7 +541,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         private float lastDragY;
         private boolean moveModeActive;
         private final Map<String, TileCoord> moveTargetsByUnit;
-        private TileCoord movePreviewTile;
+        private @Nullable TileCoord movePreviewTile;
         private float movePreviewBlinkTimer;
         private boolean movePreviewVisible;
 
@@ -546,12 +550,13 @@ public class BattlefieldScreen extends ScreenAdapter {
         private final float mapWorldWidth;
         private final float mapWorldHeight;
 
+        @SuppressWarnings("NullAway.Init")
         private MapPanel(Texture pixel,
-                         Runnable onEndTurn,
-                         Supplier<CampaignState> campaignStateSupplier,
-                         int scenarioMapHeightTiles,
-                         Map<UnitType, Texture> unitIcons,
-                         Texture unidentifiedIcon) {
+                 Runnable onEndTurn,
+                 Supplier<CampaignState> campaignStateSupplier,
+                 int scenarioMapHeightTiles,
+                 Map<UnitType, Texture> unitIcons,
+                 Texture unidentifiedIcon) {
             this.pixel = pixel;
             this.onEndTurn = onEndTurn;
             this.campaignStateSupplier = Objects.requireNonNull(campaignStateSupplier, "campaignStateSupplier must not be null");
@@ -852,11 +857,11 @@ public class BattlefieldScreen extends ScreenAdapter {
             cameraY = MathUtils.clamp(cameraY, 0f, maxCameraY);
         }
 
-        public String getSelectedUnitId() {
+        public @Nullable String getSelectedUnitId() {
             return selectedUnitId;
         }
 
-        private void selectUnit(String unitId) {
+        private void selectUnit(@Nullable String unitId) {
             if (!Objects.equals(selectedUnitId, unitId)) {
                 moveModeActive = false;
                 clearMovePreview();
@@ -956,12 +961,12 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
 
         private void drawUnitIcon(Batch batch,
-                                  float x,
-                                  float y,
-                                  float size,
-                                  Color fillColor,
-                                  Color outlineColor,
-                                  UnitType visibleType) {
+                      float x,
+                      float y,
+                      float size,
+                      Color fillColor,
+                      Color outlineColor,
+                      @Nullable UnitType visibleType) {
             float pixel = size / 16f;
             batch.setColor(outlineColor);
             drawBlock(batch, x - pixel, y - pixel, size + pixel * 2f, pixel);
@@ -976,7 +981,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             batch.draw(iconTexture(visibleType), x, y, size, size);
         }
 
-        private Texture iconTexture(UnitType visibleType) {
+        private Texture iconTexture(@Nullable UnitType visibleType) {
             if (visibleType == null) {
                 return unidentifiedIcon;
             }
@@ -987,7 +992,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             batch.draw(pixel, x, y, width, height);
         }
 
-        private boolean isTilePassable(TileCoord tile) {
+        private boolean isTilePassable(@Nullable TileCoord tile) {
             if (tile == null) {
                 return false;
             }

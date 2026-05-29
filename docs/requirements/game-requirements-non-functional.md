@@ -20,6 +20,7 @@ This document defines non-functional requirements that reflect quality attribute
 ## Maintainability
 - NFR-MNT-001: Domain identity and placement data are represented with immutable records to reduce mutation-related defects.
 - NFR-MNT-002: Engine execution follows explicit named phases, improving traceability and diagnosability.
+- NFR-MNT-003: Compilation-time nullability checks are enforced for application and test sources via package-level `@NullMarked` defaults and Gradle nullability verification.
 
 ## Usability Baseline
 - NFR-USAB-001: UI consistently exposes scenario name, turn number, and active side in the status bar.

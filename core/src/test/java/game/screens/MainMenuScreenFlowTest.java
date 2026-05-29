@@ -2,6 +2,7 @@ package game.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import game.scenario.LoadedScenario;
 import game.scenario.ScenarioEntry;
@@ -81,7 +82,7 @@ class MainMenuScreenFlowTest {
     }
 
     private static final class RecordingGame extends Game {
-        private Screen capturedScreen;
+        private @Nullable Screen capturedScreen;
 
         @Override
         public void create() {

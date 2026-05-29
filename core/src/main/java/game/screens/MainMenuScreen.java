@@ -32,6 +32,7 @@ public class MainMenuScreen extends ScreenAdapter {
     private List<ScenarioEntry> entries;
     private int selectedIndex = 0;
 
+    @SuppressWarnings("NullAway.Init")
     public MainMenuScreen(Game game) {
         this.game = game;
     }

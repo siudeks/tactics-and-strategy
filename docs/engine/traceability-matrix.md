@@ -17,6 +17,7 @@ Status legend:
 | REQ-MAP-001 | Hex map and terrain control model | Partial | `ScenarioLoaderTest.loadBootstrapScenario_parsesMapDimensions`, `TurnEngineOrderTest.moveOrder_toVoidTile_unitStaysInPlace` | Map dimensions and impassable terrain checks are present; control points are not. |
 | REQ-SCEN-001 | Scenario objective/failure model | Partial | `ScenarioLoaderTest.loadBootstrapScenario_parsesScenarioId`, `ScenarioLoaderTest.listAvailableScenarios_allBundledScenarioResourcesLoad` | Scenario loading works; objective/failure runtime evaluation is missing. |
 | REQ-CBT-001 | Contextual combat resolution | Partial | `OneTurnSimulationTest.oneTurn_phaseTraceContainsAllFivePhases` | Combat phase exists as turn placeholder only. |
+| NFR-MNT-003 | Compilation-time nullability checks via package `@NullMarked` defaults | Implemented | `ArchitecturePackageInfoTest.allApplicationPackagesMustDefinePackageInfo`, `ArchitecturePackageInfoTest.allApplicationPackagesMustBeNullMarked`, Gradle task `nullabilityCheck` | Build enables Error Prone + NullAway for `compileJava` and `compileTestJava` with `NullAway:AnnotatedPackages=game`. |
 | REQ-SUP-001 | Supply continuity and penalties | Not in v1 scope | None | Not implemented in engine runtime. |
 | REQ-STACK-001 | Stacking constraints | Not in v1 scope | None | Not implemented in engine runtime. |
 | REQ-HUD-001 | HUD operational readability | Not in v1 scope | None in this package | UI-specific behavior is outside this engine mechanics package. |

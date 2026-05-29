@@ -1,5 +1,6 @@
 package game.screens;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BattlefieldScreenSyncTest {
 
     private static final class FakeView implements BattlefieldScreen.UnitInfoView {
-        String shownId = null;
+        @Nullable String shownId = null;
         boolean visible = false;
 
         @Override

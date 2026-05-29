@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class BattlefieldScreenRenderingTest {
 
@@ -45,11 +46,20 @@ class BattlefieldScreenRenderingTest {
 
         assertEquals(4, placements.size());
         assertAll(
-            () -> assertPlacement(placementsById.get("allies-armor-1"), 16f, 112f, Side.ALLIES),
-            () -> assertPlacement(placementsById.get("allies-inf-1"), 32f, 112f, Side.ALLIES),
-            () -> assertPlacement(placementsById.get("axis-armor-1"), 128f, 0f, Side.AXIS),
-            () -> assertPlacement(placementsById.get("axis-inf-1"), 112f, 0f, Side.AXIS)
+            () -> assertPlacement(requiredPlacement(placementsById, "allies-armor-1"), 16f, 112f, Side.ALLIES),
+            () -> assertPlacement(requiredPlacement(placementsById, "allies-inf-1"), 32f, 112f, Side.ALLIES),
+            () -> assertPlacement(requiredPlacement(placementsById, "axis-armor-1"), 128f, 0f, Side.AXIS),
+            () -> assertPlacement(requiredPlacement(placementsById, "axis-inf-1"), 112f, 0f, Side.AXIS)
         );
+    }
+
+    private static BattlefieldScreen.UnitRenderPlacement requiredPlacement(
+        Map<String, BattlefieldScreen.UnitRenderPlacement> placementsById,
+        String unitId
+    ) {
+        BattlefieldScreen.UnitRenderPlacement placement = placementsById.get(unitId);
+        assertNotNull(placement, "Missing placement for unit: " + unitId);
+        return placement;
     }
 
     @Test
