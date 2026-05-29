@@ -5,11 +5,14 @@ import game.domain.Side;
 import game.domain.Unit;
 import game.domain.UnitSize;
 import game.domain.UnitType;
+import game.terrain.GeneratedTerrainData;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BattlefieldScreenUnitSelectionTest {
 
@@ -125,6 +128,134 @@ class BattlefieldScreenUnitSelectionTest {
         UnitType result = BattlefieldScreen.visibleUnitType(unit, Side.ALLIES);
 
         assertNull(result);
+    }
+
+    @Test
+    void mapTileAtPanelPoint_returnsTileCoordinates_forClickInsideMap() {
+        BattlefieldScreen.TileCoord tile = BattlefieldScreen.mapTileAtPanelPoint(
+            32f,
+            16f,
+            0f,
+            0f,
+            1f,
+            10,
+            10
+        );
+
+        assertEquals(new BattlefieldScreen.TileCoord(2, 8), tile);
+    }
+
+    @Test
+    void mapTileAtPanelPoint_returnsNull_forClickOutsideMap() {
+        BattlefieldScreen.TileCoord tile = BattlefieldScreen.mapTileAtPanelPoint(
+            -1f,
+            16f,
+            0f,
+            0f,
+            1f,
+            10,
+            10
+        );
+
+        assertNull(tile);
+    }
+
+    @Test
+    void moveTargetAssignmentForClick_returnsAssignment_whenMoveModeAndSelectionArePresent() {
+        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+            true,
+            "A",
+            new BattlefieldScreen.TileCoord(3, 4),
+            true
+        );
+
+        assertEquals(new BattlefieldScreen.MoveTargetAssignment("A", new BattlefieldScreen.TileCoord(3, 4)), assignment);
+    }
+
+    @Test
+    void moveTargetAssignmentForClick_returnsNull_whenMoveModeIsDisabled() {
+        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+            false,
+            "A",
+            new BattlefieldScreen.TileCoord(3, 4),
+            true
+        );
+
+        assertNull(assignment);
+    }
+
+    @Test
+    void moveTargetAssignmentForClick_returnsNull_whenSelectionMissing() {
+        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+            true,
+            null,
+            new BattlefieldScreen.TileCoord(3, 4),
+            true
+        );
+
+        assertNull(assignment);
+    }
+
+    @Test
+    void moveTargetAssignmentForClick_returnsNull_whenClickedTileIsImpassable() {
+        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+            true,
+            "A",
+            new BattlefieldScreen.TileCoord(3, 4),
+            false
+        );
+
+        assertNull(assignment);
+    }
+
+    @Test
+    void movePreviewTile_returnsHoveredTile_whenMoveModeSelectionAndTerrainAreValid() {
+        BattlefieldScreen.TileCoord previewTile = BattlefieldScreen.movePreviewTile(
+            true,
+            "A",
+            new BattlefieldScreen.TileCoord(7, 8),
+            true
+        );
+
+        assertEquals(new BattlefieldScreen.TileCoord(7, 8), previewTile);
+    }
+
+    @Test
+    void movePreviewTile_returnsNull_whenHoveredTileIsImpassable() {
+        BattlefieldScreen.TileCoord previewTile = BattlefieldScreen.movePreviewTile(
+            true,
+            "A",
+            new BattlefieldScreen.TileCoord(7, 8),
+            false
+        );
+
+        assertNull(previewTile);
+    }
+
+    @Test
+    void isPassableTerrainCode_returnsFalse_forVoidAndWater() {
+        assertFalse(BattlefieldScreen.isPassableTerrainCode(GeneratedTerrainData.TERRAIN_VOID));
+        assertFalse(BattlefieldScreen.isPassableTerrainCode(GeneratedTerrainData.TERRAIN_WATER));
+    }
+
+    @Test
+    void isPassableTerrainCode_returnsTrue_forSandAndMountain() {
+        assertTrue(BattlefieldScreen.isPassableTerrainCode(GeneratedTerrainData.TERRAIN_SAND));
+        assertTrue(BattlefieldScreen.isPassableTerrainCode(GeneratedTerrainData.TERRAIN_MOUNTAIN));
+    }
+
+    @Test
+    void shouldConsumeClickInMoveMode_returnsTrue_whenMoveModeIsActive() {
+        boolean consume = BattlefieldScreen.shouldConsumeClickInMoveMode(true);
+
+        assertTrue(consume);
+    }
+
+    @Test
+    void shouldConsumeClickInMoveMode_returnsFalse_whenMoveModeIsDisabled() {
+        boolean consume = BattlefieldScreen.shouldConsumeClickInMoveMode(false);
+
+        assertFalse(consume);
     }
 
     private static Unit unit(String id) {

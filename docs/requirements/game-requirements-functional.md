@@ -77,12 +77,12 @@ The following functional behaviors are implemented and are part of this baseline
 - REQ-UI-FOG-001: Enemy unit type is hidden in the map icon layer and rendered as unidentified icon.
 - REQ-UI-DBG-001: Debug grid overlay can be toggled on/off with G key.
 - REQ-UI-PANEL-001: Unit info panel visibility is synchronized with selection state (show when selected, hide when no selection).
+- REQ-UI-MOVE-001: After selecting a unit and activating MOVE mode, the game immediately enters destination-selection state. While the cursor is over a valid destination hex, the map shows a blinking preview for that destination hex to indicate the unit's prospective arrival position. Invalid terrain does not show destination preview.
 
 ## Planned Functional Requirements (Pending Implementation)
 The following functional requirements are approved for next implementation increment and are not part of implemented v1 baseline yet.
 
-- REQ-UI-MOVE-001: After selecting a unit and activating MOVE mode, player can assign a target on the hex map.
-- REQ-UI-MOVE-002: For selected unit, assigned target is shown on map as a small flag marker.
+- REQ-UI-MOVE-002: Clicking a valid destination hex confirms the target, ends destination-selection state for that unit, removes the blinking preview, and shows the assigned target on map as a small flag marker. Clicking without an active valid preview does not confirm a target and keeps destination-selection state active.
 - REQ-UI-MOVE-003: After target confirmation, selection focus moves to next active-side unit without assigned target in current turn.
 - REQ-UI-AUDIO-001: Target confirmation triggers a short feedback sound.
 - REQ-ORD-MOVE-001: Confirmed target hex is persisted as unit-scoped movement target context for current turn.

@@ -29,11 +29,13 @@ import game.domain.Unit;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
 import game.scenario.LoadedScenario;
+import game.terrain.GeneratedTerrainData;
 import game.terrain.TerrainMapDefinition;
 import game.terrain.TerrainTileAtlas;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,6 +75,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     private Label statusLabel;
     private Label unitNameLabel;
     private Table unitInfoSection;
+    private TextButton moveButton;
     private Map<UnitType, Texture> unitIconTextures;
     private Texture unidentifiedIconTexture;
 
@@ -143,9 +146,19 @@ public class BattlefieldScreen extends ScreenAdapter {
         unitInfoSection.add(unitNameLabel).left();
         unitInfoSection.setVisible(false);
         panel.add(unitInfoSection).growX().left().row();
-        TextButton moveButton = new TextButton("Move", buttonStyle);
+        moveButton = new TextButton("Move", buttonStyle);
         moveButton.setDisabled(true);
         moveButton.setTouchable(Touchable.disabled);
+        moveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (moveButton.isDisabled()) {
+                    return;
+                }
+                mapPanel.toggleMoveMode();
+                syncMoveButtonState();
+            }
+        });
         panel.add(moveButton).row();
 
         TextButton holdButton = new TextButton("Hold", buttonStyle);
@@ -194,6 +207,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     public void render(float delta) {
         ScreenUtils.clear(BG);
         stage.act(delta);
+        syncMoveButtonState();
         if (unitNameLabel != null && unitInfoSection != null) {
             syncUnitInfoPanel(mapPanel.getSelectedUnitId(), new UnitInfoView() {
                 public void showUnit(String id) {
@@ -403,6 +417,52 @@ public class BattlefieldScreen extends ScreenAdapter {
         return MathUtils.clamp(unclamped, 0f, maxCamera);
     }
 
+    static TileCoord mapTileAtPanelPoint(float panelPointerX,
+                                         float panelPointerY,
+                                         float cameraX,
+                                         float cameraY,
+                                         float zoomLevel,
+                                         int mapWidthTiles,
+                                         int mapHeightTiles) {
+        float worldX = cameraX + panelPointerX / zoomLevel;
+        float worldY = cameraY + panelPointerY / zoomLevel;
+        int tileX = (int) Math.floor(worldX / MapPanel.DRAW_TILE_SIZE);
+        int rowFromBottom = (int) Math.floor(worldY / MapPanel.DRAW_TILE_SIZE);
+        int tileY = mapHeightTiles - rowFromBottom - 1;
+        if (tileX < 0 || tileY < 0 || tileX >= mapWidthTiles || tileY >= mapHeightTiles) {
+            return null;
+        }
+        return new TileCoord(tileX, tileY);
+    }
+
+    static MoveTargetAssignment moveTargetAssignmentForClick(boolean moveModeActive,
+                                                             String selectedUnitId,
+                                                             TileCoord clickedTile,
+                                                             boolean clickedTilePassable) {
+        if (!moveModeActive || selectedUnitId == null || clickedTile == null || !clickedTilePassable) {
+            return null;
+        }
+        return new MoveTargetAssignment(selectedUnitId, clickedTile);
+    }
+
+    static TileCoord movePreviewTile(boolean moveModeActive,
+                                     String selectedUnitId,
+                                     TileCoord hoveredTile,
+                                     boolean hoveredTilePassable) {
+        if (!moveModeActive || selectedUnitId == null || hoveredTile == null || !hoveredTilePassable) {
+            return null;
+        }
+        return hoveredTile;
+    }
+
+    static boolean isPassableTerrainCode(int terrainCode) {
+        return terrainCode != GeneratedTerrainData.TERRAIN_VOID && terrainCode != GeneratedTerrainData.TERRAIN_WATER;
+    }
+
+    static boolean shouldConsumeClickInMoveMode(boolean moveModeActive) {
+        return moveModeActive;
+    }
+
     interface UnitInfoView {
         void showUnit(String unitId);
         void hide();
@@ -416,9 +476,29 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
     }
 
+    private void syncMoveButtonState() {
+        if (moveButton == null || mapPanel == null) {
+            return;
+        }
+        boolean hasSelection = mapPanel.getSelectedUnitId() != null;
+        moveButton.setDisabled(!hasSelection);
+        moveButton.setTouchable(hasSelection ? Touchable.enabled : Touchable.disabled);
+        moveButton.setText(mapPanel.isMoveModeActive() ? "Move (On)" : "Move");
+    }
+
     static record UnitRenderPlacement(Unit unit, float screenX, float screenY, float drawSize) {
         UnitRenderPlacement {
             Objects.requireNonNull(unit, "unit must not be null");
+        }
+    }
+
+    static record TileCoord(int tileX, int tileY) {
+    }
+
+    static record MoveTargetAssignment(String unitId, TileCoord tile) {
+        MoveTargetAssignment {
+            Objects.requireNonNull(unitId, "unitId must not be null");
+            Objects.requireNonNull(tile, "tile must not be null");
         }
     }
 
@@ -455,6 +535,11 @@ public class BattlefieldScreen extends ScreenAdapter {
         private boolean pendingSelectionCameraCenter;
         private float lastDragX;
         private float lastDragY;
+        private boolean moveModeActive;
+        private final Map<String, TileCoord> moveTargetsByUnit;
+        private TileCoord movePreviewTile;
+        private float movePreviewBlinkTimer;
+        private boolean movePreviewVisible;
 
         private final int mapWidthTiles;
         private final int mapHeightTiles;
@@ -480,6 +565,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             this.mapWorldWidth = mapWidthTiles * DRAW_TILE_SIZE;
             this.mapWorldHeight = mapHeightTiles * DRAW_TILE_SIZE;
             this.zoomLevel = 1f;
+            this.moveTargetsByUnit = new HashMap<>();
 
             setTouchable(Touchable.enabled);
             this.debugGridOverlay = false;
@@ -517,12 +603,61 @@ public class BattlefieldScreen extends ScreenAdapter {
                     float dx = x - lastDragX;
                     float dy = y - lastDragY;
                     if (dx * dx + dy * dy >= 100f) return; // drag, not a click
+
+                    TileCoord clickedTile = mapTileAtPanelPoint(
+                        x,
+                        y,
+                        cameraX,
+                        cameraY,
+                        zoomLevel,
+                        mapWidthTiles,
+                        mapHeightTiles
+                    );
+                    boolean clickedTilePassable = isTilePassable(clickedTile);
+                    MoveTargetAssignment assignment = moveTargetAssignmentForClick(
+                        moveModeActive,
+                        selectedUnitId,
+                        clickedTile,
+                        clickedTilePassable
+                    );
+                    if (assignment != null) {
+                        moveTargetsByUnit.put(assignment.unitId(), assignment.tile());
+                        moveModeActive = false;
+                        clearMovePreview();
+                        return;
+                    }
+                    if (shouldConsumeClickInMoveMode(moveModeActive)) {
+                        return;
+                    }
+
                     float sx = x + getX();
                     float sy = y + getY();
                     CampaignState state = campaignStateSupplier.get();
                     List<UnitRenderPlacement> placements = computeVisibleUnitPlacements(
                         state, mapHeightTiles, getX(), getY(), getWidth(), getHeight(), cameraX, cameraY, zoomLevel);
                     selectUnit(unitIdAtScreenPoint(placements, sx, sy, state.activeSide()));
+                }
+
+                @Override
+                public boolean mouseMoved(InputEvent event, float x, float y) {
+                    TileCoord hoveredTile = mapTileAtPanelPoint(
+                        x,
+                        y,
+                        cameraX,
+                        cameraY,
+                        zoomLevel,
+                        mapWidthTiles,
+                        mapHeightTiles
+                    );
+                    movePreviewTile = movePreviewTile(
+                        moveModeActive,
+                        selectedUnitId,
+                        hoveredTile,
+                        isTilePassable(hoveredTile)
+                    );
+                    movePreviewVisible = true;
+                    movePreviewBlinkTimer = 0f;
+                    return movePreviewTile != null;
                 }
 
                 @Override
@@ -562,7 +697,12 @@ public class BattlefieldScreen extends ScreenAdapter {
                         return true;
                     }
                     if (keycode == com.badlogic.gdx.Input.Keys.ESCAPE) {
+                        moveModeActive = false;
                         selectUnit(null);
+                        return true;
+                    }
+                    if (keycode == com.badlogic.gdx.Input.Keys.M) {
+                        toggleMoveMode();
                         return true;
                     }
                     return false;
@@ -583,6 +723,8 @@ public class BattlefieldScreen extends ScreenAdapter {
             batch.draw(pixel, x, y, w, h);
 
             drawTerrain(batch, x, y, w, h);
+
+            drawMovePreview(batch, x, y);
 
             if (debugGridOverlay) {
                 drawDebugGrid(batch, x, y, w, h);
@@ -636,6 +778,27 @@ public class BattlefieldScreen extends ScreenAdapter {
                 }
                 batch.draw(pixel, panelX, lineY, panelW, 1f);
             }
+        }
+
+        private void drawMovePreview(Batch batch, float panelX, float panelY) {
+            if (movePreviewTile == null) {
+                return;
+            }
+
+            float scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
+            float previewDrawSize = scaledTileSize * UNIT_SIZE_IN_TILES;
+            float screenX = panelX + (movePreviewTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
+            float worldY = (mapHeightTiles - movePreviewTile.tileY() - UNIT_SIZE_IN_TILES) * DRAW_TILE_SIZE;
+            float screenY = panelY + (worldY - cameraY) * zoomLevel;
+            float border = previewDrawSize / 16f;
+            float borderX = screenX - border;
+            float borderY = screenY - border;
+
+            batch.setColor(movePreviewVisible ? Color.WHITE : Color.BLACK);
+            drawBlock(batch, borderX, borderY, previewDrawSize + border * 2f, border);
+            drawBlock(batch, borderX, screenY + previewDrawSize, previewDrawSize + border * 2f, border);
+            drawBlock(batch, borderX, screenY, border, previewDrawSize);
+            drawBlock(batch, screenX + previewDrawSize, screenY, border, previewDrawSize);
         }
 
         private void drawUnits(Batch batch, float panelX, float panelY, float panelWidth, float panelHeight) {
@@ -694,10 +857,30 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
 
         private void selectUnit(String unitId) {
+            if (!Objects.equals(selectedUnitId, unitId)) {
+                moveModeActive = false;
+                clearMovePreview();
+            }
             selectedUnitId = unitId;
             selectorBlinkTimer = 0f;
             selectorVisible = true;
             centerCameraOnSelectedUnitIfNeeded();
+        }
+
+        public boolean isMoveModeActive() {
+            return moveModeActive;
+        }
+
+        public void toggleMoveMode() {
+            if (selectedUnitId == null) {
+                moveModeActive = false;
+                clearMovePreview();
+                return;
+            }
+            moveModeActive = !moveModeActive;
+            if (!moveModeActive) {
+                clearMovePreview();
+            }
         }
 
         private void centerCameraOnSelectedUnitIfNeeded() {
@@ -734,6 +917,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
 
         void resetSelection() {
+            clearMovePreview();
             CampaignState state = campaignStateSupplier.get();
             List<Unit> active = state.units().stream()
                 .filter(u -> u.side() == state.activeSide())
@@ -759,6 +943,11 @@ public class BattlefieldScreen extends ScreenAdapter {
             if (selectorBlinkTimer >= 0.5f) {
                 selectorBlinkTimer -= 0.5f;
                 selectorVisible = !selectorVisible;
+            }
+            movePreviewBlinkTimer += delta;
+            if (movePreviewBlinkTimer >= 0.5f) {
+                movePreviewBlinkTimer -= 0.5f;
+                movePreviewVisible = !movePreviewVisible;
             }
         }
 
@@ -796,6 +985,20 @@ public class BattlefieldScreen extends ScreenAdapter {
 
         private void drawBlock(Batch batch, float x, float y, float width, float height) {
             batch.draw(pixel, x, y, width, height);
+        }
+
+        private boolean isTilePassable(TileCoord tile) {
+            if (tile == null) {
+                return false;
+            }
+            int mapIndex = tile.tileY() * mapWidthTiles + tile.tileX();
+            return isPassableTerrainCode(mapDefinition.getTerrainCode(mapIndex));
+        }
+
+        private void clearMovePreview() {
+            movePreviewTile = null;
+            movePreviewBlinkTimer = 0f;
+            movePreviewVisible = true;
         }
     }
 }
