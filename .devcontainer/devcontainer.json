@@ -8,13 +8,33 @@
     },
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.12"
-    }
+    },
+    "ghcr.io/jsburckhardt/devcontainer-features/fd:1": { },
+    "ghcr.io/jsburckhardt/devcontainer-features/ripgrep:1": { }
   },
   // libGDX/LWJGL desktop needs GLX/OpenGL runtime libs inside container.
   // Without these packages GLFW fails with: GLFW_API_UNAVAILABLE (GLX: Failed to load GLX).
   "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libgl1 libgl1-mesa-dri libglx-mesa0 mesa-utils xvfb && java -version && gradle -v && python --version",
   "customizations": {
     "vscode": {
+      "settings": {
+        "search.exclude": {
+          "**/build/**": true,
+          "**/.gradle/**": true,
+          "**/.git/**": true,
+          "**/node_modules/**": true,
+          "**/*.class": true,
+          "**/*.jar": true
+        },
+        "files.watcherExclude": {
+          "**/build/**": true,
+          "**/.gradle/**": true,
+          "**/.git/**": true
+        },
+        "files.exclude": {
+          "**/.gradle": true
+        }
+      },
       "extensions": [
         "vscjava.vscode-java-pack",
         "redhat.java",
