@@ -71,6 +71,22 @@ This document defines functional requirements for a turn-based tactical strategy
 - Input must support fast tactical decisions with clear state feedback.
 - Objective and unit-state readability has higher priority than decorative UI.
 
+### MOVE Target Planning (next increment)
+- During command phase, player can assign a MOVE target as a single hex for each active-side unit.
+- Target selection allows pointing to any map hex; legality is validated later in movement resolution.
+- Confirming a target must:
+  - Play a short confirmation sound.
+  - Persist target context for the selected unit within the current turn.
+  - Move focus to the next active-side unit that has no target yet in current turn.
+- Multi-unit planning is supported: each unit can have an independent target in the same command phase.
+- When a unit is selected, its assigned target is highlighted on map with a small flag symbol.
+- Movement phase consumes assigned targets and attempts to move units toward them according to validation rules.
+
+Open decisions to finalize:
+- Exact confirmation gesture (single click, keyboard key, dedicated action).
+- Exact validation point in flow (at phase transition or per-unit move attempt).
+- Fallback for invalid target during movement attempt.
+
 ## Confidence Levels by Section
 - High confidence: gameplay loop, scenario objective model, map/control-point concept.
 - Medium confidence: supply behavior details, stacking granularity, full HUD composition.
@@ -85,9 +101,15 @@ This document defines functional requirements for a turn-based tactical strategy
 ### Medium priority
 - AI behavior profiles by scenario stage.
 - Campaign difficulty ramp and scenario sequencing rules.
+- Final confirmation and validation policy for MOVE target planning.
 
 ### Low priority
 - Extended quality-of-life overlays and optional analytics views.
+
+## Example Invocations (REQ Workflow)
+- `/Implement Requirement From Plan REQ-MOVE-001`
+- `/Implement Requirement From Plan REQ-MOVE-001, only core + unit tests`
+- `/Implement Requirement From Plan REQ-MOVE-001, include full documentation and traceability update`
 
 ## Non-Goals (Current Stage)
 - No gameplay code implementation.

@@ -78,6 +78,17 @@ The following functional behaviors are implemented and are part of this baseline
 - REQ-UI-DBG-001: Debug grid overlay can be toggled on/off with G key.
 - REQ-UI-PANEL-001: Unit info panel visibility is synchronized with selection state (show when selected, hide when no selection).
 
+## Planned Functional Requirements (Pending Implementation)
+The following functional requirements are approved for next implementation increment and are not part of implemented v1 baseline yet.
+
+- REQ-UI-MOVE-001: After selecting a unit and activating MOVE mode, player can assign a target on the hex map.
+- REQ-UI-MOVE-002: For selected unit, assigned target is shown on map as a small flag marker.
+- REQ-UI-MOVE-003: After target confirmation, selection focus moves to next active-side unit without assigned target in current turn.
+- REQ-UI-AUDIO-001: Target confirmation triggers a short feedback sound.
+- REQ-ORD-MOVE-001: Confirmed target hex is persisted as unit-scoped movement target context for current turn.
+- REQ-ORD-MOVE-002: Movement phase consumes persisted movement target context and attempts movement toward assigned target.
+- REQ-ORD-MOVE-003: System supports assigning movement targets for multiple units in one command phase.
+
 ## Related Documents
 - Deferred scope: [game-requirements-plan.md](game-requirements-plan.md)
 - Traceability matrix: [../engine/traceability-matrix.md](../engine/traceability-matrix.md)

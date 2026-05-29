@@ -33,6 +33,13 @@ Status legend:
 | REQ-UI-FOG-001 | Enemy unit type concealment in icon layer | Implemented | `BattlefieldScreenUnitSelectionTest.visibleUnitType_returnsActualType_forOwnUnit`, `BattlefieldScreenUnitSelectionTest.visibleUnitType_returnsNull_forEnemyUnit` | Implemented as icon-type visibility rule; refreshed tank icon assets at `core/src/main/resources/ui/icon_medium_tank_64x64.png`, `core/src/main/resources/ui/icon_light_tank_64x64.png`, `core/src/main/resources/ui/icon_infantry_tank_64x64.png`, and `core/src/main/resources/ui/icon_anti_tank_64x64.png`. |
 | REQ-UI-DBG-001 | Debug grid overlay toggle with G key | Partial | None (direct keybinding/render toggle tests missing) | Implemented in key handling and conditional draw path. |
 | REQ-UI-PANEL-001 | Unit info panel sync with selection state | Implemented | `BattlefieldScreenSyncTest.syncUnitInfoPanel_showsUnitAndSetsId_whenUnitSelected`, `BattlefieldScreenSyncTest.syncUnitInfoPanel_hidesSection_whenNoUnitSelected` | Implemented in shared sync helper. |
+| REQ-UI-MOVE-001 | Interactive MOVE target assignment on hex map | Planned | None yet (to add battlefield input flow tests) | Target assignment model approved in requirements; implementation pending. |
+| REQ-UI-MOVE-002 | Selected unit target marker rendered as small flag | Planned | None yet (to add render-state tests) | Visual marker behavior approved; implementation pending. |
+| REQ-UI-MOVE-003 | Auto-focus next unit without target after confirmation | Planned | None yet (to add selection-flow tests) | Requires deterministic ordering policy in selection list. |
+| REQ-UI-AUDIO-001 | Short confirmation sound on target assignment | Planned | None yet (to add UI audio trigger tests) | Trigger points and debouncing to be validated in tests. |
+| REQ-ORD-MOVE-001 | Persist unit-scoped MOVE target context for current turn | Planned | None yet (to add order-context persistence tests) | Persists per-unit target intent between command and movement phases. |
+| REQ-ORD-MOVE-002 | Movement phase consumes target context to attempt movement | Planned | None yet (to add turn-engine movement-intent tests) | Validation timing and invalid-target fallback still open. |
+| REQ-ORD-MOVE-003 | Multi-unit target planning in single command phase | Planned | None yet (to add multi-unit integration tests) | Independent target context per unit in same turn. |
 
 ## 3. Code Anchor Map
 - Turn semantics: `core/src/main/java/pl/tactics/engine/TurnEngine.java`
@@ -46,3 +53,4 @@ Status legend:
 1. Every new normative rule MUST add at least one executable evidence reference.
 2. Rules without evidence MUST NOT be marked as `Implemented`.
 3. Out-of-scope items MAY be tracked here but MUST stay non-normative for v1.
+4. Planned requirements MAY be listed before implementation, but MUST remain in `Planned` status until executable evidence is added.

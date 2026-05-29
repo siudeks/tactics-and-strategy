@@ -25,6 +25,13 @@ This document defines non-functional requirements that reflect quality attribute
 - NFR-USAB-001: UI consistently exposes scenario name, turn number, and active side in the status bar.
 - NFR-USAB-002: Selection visibility and camera behavior are designed to keep interaction state understandable during gameplay.
 
+## Planned Non-Functional Requirements (Pending Implementation)
+The following quality requirements are approved for next implementation increment and are not part of implemented v1 baseline yet.
+
+- NFR-USAB-003: MOVE target planning must provide clear and persistent visual state (selected unit plus target flag marker).
+- NFR-USAB-004: Target confirmation feedback (sound and focus transition) must be immediate and consistent.
+- NFR-DET-004: Target assignment and movement-phase consumption must remain deterministic for identical inputs.
+
 ## Related Documents
 - Functional requirements: [game-requirements-functional.md](game-requirements-functional.md)
 - Deferred scope: [game-requirements-plan.md](game-requirements-plan.md)
