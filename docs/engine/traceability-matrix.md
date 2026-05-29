@@ -38,16 +38,17 @@ Status legend:
 | REQ-UI-MOVE-002 | Clicking valid destination replaces preview with persistent small flag marker and exits selection state | Partial | `BattlefieldScreenUnitSelectionTest.moveTargetAssignmentForClick_returnsAssignment_whenMoveModeAndSelectionArePresent`, `BattlefieldScreenUnitSelectionTest.moveTargetAssignmentForClick_returnsNull_whenPreviewIsMissing`, `BattlefieldScreenUnitSelectionTest.moveTargetAssignmentForClick_returnsNull_whenClickedTileDoesNotMatchPreview` | Confirmation now requires an active matching preview tile, exits MOVE mode for the unit, clears preview, and stores assigned target used by map flag-marker rendering; render flow still lacks dedicated end-to-end UI test coverage. |
 | REQ-UI-MOVE-003 | Auto-focus next unit without target after confirmation | Partial | `BattlefieldScreenUnitSelectionTest.nextUnassignedUnitId_returnsNextUnitWithoutTarget`, `BattlefieldScreenUnitSelectionTest.nextUnassignedUnitId_wrapsAroundAndSkipsAssignedUnits`, `BattlefieldScreenUnitSelectionTest.nextUnassignedUnitId_returnsNull_whenAllUnitsAlreadyAssigned`, `BattlefieldScreenUnitSelectionTest.nextUnassignedUnitId_returnsFirstUnassigned_whenCurrentIdIsNull` | Implemented in target-confirmation path with deterministic active-side iteration; evidence currently covers helper-level selection logic rather than full input/render flow. |
 | REQ-UI-AUDIO-001 | Short confirmation sound on target assignment | Partial | `BattlefieldScreenUnitSelectionTest.shouldPlayMoveConfirmationSound_returnsTrue_whenAssignmentExists`, `BattlefieldScreenUnitSelectionTest.shouldPlayMoveConfirmationSound_returnsFalse_whenAssignmentMissing` | Confirmation flow now triggers a short synthesized tone on valid MOVE target assignment; evidence currently covers trigger logic rather than end-to-end audio playback in runtime. |
-| REQ-ORD-MOVE-001 | Persist unit-scoped MOVE target context for current turn | Planned | None yet (to add order-context persistence tests) | Persists per-unit target intent between command and movement phases. |
+| REQ-ORD-MOVE-001 | Persist unit-scoped MOVE target context for current turn | Implemented | `GameRuntimeMoveTargetPersistenceTest.assignMoveTarget_persistsMoveOrderInPendingOrders`, `GameRuntimeMoveTargetPersistenceTest.assignMoveTarget_replacesExistingMoveOrderForSameUnit`, `GameRuntimeMoveTargetPersistenceTest.assignMoveTarget_keepsIndependentOrdersForDifferentUnits`, `GameRuntimeMoveTargetPersistenceTest.assignMoveTarget_unknownUnitId_isSilentNoOp`, `GameRuntimeMoveTargetPersistenceTest.assignMoveTarget_nullUnitId_throwsNullPointerException`, `GameRuntimeMoveTargetPersistenceTest.assignMoveTarget_doesNotMutateUnits_orTurnNumber_orActiveSide`, `GameRuntimeMoveTargetPersistenceTest.assignMoveTarget_usesUnitsOwnSide_notActiveSide` | `GameRuntime.assignMoveTarget(unitId, tileX, tileY)` rebuilds `CampaignState.pendingOrders` with a synthesized `Order(id="move-"+unitId, type=MOVE, side=unit.side)`, replace-on-reassign; unknown unitId is a silent no-op; cleared automatically by `TurnEngine` at END_TURN. |
 | REQ-ORD-MOVE-002 | Movement phase consumes target context to attempt movement | Planned | None yet (to add turn-engine movement-intent tests) | Validation timing and invalid-target fallback still open. |
 | REQ-ORD-MOVE-003 | Multi-unit target planning in single command phase | Planned | None yet (to add multi-unit integration tests) | Independent target context per unit in same turn. |
 
 ## 3. Code Anchor Map
-- Turn semantics: `core/src/main/java/pl/tactics/engine/TurnEngine.java`
-- Turn phases: `core/src/main/java/pl/tactics/engine/TurnPhase.java`
-- Turn result contract: `core/src/main/java/pl/tactics/engine/TurnResult.java`
-- Deterministic seed contract: `core/src/main/java/pl/tactics/engine/DeterministicContext.java`
-- Scenario loading: `core/src/main/java/pl/tactics/scenario/ScenarioLoader.java`
+- Turn semantics: `core/src/main/java/game/engine/TurnEngine.java`
+- Turn phases: `core/src/main/java/game/engine/TurnPhase.java`
+- Turn result contract: `core/src/main/java/game/engine/TurnResult.java`
+- Deterministic seed contract: `core/src/main/java/game/engine/DeterministicContext.java`
+- Scenario loading: `core/src/main/java/game/scenario/ScenarioLoader.java`
+- Game runtime and order persistence: `core/src/main/java/game/engine/GameRuntime.java`
 - Battlefield UI behaviors: `core/src/main/java/game/screens/BattlefieldScreen.java`
 
 ## 4. Matrix Governance

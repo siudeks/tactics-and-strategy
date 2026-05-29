@@ -2,8 +2,8 @@
 description: "Implement requirement from REQ ID, update functional/non-functional docs, traceability matrix, and physically remove completed item from plan."
 name: "Implement Requirement From Plan"
 argument-hint: "Provide the REQ identifier from the plan (and optionally scope/notes)."
-agent: "agent"
-model: "GPT-5 (copilot)"
+agent: gem-orchestrator
+model: Claude Opus 4.7 (copilot)
 ---
 Implement a requirement based on the REQ identifier from the plan provided by the user.
 

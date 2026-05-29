@@ -1,7 +1,8 @@
 # tactics-and-strategy
 
-## Original game:
-https://www.myabandonware.com/game/desert-rats-the-north-africa-campaign-al/play-al
+[Original game](https://www.myabandonware.com/game/desert-rats-the-north-africa-campaign-al/play-al)  
+[Remake](https://siudeks.itch.io/tactics-and-strategy)
+
 
 ## libGDX Hello World
 This repository now contains a runnable libGDX starter app with a tactical screen layout:

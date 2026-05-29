@@ -72,7 +72,6 @@ This document defines functional requirements for a turn-based tactical strategy
 - Objective and unit-state readability has higher priority than decorative UI.
 
 ### MOVE Target Planning (next increment)
-- REQ-ORD-MOVE-001: Confirming a target persists target context for the selected unit within the current turn.
 - REQ-ORD-MOVE-002: Movement phase consumes assigned targets and attempts movement toward them with movement-resolution validation.
 - REQ-ORD-MOVE-003: Multi-unit planning is supported with independent targets for multiple units in the same command phase.
 
