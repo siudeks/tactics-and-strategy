@@ -8,6 +8,7 @@ import game.domain.UnitType;
 import game.terrain.GeneratedTerrainData;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -68,6 +69,58 @@ class BattlefieldScreenUnitSelectionTest {
         String result = BattlefieldScreen.nextSelectedUnitId(units, "A");
 
         assertEquals("A", result);
+    }
+
+    @Test
+    void nextUnassignedUnitId_returnsNextUnitWithoutTarget() {
+        List<Unit> units = List.of(unit("A"), unit("B"), unit("C"));
+
+        String result = BattlefieldScreen.nextUnassignedUnitId(
+            units,
+            "A",
+            Map.of("A", new BattlefieldScreen.TileCoord(1, 1), "B", new BattlefieldScreen.TileCoord(2, 2))
+        );
+
+        assertEquals("C", result);
+    }
+
+    @Test
+    void nextUnassignedUnitId_wrapsAroundAndSkipsAssignedUnits() {
+        List<Unit> units = List.of(unit("A"), unit("B"), unit("C"));
+
+        String result = BattlefieldScreen.nextUnassignedUnitId(
+            units,
+            "C",
+            Map.of("C", new BattlefieldScreen.TileCoord(3, 3))
+        );
+
+        assertEquals("A", result);
+    }
+
+    @Test
+    void nextUnassignedUnitId_returnsNull_whenAllUnitsAlreadyAssigned() {
+        List<Unit> units = List.of(unit("A"), unit("B"));
+
+        String result = BattlefieldScreen.nextUnassignedUnitId(
+            units,
+            "A",
+            Map.of("A", new BattlefieldScreen.TileCoord(1, 1), "B", new BattlefieldScreen.TileCoord(2, 2))
+        );
+
+        assertNull(result);
+    }
+
+    @Test
+    void nextUnassignedUnitId_returnsFirstUnassigned_whenCurrentIdIsNull() {
+        List<Unit> units = List.of(unit("A"), unit("B"));
+
+        String result = BattlefieldScreen.nextUnassignedUnitId(
+            units,
+            null,
+            Map.of("A", new BattlefieldScreen.TileCoord(1, 1))
+        );
+
+        assertEquals("B", result);
     }
 
     @Test

@@ -51,12 +51,14 @@ This guide describes only behavior implemented in the current game baseline.
 - Unit info panel is shown only when a unit is selected.
 - Debug grid overlay can be toggled with G.
 
-## Move Target Planning (REQ-UI-MOVE-001, REQ-UI-MOVE-002)
+## Move Target Planning (REQ-UI-MOVE-001, REQ-UI-MOVE-002, REQ-UI-MOVE-003)
 - Select unit, enter MOVE mode, then point to destination hex.
 - Valid destination hex shows blinking preview marker.
 - Invalid terrain does not show preview.
 - Click confirms destination only if active valid preview exists on that tile.
 - After confirmation, preview is cleared and persistent flag marker is shown on target hex.
+- after target confirmation, selection focus moves to the next active-side unit without assigned target in current turn order.
+- If no such unit remains, selection is cleared.
 
 ## Terrain Rules During Movement
 - Movement outside map bounds is blocked.
@@ -87,7 +89,7 @@ This guide describes only behavior implemented in the current game baseline.
 
 ## Usability Baseline (NFR-USAB-001, NFR-USAB-002, NFR-USAB-003)
 - Status bar exposes scenario name, turn number, and active side.
-- Selection, camera, and MOVE flow are designed for clear interaction state.
+- Selection, camera, and MOVE flow are designed for clear interaction state, including deterministic auto-focus to the next unit that still needs a target.
 - MOVE planning and confirmation provide explicit visual feedback.
 
 ## Explicit Scope Boundary

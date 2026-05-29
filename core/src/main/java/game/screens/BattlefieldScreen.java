@@ -367,6 +367,33 @@ public class BattlefieldScreen extends ScreenAdapter {
         return activeUnits.get((idx + 1) % activeUnits.size()).id();
     }
 
+    static @Nullable String nextUnassignedUnitId(List<Unit> activeUnits,
+                                                 @Nullable String currentId,
+                                                 Map<String, TileCoord> moveTargetsByUnit) {
+        Objects.requireNonNull(moveTargetsByUnit, "moveTargetsByUnit must not be null");
+        if (activeUnits.isEmpty()) {
+            return null;
+        }
+
+        int currentIndex = -1;
+        for (int i = 0; i < activeUnits.size(); i++) {
+            if (activeUnits.get(i).id().equals(currentId)) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        for (int offset = 1; offset <= activeUnits.size(); offset++) {
+            int index = (currentIndex + offset + activeUnits.size()) % activeUnits.size();
+            String candidateId = activeUnits.get(index).id();
+            if (!moveTargetsByUnit.containsKey(candidateId)) {
+                return candidateId;
+            }
+        }
+
+        return null;
+    }
+
     static float clampZoomLevel(float zoomLevel, float minZoomLevel, float maxZoomLevel) {
         return MathUtils.clamp(zoomLevel, minZoomLevel, maxZoomLevel);
     }
@@ -639,6 +666,11 @@ public class BattlefieldScreen extends ScreenAdapter {
                         moveTargetsByUnit.put(assignment.unitId(), assignment.tile());
                         moveModeActive = false;
                         clearMovePreview();
+                        CampaignState state = campaignStateSupplier.get();
+                        List<Unit> activeUnits = state.units().stream()
+                            .filter(unit -> unit.side() == state.activeSide())
+                            .toList();
+                        selectUnit(nextUnassignedUnitId(activeUnits, selectedUnitId, moveTargetsByUnit));
                         return;
                     }
                     if (shouldConsumeClickInMoveMode(moveModeActive)) {

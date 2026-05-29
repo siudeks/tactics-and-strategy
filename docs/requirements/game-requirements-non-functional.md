@@ -24,7 +24,7 @@ This document defines non-functional requirements that reflect quality attribute
 
 ## Usability Baseline
 - NFR-USAB-001: UI consistently exposes scenario name, turn number, and active side in the status bar.
-- NFR-USAB-002: Selection visibility, camera behavior, and explicit MOVE-mode target assignment flow are designed to keep interaction state understandable during gameplay.
+- NFR-USAB-002: Selection visibility, camera behavior, and explicit MOVE-mode target assignment flow are designed to keep interaction state understandable during gameplay, including deterministic auto-focus to the next unit that still needs a target.
 - NFR-USAB-003: MOVE target planning and confirmation provide unambiguous visual state feedback: valid destinations blink while previewed, and confirmed destinations replace preview with a persistent marker.
 
 ## Planned Non-Functional Requirements (Pending Implementation)

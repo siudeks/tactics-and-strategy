@@ -28,7 +28,9 @@ Working rules:
    - `docs/requirements/game-requirements-functional.md` (what was implemented functionally),
    - `docs/requirements/game-requirements-non-functional.md` (non-functional impact),
    - `docs/engine/traceability-matrix.md` (REQ -> implementation -> tests),
+   - `docs/guides/user-guide.md` (ensure user-facing behavior is in sync with newly implemented game requirements),
    - `docs/requirements/game-requirements-plan.md` (physically remove the completed item from the To-Do plan).
+   
 7. Keep REQ identifiers consistent and do not create new IDs without justification.
 8. Run appropriate tests and report the result.
 
@@ -48,6 +50,7 @@ Required response format:
 - [docs/requirements/game-requirements-functional.md](../../docs/requirements/game-requirements-functional.md): ...
 - [docs/requirements/game-requirements-non-functional.md](../../docs/requirements/game-requirements-non-functional.md): ...
 - [docs/engine/traceability-matrix.md](../../docs/engine/traceability-matrix.md): ...
+- [docs/guides/user-guide.md](../../docs/guides/user-guide.md): ...
 - [docs/requirements/game-requirements-plan.md](../../docs/requirements/game-requirements-plan.md): ...
 
 ## Validation Result
