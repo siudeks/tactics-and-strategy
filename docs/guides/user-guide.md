@@ -51,7 +51,7 @@ This guide describes only behavior implemented in the current game baseline.
 - Unit info panel is shown only when a unit is selected.
 - Debug grid overlay can be toggled with G.
 
-## Move Target Planning (REQ-UI-MOVE-001, REQ-UI-MOVE-002, REQ-UI-MOVE-003, REQ-ORD-MOVE-001)
+## Move Target Planning (REQ-UI-MOVE-001, REQ-UI-MOVE-002, REQ-UI-MOVE-003, REQ-ORD-MOVE-001, REQ-ORD-MOVE-002, REQ-ORD-MOVE-003)
 - Select unit, enter MOVE mode, then point to destination hex.
 - Valid destination hex shows blinking preview marker.
 - Invalid terrain does not show preview.
@@ -61,6 +61,9 @@ This guide describes only behavior implemented in the current game baseline.
 - after target confirmation, selection focus moves to the next active-side unit without assigned target in current turn order.
 - If no such unit remains, selection is cleared.
 - Confirmed MOVE targets are persisted per unit for the current turn; re-confirming a target for the same unit replaces the previous one, and persisted targets are cleared automatically when the turn ends.
+- Multiple units of the active side may each be assigned their own MOVE target in the same command phase; each unit's target is independent of the others.
+- Assigned MOVE targets are resolved when the turn is ended: each unit advances toward its own target during turn simulation.
+- Targets are validated at resolution time, not when assigned: if a target falls outside the map or on impassable terrain, the order is silently dropped and the unit stays in place (no error is shown).
 
 ## Terrain Rules During Movement
 - Movement outside map bounds is blocked.

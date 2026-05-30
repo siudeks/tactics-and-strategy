@@ -11,3 +11,4 @@ applyTo: ["core/src/main/java/**/*.java", "core/src/test/java/**/*.java", "headl
 - Avoid adding redundant `Objects.requireNonNull(...)` in internal code paths already proven non-null by the type contract.
 - Keep explicit runtime null guards at trust boundaries (external input, deserialization, interop, dynamic maps/JSON, reflection).
 - If introducing nullable flow, update annotations and tests so intent is explicit and checker-clean.
+- Do not add redundant Objects.requireNonNull where a value is guaranteed to be non-null by JSpecify

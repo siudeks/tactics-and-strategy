@@ -2,8 +2,6 @@ package game.screens;
 
 import org.jspecify.annotations.Nullable;
 
-import java.util.Objects;
-
 /**
  * Finite-state machine for battlefield selection and MOVE-targeting mode.
  */
@@ -60,14 +58,8 @@ final class SelectionState {
     }
 
     private record UnitSelectedState(String selectedUnitId) implements SelectionFsmState {
-        UnitSelectedState {
-            Objects.requireNonNull(selectedUnitId, "selectedUnitId must not be null");
-        }
     }
 
     private record MoveTargetingState(String selectedUnitId) implements SelectionFsmState {
-        MoveTargetingState {
-            Objects.requireNonNull(selectedUnitId, "selectedUnitId must not be null");
-        }
     }
 }

@@ -82,12 +82,8 @@ The following functional behaviors are implemented and are part of this baseline
 - REQ-UI-MOVE-003: After target confirmation, selection focus moves to the next active-side unit that has no assigned target in current turn order. If no such unit remains, selection is cleared.
 - REQ-UI-AUDIO-001: Confirming a valid MOVE target plays a short confirmation sound as immediate interaction feedback.
 - REQ-ORD-MOVE-001: A confirmed MOVE target is persisted as a unit-scoped `MOVE` order in `CampaignState.pendingOrders` for the current turn, keyed by `unitId`. Re-assigning a target for the same unit replaces the prior order (at most one MOVE order per unit), and persisted orders are cleared automatically at end of turn.
-
-## Planned Functional Requirements (Pending Implementation)
-The following functional requirements are approved for next implementation increment and are not part of implemented v1 baseline yet.
-
-- REQ-ORD-MOVE-002: Movement phase consumes persisted movement target context and attempts movement toward assigned target.
-- REQ-ORD-MOVE-003: System supports assigning movement targets for multiple units in one command phase.
+- REQ-ORD-MOVE-002: Movement phase executes during turn simulation and consumes pending `MOVE` orders assigned in the command phase. Each order is validated at execution time (not at assignment time): the target coordinates must lie within map bounds and the scenario's default terrain must be traversable (not `VOID` or `WATER`). Invalid targets are silently dropped — no exception is raised, no partial move occurs, the order is not surfaced as cancelled to the caller, and the unit remains in place. Implementation: `TurnEngine.applyMoveOrders` consumes `CampaignState.pendingOrders`.
+- REQ-ORD-MOVE-003: Multiple units on the same side may each receive an independent `MOVE` target during a single command phase. During movement-phase execution each unit is resolved against its own target; assignments do not interfere across units.
 
 ## Related Documents
 - Deferred scope: [game-requirements-plan.md](game-requirements-plan.md)
