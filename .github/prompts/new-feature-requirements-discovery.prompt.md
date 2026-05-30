@@ -1,6 +1,6 @@
 ---
 description: "Prowadzi rozmowe zbierajaca wymagania do nowej funkcjonalnosci: problem, zakres, kryteria akceptacji, ryzyka, pytania otwarte i propozycje aktualizacji dokumentacji."
-name: "New Feature Requirements Discovery"
+name: "P New Feature Requirements Discovery"
 argument-hint: "Opisz pomysl/funkcjonalnosc, kontekst biznesowy i to, co juz jest znane."
 agent: "agent"
 model: "GPT-5 (copilot)"

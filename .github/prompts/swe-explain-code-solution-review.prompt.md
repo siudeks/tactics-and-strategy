@@ -1,6 +1,6 @@
 ---
 description: "Explain and review a code solution (including PR diffs) with rationale, trade-offs, risks, and test gaps using SWE agent."
-name: "SWE Explain Code Solution Review"
+name: "P Explain Code Solution Review"
 argument-hint: "Provide files/symbols + what you want explained (e.g., design, logic, performance, tests)."
 agent: SWE
 model: GPT-5 (copilot)
