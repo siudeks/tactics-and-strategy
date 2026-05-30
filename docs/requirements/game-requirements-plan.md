@@ -26,7 +26,7 @@ This document defines functional requirements for a turn-based tactical strategy
 - End condition checks run after each full turn cycle.
 
 ## Map and Terrain
-- Battlefield representation uses a hex-based map.
+- Battlefield representation uses a square-tile map.
 - Terrain categories must influence movement and engagement context.
 - Strategic control points must be represented as objective-capable map nodes.
 - Scenario files must define objective-relevant map sectors.
@@ -40,7 +40,7 @@ This document defines functional requirements for a turn-based tactical strategy
 ## Supply and Stacking
 - Supply status is tracked per unit or formation group.
 - Supply disruption impacts operational effectiveness.
-- Stacking constraints limit concentration of units on a single hex.
+- Stacking constraints limit concentration of units on a single square tile.
 - Loss of supply continuity can trigger scenario penalties.
 
 ## Combat System

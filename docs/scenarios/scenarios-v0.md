@@ -108,7 +108,7 @@
 ## Traceability Index
 - REQ-LOOP-001: Core gameplay loop
 - REQ-TURN-001: Turn sequence and validation
-- REQ-MAP-001: Hex map, terrain, control points
+- REQ-MAP-001: Square-tile map, terrain, control points
 - REQ-UNIT-001: Formation-based units and states
 - REQ-SUP-001: Supply continuity and penalties
 - REQ-STACK-001: Unit concentration constraints

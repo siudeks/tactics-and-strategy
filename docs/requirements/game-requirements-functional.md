@@ -29,7 +29,7 @@ Behavior notes:
 - NEUTRAL is not a valid active turn side for side flipping.
 
 ## Map and Terrain
-- Unit placement uses hex-tile coordinates from scenario definitions.
+- Unit placement uses square-tile coordinates from scenario definitions.
 - Scenario map metadata (width, height, default terrain type) is loaded and used for engine-side validation and movement bounds checks.
 - Terrain rendering uses the generated terrain map baseline in the current UI implementation.
 - Movement validation enforces map bounds.
@@ -77,8 +77,8 @@ The following functional behaviors are implemented and are part of this baseline
 - REQ-UI-FOG-001: Enemy unit type is hidden in the map icon layer and rendered as unidentified icon.
 - REQ-UI-DBG-001: Debug grid overlay can be toggled on/off with G key.
 - REQ-UI-PANEL-001: Unit info panel visibility is synchronized with selection state (show when selected, hide when no selection).
-- REQ-UI-MOVE-001: After selecting a unit and activating MOVE mode, the game immediately enters destination-selection state. While the cursor is over a valid destination hex, the map shows a blinking preview for that destination hex to indicate the unit's prospective arrival position. Invalid terrain does not show destination preview.
-- REQ-UI-MOVE-002: Clicking a valid destination hex confirms the target only when an active valid destination preview exists on that same hex, exits destination-selection state, removes the blinking preview, and shows a persistent small flag marker on the assigned target hex. Clicking without an active valid preview does not confirm a target and keeps destination-selection state active.
+- REQ-UI-MOVE-001: After selecting a unit and activating MOVE mode, the game immediately enters destination-selection state. While the cursor is over a valid destination tile, the map shows a blinking preview for that destination tile to indicate the unit's prospective arrival position. Invalid terrain does not show destination preview.
+- REQ-UI-MOVE-002: Clicking a valid destination tile confirms the target only when an active valid destination preview exists on that same tile, exits destination-selection state, removes the blinking preview, and shows a persistent small flag marker on the assigned target tile. Clicking without an active valid preview does not confirm a target and keeps destination-selection state active.
 - REQ-UI-MOVE-003: After target confirmation, selection focus moves to the next active-side unit that has no assigned target in current turn order. If no such unit remains, selection is cleared.
 - REQ-UI-AUDIO-001: Confirming a valid MOVE target plays a short confirmation sound as immediate interaction feedback.
 - REQ-ORD-MOVE-001: A confirmed MOVE target is persisted as a unit-scoped `MOVE` order in `CampaignState.pendingOrders` for the current turn, keyed by `unitId`. Re-assigning a target for the same unit replaces the prior order (at most one MOVE order per unit), and persisted orders are cleared automatically at end of turn.

@@ -52,12 +52,12 @@ This guide describes only behavior implemented in the current game baseline.
 - Debug grid overlay can be toggled with G.
 
 ## Move Target Planning (REQ-UI-MOVE-001, REQ-UI-MOVE-002, REQ-UI-MOVE-003, REQ-ORD-MOVE-001, REQ-ORD-MOVE-002, REQ-ORD-MOVE-003)
-- Select unit, enter MOVE mode, then point to destination hex.
-- Valid destination hex shows blinking preview marker.
+- Select unit, enter MOVE mode, then point to destination tile.
+- Valid destination tile shows blinking preview marker.
 - Invalid terrain does not show preview.
 - Click confirms destination only if active valid preview exists on that tile.
 - Valid target confirmation plays a short feedback sound.
-- After confirmation, preview is cleared and persistent flag marker is shown on target hex.
+- After confirmation, preview is cleared and persistent flag marker is shown on target tile.
 - after target confirmation, selection focus moves to the next active-side unit without assigned target in current turn order.
 - If no such unit remains, selection is cleared.
 - Confirmed MOVE targets are persisted per unit for the current turn; re-confirming a target for the same unit replaces the previous one, and persisted targets are cleared automatically when the turn ends.
