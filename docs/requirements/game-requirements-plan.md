@@ -37,6 +37,56 @@ This document defines functional requirements for a turn-based tactical strategy
 - Unit state must support at least: active, disrupted, eliminated.
 - Unit data must be scenario-configurable.
 
+## Movement Phase Details (Planned)
+### Scope
+- Define how movement orders are validated and resolved during the Movement phase.
+- Keep compatibility with existing turn structure and scenario-driven data model.
+
+### Planned Requirement Candidates
+- REQ-MOVE-001: The engine shall enforce per-unit movement allowance during the Movement phase.
+- REQ-MOVE-002: The engine shall use terrain-cost-aware route resolution with deterministic tie-breaking.
+- REQ-MOVE-003: The engine shall enforce occupancy and collision rules for simultaneous movement.
+
+### Draft Acceptance Criteria
+- AC-MOVE-001 (Range Within Allowance):
+  Given a unit with movement allowance N and a valid target reachable with total movement cost <= N,
+  when the turn is resolved,
+  then the unit shall end the turn on the target tile.
+- AC-MOVE-002 (Range Exceeded):
+  Given a unit with movement allowance N and an assigned target requiring total movement cost > N,
+  when the turn is resolved,
+  then the order shall be rejected and the unit shall remain on its original tile.
+- AC-MOVE-003 (Impassable Terrain):
+  Given a planned route that crosses an impassable tile type,
+  when the turn is resolved,
+  then the route shall be treated as invalid and the unit shall remain in place.
+- AC-MOVE-004 (Deterministic Path Tie-Break):
+  Given at least two equal-cost valid paths to the same target,
+  when the same initial state is resolved multiple times,
+  then the engine shall pick the same path and produce identical final unit positions.
+- AC-MOVE-005 (Conflicting Destination):
+  Given two units with valid orders that would end on the same destination tile,
+  when the turn is resolved,
+  then the conflict shall be resolved by the defined collision policy and the resulting board state shall satisfy occupancy constraints.
+- AC-MOVE-006 (Simultaneous Multi-Unit Resolution):
+  Given multiple units with independent valid movement orders,
+  when the turn is resolved,
+  then each unit outcome shall be computed without side effects from processing order beyond the declared tie-break and collision rules.
+- AC-MOVE-007 (Order Consumption):
+  Given movement orders present in pending orders at turn start,
+  when End Turn is executed and the Movement phase completes,
+  then processed movement orders shall be consumed and not re-applied in the next turn unless reassigned.
+
+### Key Decisions Required
+- Mobility model per unit role (tile allowance, points-based, or hybrid).
+- Terrain movement cost table and impassable rules.
+- Collision and tie-break policy when two or more units target conflicting destinations.
+
+### Out of Scope for This Iteration
+- Visual movement animation polish.
+- Full AI movement optimization.
+- Combat-retreat interaction redesign.
+
 ## Supply and Stacking
 - Supply status is tracked per unit or formation group.
 - Supply disruption impacts operational effectiveness.
@@ -79,7 +129,9 @@ This document defines functional requirements for a turn-based tactical strategy
 ## Open Questions Backlog
 ### High priority
 - Exact combat resolution model and balancing levers.
-- Full terrain-to-movement impact table.
+- Movement allowance model by unit role/class.
+- Terrain movement cost table and deterministic path/tie-break rules.
+- Collision/stacking behavior for conflicting movement orders.
 - Final supply disruption penalty model.
 
 ### Medium priority
@@ -92,7 +144,8 @@ This document defines functional requirements for a turn-based tactical strategy
 ## Example Invocations (REQ Workflow)
 - `/Implement Requirement From Plan REQ-MOVE-001`
 - `/Implement Requirement From Plan REQ-MOVE-001, only core + unit tests`
-- `/Implement Requirement From Plan REQ-MOVE-001, include full documentation and traceability update`
+- `/Implement Requirement From Plan REQ-MOVE-002, include terrain cost model + tests`
+- `/Implement Requirement From Plan REQ-MOVE-003, include documentation and traceability update`
 
 ## Non-Goals (Current Stage)
 - No gameplay code implementation.

@@ -36,6 +36,7 @@ Sposob pracy:
    - wymagania niefunkcjonalne,
    - elementy do dopisania do planu implementacyjnego.
 5. Nie zakladaj brakujacych danych. Gdy sa luki, wyraznie je oznacz i pytaj dalej.
+6. Dopracuj kryteria akceptacji
 
 Na koncu kazdej iteracji zwracaj wynik w formacie:
 
@@ -66,10 +67,6 @@ Na koncu kazdej iteracji zwracaj wynik w formacie:
 ## Bloki gotowe do wklejenia
 - `docs/requirements/game-requirements-plan.md`:
    - Zwroc gotowy blok Markdown do wklejenia w odpowiedniej sekcji planu.
-- `docs/requirements/game-requirements-functional.md`:
-   - Zwroc gotowy blok Markdown z nowymi wymaganiami funkcjonalnymi (jesli wymaganie przechodzi do baseline implementacji).
-- `docs/requirements/game-requirements-non-functional.md`:
-   - Zwroc gotowy blok Markdown z nowymi wymaganiami niefunkcjonalnymi (jesli dotyczy).
 - `docs/engine/traceability-matrix.md`:
    - Zwroc gotowy blok Markdown z proponowanym mapowaniem REQ -> implementacja -> testy.
 
