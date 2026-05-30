@@ -1,7 +1,7 @@
 # Project Guidelines — tactics-and-strategy
 
 ## Overview
-Turn-based tactical strategy game (Desert Rats / North Africa theme) built with **Java 21 + libGDX**.  
+Turn-based / real-time tactical strategy game (Desert Rats / North Africa theme) built with **Java 21 + libGDX**.  
 Inspired by the original ZX Spectrum 128K Desert Rats game.  
 
 ## Build & Test
