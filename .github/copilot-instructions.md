@@ -21,5 +21,9 @@ Engine determinism is verified by `EngineDeterminismSmokeTest` — do not break 
 - Target Java 21 idioms: records, sealed classes, pattern matching, text blocks.
 - Java 21 records for all domain value types; no mutable state in domain layer.
 
+## Nullability Contract
+- Nullability is compiler-enforced (Error Prone + NullAway in JSpecify mode) and violations fail the build (`-Werror`, `-Xep:NullAway:ERROR`).
+- With `@org.jspecify.annotations.NullMarked`, prefer type/annotation fixes over internal defensive checks; keep runtime null checks only at trust boundaries (deserialization, external APIs, interop, untyped inputs).
+
 ## Conventions
 - Implementation language: **English** for code, comments and docs.
