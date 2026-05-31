@@ -2,8 +2,8 @@
 description: "Prowadzi rozmowe zbierajaca wymagania do nowej funkcjonalnosci: problem, zakres, kryteria akceptacji, ryzyka, pytania otwarte i propozycje aktualizacji dokumentacji."
 name: "P New Feature Requirements Discovery"
 argument-hint: "Opisz pomysl/funkcjonalnosc, kontekst biznesowy i to, co juz jest znane."
-agent: "agent"
-model: "GPT-5 (copilot)"
+agent: gem-orchestrator
+model: Claude Sonnet 4.6 (copilot)
 ---
 Pomoz mi przeprowadzic uporzadkowana dyskusje analityczna dla nowej funkcjonalnosci w tym projekcie.
 
