@@ -11,17 +11,20 @@ import game.domain.Unit;
 import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
+import game.engine.TurnPhase;
 import game.scenario.LoadedScenario;
 import game.scenario.ScenarioLoader;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BattlefieldScreenRenderingTest {
 
@@ -237,6 +240,43 @@ class BattlefieldScreenRenderingTest {
             () -> assertEquals(0f, BattlefieldScreen.centeredCameraPosition(20f, 100f, 1f, 300f)),
             () -> assertEquals(200f, BattlefieldScreen.centeredCameraPosition(280f, 100f, 1f, 300f))
         );
+    }
+
+    @Test
+    void phaseOverlayRenderContract_returnsFullscreenDimAndPhaseLabel_whenOverlayIsActive() {
+        BattlefieldScreen.PhaseOverlayState activeState = BattlefieldScreen.initializePhaseOverlayState(
+            List.of(TurnPhase.RETREAT)
+        );
+        assertNotNull(activeState);
+
+        BattlefieldScreen.PhaseOverlayRenderContract contract = BattlefieldScreen.phaseOverlayRenderContract(activeState);
+        BattlefieldScreen.PhaseOverlayRenderContract nonNullContract = Objects.requireNonNull(contract);
+
+        assertAll(
+            () -> assertEquals("RETREAT", nonNullContract.label()),
+            () -> assertEquals(0f, nonNullContract.dimColor().r),
+            () -> assertEquals(0f, nonNullContract.dimColor().g),
+            () -> assertEquals(0f, nonNullContract.dimColor().b),
+            () -> assertTrue(nonNullContract.dimColor().a > 0f)
+        );
+    }
+
+    @Test
+    void advanceOverlayForRender_propagatesMapAndHudLockDuringOverlay_thenUnlocksAfterCompletion() {
+        BattlefieldScreen.PhaseOverlayState initialState = BattlefieldScreen.initializePhaseOverlayState(
+            List.of(TurnPhase.ISSUE_ORDERS)
+        );
+        assertNotNull(initialState);
+
+        BattlefieldScreen.RenderLifecycleState activeTick = BattlefieldScreen.advanceOverlayForRender(initialState, 1.0f);
+        assertNotNull(activeTick.overlayState());
+        assertTrue(activeTick.mapInputLocked());
+        assertEquals(false, activeTick.hudActionsEnabled());
+
+        BattlefieldScreen.RenderLifecycleState completedTick = BattlefieldScreen.advanceOverlayForRender(activeTick.overlayState(), 2.0f);
+        assertEquals(null, completedTick.overlayState());
+        assertEquals(false, completedTick.mapInputLocked());
+        assertTrue(completedTick.hudActionsEnabled());
     }
 
     private static void assertPlacement(BattlefieldScreen.UnitRenderPlacement placement,

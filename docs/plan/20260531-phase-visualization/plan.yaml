@@ -1,0 +1,362 @@
+plan_id: 20260531-phase-visualization
+objective: "Implement phase visualization overlays with 3s per phase, dimmed fullscreen overlay, full input lock during sequence, drive order from TurnResult.phaseTrace, include RETREAT, preserve engine determinism."
+created_at: "2026-05-31T00:00:00Z"
+created_by: gem-planner
+status: completed
+research_confidence: high
+plan_metrics:
+  wave_1_task_count: 1
+  total_dependencies: 4
+  risk_score: medium
+tldr: |
+  Add UI-layer phase overlay sequencing in BattlefieldScreen/MapPanel driven by TurnResult.phaseTrace,
+  enforce full interaction lock and End Turn idempotency while overlay is active, add screen tests in
+  existing test suites, and update requirement + traceability docs with executable evidence. Keep
+  timing strictly in UI render/update paths to avoid any engine delays and preserve determinism.
+open_questions: []
+gaps: []
+pre_mortem:
+  overall_risk_level: medium
+  critical_failure_modes:
+    - scenario: "Overlay sequence accidentally introduces engine-side sleep/delay or phase mutation, breaking determinism contracts."
+      likelihood: low
+      impact: critical
+      mitigation: "Constrain all timing to BattlefieldScreen/MapPanel render/update state and run EngineDeterminismSmokeTest in verification."
+    - scenario: "Input lock misses one interaction path (keyboard, map click, drag, zoom), allowing state mutation mid-sequence."
+      likelihood: medium
+      impact: high
+      mitigation: "Centralize interaction gating behind overlay-active guard and add targeted tests in existing screen test files."
+    - scenario: "End Turn action can be triggered twice while overlay is active, causing duplicate simulation execution."
+      likelihood: medium
+      impact: high
+      mitigation: "Add explicit in-flight/active guard around end-turn entry path and assert single-execution behavior in tests."
+  assumptions:
+    - "TurnResult.phaseTrace already contains canonical phase order including RETREAT for full turn simulation evidence."
+    - "BattlefieldScreen and MapPanel are the intended UI integration points for overlays and input control."
+    - "Engine runtime behavior remains unchanged; only UI sequencing and docs/tests are modified."
+implementation_specification:
+  code_structure: "UI-only orchestration in BattlefieldScreen (phase-overlay state machine and timing) with MapPanel participation for interaction gating; no TurnEngine/GameRuntime delay changes."
+  affected_areas:
+    - "core/src/main/java/game/screens/BattlefieldScreen.java"
+    - "core/src/main/java/game/screens/MapPanel.java"
+    - "core/src/test/java/game/screens/BattlefieldScreenRenderingTest.java"
+    - "core/src/test/java/game/screens/BattlefieldScreenUnitSelectionTest.java"
+    - "docs/requirements/game-requirements-plan.md"
+    - "docs/requirements/game-requirements-functional.md"
+    - "docs/engine/traceability-matrix.md"
+  component_details:
+    - component: "BattlefieldScreen phase overlay sequencer"
+      responsibility: "Build and run 3-second-per-phase fullscreen overlay sequence from TurnResult.phaseTrace and render dimmed phase banner."
+      interfaces:
+        - "End-turn handler consumes TurnResult.phaseTrace and initializes overlay queue."
+        - "Render/update tick advances active phase by delta until sequence completion."
+      dependencies:
+        - component: "GameRuntime.simulateOneTurn / TurnResult.phaseTrace"
+          relationship: "Data source only; no timing changes"
+      integration_points:
+        - "BattlefieldScreen.endTurn entry path"
+        - "BattlefieldScreen.render(delta)"
+    - component: "UI input gate"
+      responsibility: "Block all map and HUD interactions while overlay sequence is active and prevent duplicate End Turn execution."
+      interfaces:
+        - "overlayActive guard used by click/drag/zoom/key and End Turn handlers"
+      dependencies:
+        - component: "MapPanel pointer interaction methods"
+          relationship: "Receives or checks lock state"
+      integration_points:
+        - "BattlefieldScreen input processing callbacks"
+        - "MapPanel interaction entry points"
+    - component: "Screen test evidence"
+      responsibility: "Verify phase order/timing, RETREAT inclusion, input lock coverage, and post-sequence unlock behavior."
+      interfaces:
+        - "Existing screen test fixtures and helpers"
+      dependencies:
+        - component: "BattlefieldScreen overlay API/state"
+          relationship: "Verification only"
+      integration_points:
+        - "BattlefieldScreenRenderingTest"
+        - "BattlefieldScreenUnitSelectionTest"
+contracts:
+  - from_task: T1-ui-phase-sequencer
+    to_task: T2-ui-input-gating-idempotency
+    interface: "Overlay activity contract"
+    format: "Boolean overlay-active state + sequence lifecycle hooks exposed/usable from input handlers"
+  - from_task: T1-ui-phase-sequencer
+    to_task: T3-ui-screen-tests
+    interface: "Phase progression contract"
+    format: "Deterministic per-phase timer (3.0s), phase list sourced from phaseTrace including RETREAT"
+  - from_task: T2-ui-input-gating-idempotency
+    to_task: T3-ui-screen-tests
+    interface: "Input lock contract"
+    format: "Unified lock behavior across click/drag/zoom/key and End Turn no-double-exec guard"
+  - from_task: T3-ui-screen-tests
+    to_task: T4-docs-req-traceability
+    interface: "Executable evidence list"
+    format: "Updated test method references and coverage statements mapped to REQ-UI-PHASE-001 and REQ-UI-LOCK-001"
+tasks:
+  - id: T1-ui-phase-sequencer
+    title: "Implement UI phase overlay sequencer from TurnResult.phaseTrace"
+    description: |
+      Add/adjust BattlefieldScreen and MapPanel UI logic to initialize and run a fullscreen dimmed
+      phase overlay sequence after End Turn using TurnResult.phaseTrace order. Include RETREAT if
+      present, enforce uniform 3s phase duration, and keep all timing in UI render/update code.
+      Do not add engine-side delays or alter turn-engine semantics.
+    wave: 1
+    agent: gem-implementer
+    prototype: false
+    covers: ["UI phase visualization", "phaseTrace-driven order", "RETREAT inclusion", "determinism guardrails"]
+    priority: high
+    status: completed
+    flags:
+      flaky: false
+      retries_used: 0
+    dependencies: []
+    conflicts_with: ["T2-ui-input-gating-idempotency"]
+    context_files:
+      - path: "core/src/main/java/game/screens/BattlefieldScreen.java"
+        description: "Primary overlay sequence/timing/render integration point."
+      - path: "core/src/main/java/game/screens/MapPanel.java"
+        description: "Map rendering/input cooperation under overlay."
+      - path: "core/src/main/java/game/engine/TurnResult.java"
+        description: "phaseTrace contract source."
+    diagnosis:
+      root_cause: "Current screen flow does not visualize per-phase progression post-End Turn."
+      fix_recommendations: "Introduce explicit UI sequence state machine keyed by phaseTrace and driven by delta-time."
+      injected_at: "planning"
+    planning_pass: 1
+    planning_history:
+      - pass: 1
+        reason: "Initial DAG synthesis from objective and research constraints"
+        timestamp: "2026-05-31T00:00:00Z"
+    estimated_effort: medium
+    estimated_files: 2
+    estimated_lines: 220
+    focus_area: "BattlefieldScreen overlay state and render lifecycle"
+    verification:
+      - "Screen tests assert phase order equals phaseTrace order and includes RETREAT."
+      - "No engine files changed for timing behavior."
+    acceptance_criteria:
+      - "Overlay sequence starts immediately after End Turn simulation and uses phaseTrace order."
+      - "Each phase overlay remains visible for 3.0 seconds."
+      - "Overlay is fullscreen with dimmed background and phase label."
+      - "No engine-side sleeps/delays introduced."
+    failure_modes:
+      - scenario: "Phase order diverges from phaseTrace due to local hardcoded ordering."
+        likelihood: medium
+        impact: high
+        mitigation: "Use phaseTrace as single source of truth and assert order in tests."
+      - scenario: "RETREAT omitted when present in trace."
+        likelihood: medium
+        impact: medium
+        mitigation: "Iterate full trace values and map labels centrally."
+    tech_stack: ["Java 21", "libGDX", "JUnit 5"]
+    test_coverage: "Add/adjust existing BattlefieldScreen test suites in later task"
+    requires_review: false
+    review_depth: null
+    review_security_sensitive: false
+    environment: null
+    requires_approval: false
+    devops_security_sensitive: false
+    task_type: null
+    audience: null
+    coverage_matrix: []
+
+  - id: T2-ui-input-gating-idempotency
+    title: "Enforce full input lock and single End Turn execution during overlays"
+    description: |
+      Implement comprehensive interaction lock while overlay sequence is active and guard End Turn
+      against duplicate execution. Ensure map click, drag, zoom, unit selection, and relevant HUD
+      controls are blocked for the whole sequence and restored after completion.
+    wave: 2
+    agent: gem-implementer
+    prototype: false
+    covers: ["input lock", "end-turn idempotency", "overlay lifecycle"]
+    priority: high
+    status: completed
+    flags:
+      flaky: false
+      retries_used: 0
+    dependencies: ["T1-ui-phase-sequencer"]
+    conflicts_with: ["T1-ui-phase-sequencer", "T3-ui-screen-tests"]
+    context_files:
+      - path: "core/src/main/java/game/screens/BattlefieldScreen.java"
+        description: "End Turn action and keyboard/HUD interaction gate."
+      - path: "core/src/main/java/game/screens/MapPanel.java"
+        description: "Pointer drag/zoom/click interaction gate."
+      - path: "core/src/main/java/game/screens/SelectionState.java"
+        description: "Selection behavior reference for lock compatibility."
+    diagnosis:
+      root_cause: "Existing input paths can still process user actions during asynchronous UI sequences."
+      fix_recommendations: "Centralized overlay-active guard across all interaction entry points and end-turn trigger."
+      injected_at: "planning"
+    planning_pass: 1
+    planning_history:
+      - pass: 1
+        reason: "Guard against duplicate command execution and mid-sequence user mutations"
+        timestamp: "2026-05-31T00:00:00Z"
+    estimated_effort: medium
+    estimated_files: 3
+    estimated_lines: 260
+    focus_area: "Unified interaction gating"
+    verification:
+      - "Attempted End Turn while overlay active does not call simulation twice."
+      - "Input handlers are no-op under active overlay and restored afterward."
+    acceptance_criteria:
+      - "End Turn cannot execute twice while overlay is active."
+      - "Click/drag/zoom/selection/keys are blocked during entire overlay sequence."
+      - "All input paths resume normal behavior after sequence completion."
+    failure_modes:
+      - scenario: "One input path remains ungated and mutates state during overlay."
+        likelihood: medium
+        impact: high
+        mitigation: "Enumerate all interaction entry points and enforce shared guard condition."
+      - scenario: "Overly broad gating prevents interaction after sequence end."
+        likelihood: low
+        impact: high
+        mitigation: "Tie lock strictly to sequence-active lifecycle and add unlock assertions in tests."
+    tech_stack: ["Java 21", "libGDX", "JUnit 5"]
+    test_coverage: "Validated by T3 with targeted screen tests"
+    requires_review: false
+    review_depth: null
+    review_security_sensitive: false
+    environment: null
+    requires_approval: false
+    devops_security_sensitive: false
+    task_type: null
+    audience: null
+    coverage_matrix: []
+
+  - id: T3-ui-screen-tests
+    title: "Extend existing screen tests for overlay timing, order, and interaction lock"
+    description: |
+      Add/adjust tests in existing BattlefieldScreen screen test files to verify phase sequence order
+      from phaseTrace, 3-second timing per phase, RETREAT inclusion, full input lock during overlays,
+      unlock behavior at sequence end, and no duplicate End Turn execution.
+    wave: 3
+    agent: gem-implementer
+    prototype: false
+    covers: ["regression protection", "timing behavior", "input lock evidence", "double execution prevention"]
+    priority: high
+    status: completed
+    flags:
+      flaky: false
+      retries_used: 0
+    dependencies: ["T1-ui-phase-sequencer", "T2-ui-input-gating-idempotency"]
+    conflicts_with: ["T2-ui-input-gating-idempotency"]
+    context_files:
+      - path: "core/src/test/java/game/screens/BattlefieldScreenRenderingTest.java"
+        description: "Overlay rendering/timing and phase order assertions."
+      - path: "core/src/test/java/game/screens/BattlefieldScreenUnitSelectionTest.java"
+        description: "Selection and interaction lock assertions."
+      - path: "core/src/test/java/game/EngineDeterminismSmokeTest.java"
+        description: "Determinism guard evidence remains green."
+    diagnosis:
+      root_cause: "Existing tests do not fully cover new phase-overlay UX constraints."
+      fix_recommendations: "Add deterministic, helper-level and flow-level assertions in existing suites."
+      injected_at: "planning"
+    planning_pass: 1
+    planning_history:
+      - pass: 1
+        reason: "Research constraint requires tests in existing screen files"
+        timestamp: "2026-05-31T00:00:00Z"
+    estimated_effort: medium
+    estimated_files: 3
+    estimated_lines: 280
+    focus_area: "UI test coverage"
+    verification:
+      - "New and updated tests pass in core screen test suites."
+      - "EngineDeterminismSmokeTest passes unchanged."
+    acceptance_criteria:
+      - "Tests validate phase overlay order derived from phaseTrace and include RETREAT."
+      - "Tests validate 3s progression per phase and sequence completion behavior."
+      - "Tests validate full input lock during active overlay and unlock at end."
+      - "Tests validate End Turn is not executed twice during active overlay."
+    failure_modes:
+      - scenario: "Time-dependent tests are flaky due to frame delta handling."
+        likelihood: medium
+        impact: medium
+        mitigation: "Use deterministic simulated delta steps and stable helper assertions."
+      - scenario: "Coverage misses one interaction mode, masking regression."
+        likelihood: medium
+        impact: high
+        mitigation: "Cover map, selection, and end-turn triggers explicitly in separate assertions."
+    tech_stack: ["Java 21", "JUnit 5"]
+    test_coverage: "Primary deliverable of this task"
+    requires_review: false
+    review_depth: null
+    review_security_sensitive: false
+    environment: null
+    requires_approval: false
+    devops_security_sensitive: false
+    task_type: null
+    audience: null
+    coverage_matrix: []
+
+  - id: T4-docs-req-traceability
+    title: "Update requirements and traceability for phase overlay REQ coverage"
+    description: |
+      Update requirements docs and traceability matrix with canonical REQ IDs REQ-UI-PHASE-001
+      and REQ-UI-LOCK-001 plus executable evidence for phase visualization timing, full input lock,
+      phaseTrace-driven order, and End Turn idempotency behavior. Ensure matrix points to updated
+      tests and current implementation anchors.
+    wave: 4
+    agent: gem-documentation-writer
+    prototype: false
+    covers: ["requirements alignment", "traceability matrix evidence", "REQ-ID governance"]
+    priority: medium
+    status: completed
+    flags:
+      flaky: false
+      retries_used: 0
+    dependencies: ["T3-ui-screen-tests"]
+    conflicts_with: []
+    context_files:
+      - path: "docs/requirements/game-requirements-plan.md"
+        description: "Planning-level requirement context."
+      - path: "docs/requirements/game-requirements-functional.md"
+        description: "Normative requirement IDs and acceptance criteria."
+      - path: "docs/engine/traceability-matrix.md"
+        description: "Requirement-to-test/code evidence mapping."
+    diagnosis:
+      root_cause: "Feature scope lacks finalized REQ-ID-to-evidence mapping in docs."
+      fix_recommendations: "Define/confirm REQ IDs and update matrix with test evidence from T3."
+      injected_at: "planning"
+    planning_pass: 1
+    planning_history:
+      - pass: 1
+        reason: "Traceability instruction requires same-change alignment for Java/test updates"
+        timestamp: "2026-05-31T00:00:00Z"
+    estimated_effort: small
+    estimated_files: 3
+    estimated_lines: 140
+    focus_area: "Documentation and auditability"
+    verification:
+      - "Traceability rows reference real, updated test names/files."
+      - "Requirements docs contain explicit phase-visualization REQ IDs and acceptance criteria."
+    acceptance_criteria:
+      - "Requirements docs explicitly define and use REQ-UI-PHASE-001 and REQ-UI-LOCK-001."
+      - "Traceability matrix maps REQ-UI-PHASE-001 and REQ-UI-LOCK-001 to implementation anchors and tests."
+      - "No stale or contradictory traceability entries remain."
+    failure_modes:
+      - scenario: "REQ IDs are applied inconsistently across requirements docs and traceability matrix."
+        likelihood: medium
+        impact: medium
+        mitigation: "Treat REQ-UI-PHASE-001 and REQ-UI-LOCK-001 as canonical and verify exact string matches across all updated docs."
+      - scenario: "Matrix references outdated/nonexistent tests after code updates."
+        likelihood: low
+        impact: high
+        mitigation: "Reconcile final test names/paths from T3 outputs before final doc edit."
+    tech_stack: ["Markdown"]
+    test_coverage: null
+    requires_review: false
+    review_depth: null
+    review_security_sensitive: false
+    environment: null
+    requires_approval: false
+    devops_security_sensitive: false
+    task_type: update
+    audience: developers
+    coverage_matrix:
+      - "REQ-UI-PHASE-001 -> phase overlay timing/sequence tests and implementation anchors"
+      - "REQ-UI-LOCK-001 -> input lock and End Turn idempotency tests and implementation anchors"
+      - "REQ-UI-PHASE-001 + REQ-UI-LOCK-001 -> traceability rows reconciled with updated test references"

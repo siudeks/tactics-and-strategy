@@ -9,11 +9,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -29,19 +28,16 @@ import game.domain.Side;
 import game.domain.Unit;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
+import game.engine.TurnPhase;
 import game.scenario.LoadedScenario;
 import game.terrain.GeneratedTerrainData;
-import game.terrain.TerrainMapDefinition;
-import game.terrain.TerrainTileAtlas;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 public class BattlefieldScreen extends ScreenAdapter {
 
@@ -69,6 +65,8 @@ public class BattlefieldScreen extends ScreenAdapter {
     private static final int MOVE_CONFIRM_SOUND_DURATION_MS = 120;
     private static final float MOVE_CONFIRM_SOUND_FREQUENCY_HZ = 880f;
     private static final float MOVE_CONFIRM_SOUND_VOLUME = 0.22f;
+    private static final float PHASE_OVERLAY_SECONDS_PER_PHASE = 3.0f;
+    private static final Color PHASE_OVERLAY_DIM = new Color(0f, 0f, 0f, 0.65f);
     private static final short[] MOVE_CONFIRM_SOUND_SAMPLES = moveConfirmSoundSamples(
         MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ,
         MOVE_CONFIRM_SOUND_DURATION_MS,
@@ -87,9 +85,12 @@ public class BattlefieldScreen extends ScreenAdapter {
     private Label unitNameLabel;
     private Table unitInfoSection;
     private TextButton moveButton;
+    private TextButton endTurnButton;
+    private TextButton menuButton;
     private @Nullable Map<UnitType, Texture> unitIconTextures;
     private @Nullable Texture unidentifiedIconTexture;
     private @Nullable AudioDevice moveConfirmAudioDevice;
+    private @Nullable PhaseOverlayState phaseOverlayState;
 
     @SuppressWarnings("NullAway.Init")
     public BattlefieldScreen(Game game, LoadedScenario loadedScenario) {
@@ -103,6 +104,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         stage = new Stage(new ScreenViewport());
         font = new BitmapFont();
         whiteTexture = createWhiteTexture();
+        phaseOverlayState = null;
         loadUnitIcons();
         var icons = Objects.requireNonNull(unitIconTextures, "unitIconTextures must be initialized");
         var unidentifiedIcon = Objects.requireNonNull(unidentifiedIconTexture, "unidentifiedIconTexture must be initialized");
@@ -168,7 +170,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         moveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (moveButton.isDisabled()) {
+                if (moveButton.isDisabled() || shouldBlockInteractions(phaseOverlayState)) {
                     return;
                 }
                 mapPanel.toggleMoveMode();
@@ -183,7 +185,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         panel.add(holdButton).row();
         panel.add().growY().row();
 
-        TextButton endTurnButton = new TextButton("End Turn  [Enter]", buttonStyle);
+        endTurnButton = new TextButton("End Turn  [Enter]", buttonStyle);
         endTurnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -192,10 +194,13 @@ public class BattlefieldScreen extends ScreenAdapter {
         });
         panel.add(endTurnButton).padBottom(4f).row();
 
-        TextButton menuButton = new TextButton("Menu", buttonStyle);
+        menuButton = new TextButton("Menu", buttonStyle);
         menuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (shouldBlockInteractions(phaseOverlayState)) {
+                    return;
+                }
                 game.setScreen(new MainMenuScreen(game));
             }
         });
@@ -212,7 +217,12 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     private void endTurn() {
-        gameRuntime.simulateOneTurn();
+        EndTurnRequestResult endTurnResult = processEndTurnRequest(phaseOverlayState, gameRuntime::simulateOneTurn);
+        if (!endTurnResult.turnAdvanced()) {
+            return;
+        }
+        phaseOverlayState = endTurnResult.overlayState();
+        mapPanel.setInputLocked(endTurnResult.mapInputLocked());
         mapPanel.resetSelection();
         if (statusLabel != null) {
             statusLabel.setText(runtimeStatusSummary());
@@ -222,7 +232,11 @@ public class BattlefieldScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(BG);
+        RenderLifecycleState renderLifecycleState = advanceOverlayForRender(phaseOverlayState, delta);
+        phaseOverlayState = renderLifecycleState.overlayState();
+        mapPanel.setInputLocked(renderLifecycleState.mapInputLocked());
         stage.act(delta);
+        syncHudActionState(renderLifecycleState.hudActionsEnabled());
         syncMoveButtonState();
         if (unitNameLabel != null && unitInfoSection != null) {
             syncUnitInfoPanel(mapPanel.getSelectedUnitId(), new UnitInfoView() {
@@ -239,6 +253,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             });
         }
         stage.draw();
+        drawPhaseOverlay();
     }
 
     @Override
@@ -594,9 +609,130 @@ public class BattlefieldScreen extends ScreenAdapter {
             return;
         }
         boolean hasSelection = mapPanel.getSelectedUnitId() != null;
-        moveButton.setDisabled(!hasSelection);
-        moveButton.setTouchable(hasSelection ? Touchable.enabled : Touchable.disabled);
+        boolean blocked = shouldBlockInteractions(phaseOverlayState);
+        boolean enabled = hasSelection && !blocked;
+        moveButton.setDisabled(!enabled);
+        moveButton.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
         moveButton.setText(mapPanel.isMoveModeActive() ? "Move (On)" : "Move");
+    }
+
+    private void syncHudActionState(boolean enabled) {
+        if (endTurnButton == null || menuButton == null) {
+            return;
+        }
+        endTurnButton.setDisabled(!enabled);
+        endTurnButton.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
+        menuButton.setDisabled(!enabled);
+        menuButton.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
+    }
+
+    @FunctionalInterface
+    interface TurnSimulationAction {
+        GameRuntime.TurnSimulationResult simulateOneTurn();
+    }
+
+    static EndTurnRequestResult processEndTurnRequest(@Nullable PhaseOverlayState currentOverlayState,
+                                                      TurnSimulationAction simulationAction) {
+        Objects.requireNonNull(simulationAction, "simulationAction must not be null");
+        if (!shouldAcceptEndTurn(currentOverlayState)) {
+            boolean blocked = shouldBlockInteractions(currentOverlayState);
+            return new EndTurnRequestResult(currentOverlayState, false, blocked);
+        }
+
+        GameRuntime.TurnSimulationResult simulationResult = simulationAction.simulateOneTurn();
+        PhaseOverlayState overlayState = initializePhaseOverlayState(simulationResult.turnResult().phaseTrace());
+        boolean blocked = shouldBlockInteractions(overlayState);
+        return new EndTurnRequestResult(overlayState, true, blocked);
+    }
+
+    static RenderLifecycleState advanceOverlayForRender(@Nullable PhaseOverlayState currentOverlayState,
+                                                        float deltaSeconds) {
+        PhaseOverlayState nextOverlayState = advancePhaseOverlayState(currentOverlayState, deltaSeconds);
+        boolean blocked = shouldBlockInteractions(nextOverlayState);
+        return new RenderLifecycleState(nextOverlayState, blocked, !blocked);
+    }
+
+    static boolean shouldBlockInteractions(@Nullable PhaseOverlayState state) {
+        return state != null;
+    }
+
+    static boolean shouldAcceptEndTurn(@Nullable PhaseOverlayState state) {
+        return !shouldBlockInteractions(state);
+    }
+
+    private void drawPhaseOverlay() {
+        PhaseOverlayRenderContract renderContract = phaseOverlayRenderContract(phaseOverlayState);
+        if (renderContract == null) {
+            return;
+        }
+        float viewportWidth = stage.getViewport().getWorldWidth();
+        float viewportHeight = stage.getViewport().getWorldHeight();
+
+        Batch batch = stage.getBatch();
+        Color previousColor = batch.getColor().cpy();
+        batch.begin();
+        batch.setColor(renderContract.dimColor());
+        batch.draw(whiteTexture, 0f, 0f, viewportWidth, viewportHeight);
+        batch.setColor(Color.WHITE);
+        GlyphLayout layout = new GlyphLayout(font, renderContract.label());
+        font.draw(
+            batch,
+            renderContract.label(),
+            (viewportWidth - layout.width) / 2f,
+            (viewportHeight + layout.height) / 2f
+        );
+        batch.setColor(previousColor);
+        batch.end();
+    }
+
+    static @Nullable PhaseOverlayState initializePhaseOverlayState(List<TurnPhase> phaseTrace) {
+        Objects.requireNonNull(phaseTrace, "phaseTrace must not be null");
+        if (phaseTrace.isEmpty()) {
+            return null;
+        }
+        return new PhaseOverlayState(phaseTrace, 0, 0f, PHASE_OVERLAY_SECONDS_PER_PHASE);
+    }
+
+    static @Nullable PhaseOverlayState advancePhaseOverlayState(@Nullable PhaseOverlayState state, float deltaSeconds) {
+        if (state == null || deltaSeconds <= 0f) {
+            return state;
+        }
+
+        int phaseIndex = state.phaseIndex();
+        float elapsedSeconds = state.elapsedSeconds() + deltaSeconds;
+        float secondsPerPhase = state.secondsPerPhase();
+
+        while (elapsedSeconds >= secondsPerPhase) {
+            elapsedSeconds -= secondsPerPhase;
+            phaseIndex++;
+            if (phaseIndex >= state.phaseTrace().size()) {
+                return null;
+            }
+        }
+
+        return new PhaseOverlayState(state.phaseTrace(), phaseIndex, elapsedSeconds, secondsPerPhase);
+    }
+
+    static TurnPhase activeOverlayPhase(PhaseOverlayState state) {
+        Objects.requireNonNull(state, "state must not be null");
+        return state.phaseTrace().get(state.phaseIndex());
+    }
+
+    private static String phaseOverlayLabel(TurnPhase phase) {
+        return switch (phase) {
+            case ISSUE_ORDERS -> "ISSUE ORDERS";
+            case SIMULTANEOUS_MOVE -> "SIMULTANEOUS MOVE";
+            case COMBAT -> "COMBAT";
+            case RETREAT -> "RETREAT";
+            case END_TURN -> "END TURN";
+        };
+    }
+
+    static @Nullable PhaseOverlayRenderContract phaseOverlayRenderContract(@Nullable PhaseOverlayState state) {
+        if (state == null) {
+            return null;
+        }
+        return new PhaseOverlayRenderContract(PHASE_OVERLAY_DIM.cpy(), phaseOverlayLabel(activeOverlayPhase(state)));
     }
 
     static record UnitRenderPlacement(Unit unit, float screenX, float screenY, float drawSize) {
@@ -620,6 +756,44 @@ public class BattlefieldScreen extends ScreenAdapter {
             Objects.requireNonNull(fill, "fill must not be null");
             Objects.requireNonNull(outline, "outline must not be null");
         }
+    }
+
+    static record PhaseOverlayState(List<TurnPhase> phaseTrace,
+                                    int phaseIndex,
+                                    float elapsedSeconds,
+                                    float secondsPerPhase) {
+        PhaseOverlayState {
+            phaseTrace = List.copyOf(Objects.requireNonNull(phaseTrace, "phaseTrace must not be null"));
+            if (phaseTrace.isEmpty()) {
+                throw new IllegalArgumentException("phaseTrace must not be empty");
+            }
+            if (phaseIndex < 0 || phaseIndex >= phaseTrace.size()) {
+                throw new IllegalArgumentException("phaseIndex out of range");
+            }
+            if (elapsedSeconds < 0f) {
+                throw new IllegalArgumentException("elapsedSeconds must be >= 0");
+            }
+            if (secondsPerPhase <= 0f) {
+                throw new IllegalArgumentException("secondsPerPhase must be > 0");
+            }
+        }
+    }
+
+    static record PhaseOverlayRenderContract(Color dimColor, String label) {
+        PhaseOverlayRenderContract {
+            Objects.requireNonNull(dimColor, "dimColor must not be null");
+            Objects.requireNonNull(label, "label must not be null");
+        }
+    }
+
+    static record EndTurnRequestResult(@Nullable PhaseOverlayState overlayState,
+                                       boolean turnAdvanced,
+                                       boolean mapInputLocked) {
+    }
+
+    static record RenderLifecycleState(@Nullable PhaseOverlayState overlayState,
+                                       boolean mapInputLocked,
+                                       boolean hudActionsEnabled) {
     }
 
 }

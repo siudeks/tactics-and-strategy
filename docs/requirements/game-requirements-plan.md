@@ -121,6 +121,18 @@ This document defines functional requirements for a turn-based tactical strategy
 - Input must support fast tactical decisions with clear state feedback.
 - Objective and unit-state readability has higher priority than decorative UI.
 
+## Phase Visualization Decisions (Plan 20260531-phase-visualization)
+- Canonical implemented requirement IDs for this decision set are `REQ-UI-PHASE-001` and `REQ-UI-LOCK-001` (normative definitions are maintained in `game-requirements-functional.md`).
+- UI-only phase timing is used; no engine-level delays are introduced.
+- Overlay order is sourced from runtime `phaseTrace`.
+- Overlay display duration is uniform at 3 seconds for every phase, including not-yet-implemented logic phases.
+- Full input lock is enforced for the complete overlay sequence.
+- Duration and phase labels are centralized as constants.
+
+### Consistency Notes (Implemented)
+- `REQ-UI-PHASE-001`: End Turn advances simulation first, then the UI renders a dimmed phase overlay sequence in `phaseTrace` order, 3.0 seconds per phase including `RETREAT`.
+- `REQ-UI-LOCK-001`: During that sequence, map input paths and key shortcuts are locked, HUD action availability follows overlay lock state, and repeated End Turn requests do not advance simulation again until overlay completion.
+
 ## Confidence Levels by Section
 - High confidence: gameplay loop, scenario objective model, map/control-point concept.
 - Medium confidence: supply behavior details, stacking granularity, full HUD composition.

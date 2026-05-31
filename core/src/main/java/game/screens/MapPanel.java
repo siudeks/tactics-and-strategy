@@ -55,9 +55,18 @@ final class MapPanel extends Actor {
     private @Nullable TileCoord movePreviewTile;
     private float movePreviewBlinkTimer;
     private boolean movePreviewVisible;
+    private boolean inputLocked;
 
     private final int mapWidthTiles;
     private final int mapHeightTiles;
+
+    enum InputPath {
+        CLICK,
+        DRAG,
+        ZOOM,
+        KEY_SHORTCUT,
+        SELECTION
+    }
 
     @SuppressWarnings("NullAway.Init")
     MapPanel(Texture pixel,
@@ -87,6 +96,7 @@ final class MapPanel extends Actor {
             ZOOM_STEP_PERCENT
         );
         this.moveTargetsByUnit = new HashMap<>();
+        this.inputLocked = false;
 
         setTouchable(Touchable.enabled);
         this.debugGridOverlay = false;
@@ -98,6 +108,9 @@ final class MapPanel extends Actor {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (shouldBlockInputPath(inputLocked, InputPath.CLICK)) {
+                    return true;
+                }
                 cameraController.startDrag(x, y);
                 if (getStage() != null) {
                     getStage().setKeyboardFocus(MapPanel.this);
@@ -108,11 +121,17 @@ final class MapPanel extends Actor {
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                if (shouldBlockInputPath(inputLocked, InputPath.DRAG)) {
+                    return;
+                }
                 cameraController.dragTo(x, y, getWidth(), getHeight());
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if (shouldBlockInputPath(inputLocked, InputPath.CLICK)) {
+                    return;
+                }
                 float dx = x - cameraController.lastDragX();
                 float dy = y - cameraController.lastDragY();
                 if (dx * dx + dy * dy >= 100f) return; // drag, not a click
@@ -171,6 +190,10 @@ final class MapPanel extends Actor {
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
+                if (shouldBlockInputPath(inputLocked, InputPath.SELECTION)) {
+                    clearMovePreview();
+                    return true;
+                }
                 TileCoord hoveredTile = BattlefieldScreen.mapTileAtPanelPoint(
                     x,
                     y,
@@ -193,6 +216,9 @@ final class MapPanel extends Actor {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                if (shouldBlockInputPath(inputLocked, InputPath.ZOOM)) {
+                    return true;
+                }
                 boolean ctrlPressed = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)
                     || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT);
                 if (!ctrlPressed || amountY == 0f) {
@@ -203,6 +229,9 @@ final class MapPanel extends Actor {
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+                if (shouldBlockInputPath(inputLocked, InputPath.KEY_SHORTCUT)) {
+                    return true;
+                }
                 if (keycode == Input.Keys.G) {
                     debugGridOverlay = !debugGridOverlay;
                     return true;
@@ -226,6 +255,19 @@ final class MapPanel extends Actor {
                 return false;
             }
         });
+    }
+
+    void setInputLocked(boolean inputLocked) {
+        this.inputLocked = inputLocked;
+        if (inputLocked) {
+            selectionState.deactivateMoveMode();
+            clearMovePreview();
+        }
+    }
+
+    static boolean shouldBlockInputPath(boolean inputLocked, InputPath inputPath) {
+        Objects.requireNonNull(inputPath, "inputPath must not be null");
+        return inputLocked;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package game;
 
 import org.junit.jupiter.api.Test;
-import game.domain.*;
 import game.engine.DeterministicContext;
 import game.engine.TurnEngine;
 import game.engine.TurnPhase;
