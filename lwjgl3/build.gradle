@@ -22,6 +22,11 @@ tasks.named('run') {
             environment 'PULSE_SERVER', "unix:${wslgPulseSocket}"
             environment 'ALSOFT_DRIVERS', 'pulse'
         }
+
+        // Wayland focus APIs are not universally available; prefer X11 backend when possible.
+        if (System.getenv('DISPLAY') != null) {
+            environment 'GLFW_PLATFORM', System.getenv('GLFW_PLATFORM') ?: 'x11'
+        }
     }
 }
 
