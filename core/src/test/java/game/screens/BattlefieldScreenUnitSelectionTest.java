@@ -1,6 +1,6 @@
 package game.screens;
 
-import com.badlogic.gdx.audio.AudioDevice;
+import com.badlogic.gdx.audio.Sound;
 import org.junit.jupiter.api.Test;
 import game.domain.Side;
 import game.domain.Unit;
@@ -10,11 +10,12 @@ import game.terrain.GeneratedTerrainData;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -311,40 +312,55 @@ class BattlefieldScreenUnitSelectionTest {
     }
 
     @Test
-    void createMoveConfirmationAudioDevice_returnsFactoryDevice_whenFactorySucceeds() {
-        RecordingAudioDevice audioDevice = new RecordingAudioDevice();
+    void createMoveConfirmationSound_returnsFactorySound_whenFactorySucceeds() {
+        RecordingSound sound = new RecordingSound();
 
-        AudioDevice result = BattlefieldScreen.createMoveConfirmationAudioDevice(() -> audioDevice);
+        Sound result = BattlefieldScreen.createMoveConfirmationSound(() -> sound);
 
-        assertEquals(audioDevice, result);
+        assertEquals(sound, result);
     }
 
     @Test
-    void createMoveConfirmationAudioDevice_returnsNoOp_whenFactoryThrows() {
-        AudioDevice result = BattlefieldScreen.createMoveConfirmationAudioDevice(
+    void createMoveConfirmationSound_returnsNull_whenFactoryThrows() {
+        Sound result = BattlefieldScreen.createMoveConfirmationSound(
             () -> {
                 throw new IllegalStateException("boom");
             }
         );
 
-        assertInstanceOf(BattlefieldScreen.NoOpAudioDevice.class, result);
+        assertNull(result);
     }
 
     @Test
-    void playMoveConfirmationSound_writesSamplesToAudioDevice() {
-        RecordingAudioDevice audioDevice = new RecordingAudioDevice();
+    void playMoveConfirmationSound_playsSoundWithConfiguredVolume() {
+        RecordingSound sound = new RecordingSound();
 
-        BattlefieldScreen.playMoveConfirmationSound(audioDevice);
+        BattlefieldScreen.playMoveConfirmationSound(sound);
 
-        assertEquals(1, audioDevice.setVolumeCalls);
-        assertEquals(1, audioDevice.writeShortCalls);
-        assertTrue(audioDevice.lastVolume > 0f);
-        assertTrue(audioDevice.lastShortSampleCount > 0);
+        assertEquals(1, sound.stopCalls.get());
+        assertEquals(1, sound.playCalls.get());
+        assertTrue(sound.lastVolume > 0f);
     }
 
     @Test
-    void playMoveConfirmationSound_acceptsNoOpAudioDevice() {
-        assertDoesNotThrow(() -> BattlefieldScreen.playMoveConfirmationSound(new BattlefieldScreen.NoOpAudioDevice()));
+    void playMoveConfirmationSound_doesNotThrow_whenSoundThrows() {
+        assertDoesNotThrow(() -> BattlefieldScreen.playMoveConfirmationSound(new ThrowingSound()));
+    }
+
+    @Test
+    void moveConfirmSoundWavBytes_containsWaveHeader() {
+        byte[] wavBytes = BattlefieldScreen.moveConfirmSoundWavBytes(22050);
+
+        assertNotNull(wavBytes);
+        assertTrue(wavBytes.length > 44);
+        assertEquals('R', wavBytes[0]);
+        assertEquals('I', wavBytes[1]);
+        assertEquals('F', wavBytes[2]);
+        assertEquals('F', wavBytes[3]);
+        assertEquals('W', wavBytes[8]);
+        assertEquals('A', wavBytes[9]);
+        assertEquals('V', wavBytes[10]);
+        assertEquals('E', wavBytes[11]);
     }
 
     @Test
@@ -405,30 +421,53 @@ class BattlefieldScreenUnitSelectionTest {
         return new Unit(id, side, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 0, 0);
     }
 
-    private static final class RecordingAudioDevice implements AudioDevice {
-        private int setVolumeCalls;
-        private int writeShortCalls;
+    private static class RecordingSound implements Sound {
+        private final AtomicInteger playCalls = new AtomicInteger(0);
+        private final AtomicInteger stopCalls = new AtomicInteger(0);
         private float lastVolume;
-        private int lastShortSampleCount;
 
         @Override
-        public boolean isMono() {
-            return false;
+        public long play() {
+            playCalls.incrementAndGet();
+            return 1L;
         }
 
         @Override
-        public void writeSamples(short[] samples, int offset, int numSamples) {
-            writeShortCalls++;
-            lastShortSampleCount = numSamples;
+        public long play(float volume) {
+            playCalls.incrementAndGet();
+            lastVolume = volume;
+            return 1L;
         }
 
         @Override
-        public void writeSamples(float[] samples, int offset, int numSamples) {
+        public long play(float volume, float pitch, float pan) {
+            playCalls.incrementAndGet();
+            lastVolume = volume;
+            return 1L;
         }
 
         @Override
-        public int getLatency() {
-            return 0;
+        public long loop() {
+            return 1L;
+        }
+
+        @Override
+        public long loop(float volume) {
+            return 1L;
+        }
+
+        @Override
+        public long loop(float volume, float pitch, float pan) {
+            return 1L;
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public void stop() {
+            stopCalls.incrementAndGet();
         }
 
         @Override
@@ -440,13 +479,40 @@ class BattlefieldScreenUnitSelectionTest {
         }
 
         @Override
-        public void dispose() {
+        public void stop(long soundId) {
         }
 
         @Override
-        public void setVolume(float volume) {
-            setVolumeCalls++;
+        public void pause(long soundId) {
+        }
+
+        @Override
+        public void resume(long soundId) {
+        }
+
+        @Override
+        public void setLooping(long soundId, boolean looping) {
+        }
+
+        @Override
+        public void setPitch(long soundId, float pitch) {
+        }
+
+        @Override
+        public void setVolume(long soundId, float volume) {
             lastVolume = volume;
+        }
+
+        @Override
+        public void setPan(long soundId, float pan, float volume) {
+            lastVolume = volume;
+        }
+    }
+
+    private static final class ThrowingSound extends RecordingSound {
+        @Override
+        public long play(float volume) {
+            throw new RuntimeException("boom");
         }
     }
 }

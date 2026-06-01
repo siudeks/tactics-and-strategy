@@ -5,13 +5,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import game.scenario.ScenarioEntry;
 import game.scenario.ScenarioLoader;
+import org.jspecify.annotations.Nullable;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,6 +33,9 @@ public class MainMenuScreen extends ScreenAdapter {
 
     private static final float MARGIN_LEFT = 32f;
     private static final float LINE_HEIGHT = 20f;
+    private static final int MENU_MUSIC_SAMPLE_RATE_HZ = 22050;
+    private static final float MENU_MUSIC_VOLUME = 0.11f;
+    private static final byte[] MENU_MUSIC_WAV_BYTES = menuMusicWavBytes(MENU_MUSIC_SAMPLE_RATE_HZ);
 
     private final Game game;
 
@@ -32,6 +43,9 @@ public class MainMenuScreen extends ScreenAdapter {
     private BitmapFont font;
     private List<ScenarioEntry> entries;
     private int selectedIndex = 0;
+    private int menuMusicLoadGeneration = 0;
+    private @Nullable Music menuMusic;
+    private @Nullable Path menuMusicFile;
 
     @SuppressWarnings("NullAway.Init")
     public MainMenuScreen(Game game) {
@@ -45,6 +59,7 @@ public class MainMenuScreen extends ScreenAdapter {
         font.getData().setScale(1.5f);
 
         entries = ScenarioLoader.listAvailableScenarios();
+        startMenuMusic();
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -74,6 +89,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
     private void launchSelected() {
         ScenarioEntry entry = entries.get(selectedIndex);
+        stopMenuMusic();
         game.setScreen(new BattlefieldScreen(game, ScenarioLoader.loadFromResource(entry.resourcePath())));
     }
 
@@ -118,9 +134,171 @@ public class MainMenuScreen extends ScreenAdapter {
     }
 
     @Override
+    public void hide() {
+        stopMenuMusic();
+        Gdx.input.setInputProcessor(null);
+    }
+
+    @Override
     public void dispose() {
+        stopMenuMusic();
         batch.dispose();
         font.dispose();
+    }
+
+    private void startMenuMusic() {
+        stopMenuMusic();
+        if (Gdx.audio == null) {
+            return;
+        }
+
+        int requestId = menuMusicLoadGeneration;
+        AsyncAudio.runOnAudioIoThread(() -> prepareMenuMusicFile(requestId));
+    }
+
+    private void prepareMenuMusicFile(int requestId) {
+        try {
+            Path preparedMusicFile = Files.createTempFile("tactics-and-strategy-menu-music", ".wav");
+            Files.write(preparedMusicFile, MENU_MUSIC_WAV_BYTES);
+            AsyncAudio.runOnAppThread(Gdx.app,
+                () -> initializePreparedMenuMusic(requestId, preparedMusicFile));
+        } catch (IOException | RuntimeException exception) {
+            AsyncAudio.runOnAppThread(Gdx.app, () -> {
+                if (requestId == menuMusicLoadGeneration) {
+                    logMenuMusicError("Failed to initialize menu music", exception);
+                }
+            });
+        }
+    }
+
+    private void initializePreparedMenuMusic(int requestId, Path preparedMusicFile) {
+        if (requestId != menuMusicLoadGeneration) {
+            deleteMenuMusicFile(preparedMusicFile);
+            return;
+        }
+
+        var audio = Gdx.audio;
+        if (audio == null) {
+            deleteMenuMusicFile(preparedMusicFile);
+            return;
+        }
+
+        try {
+            FileHandle fileHandle = Gdx.files.absolute(preparedMusicFile.toString());
+            Music preparedMusic = audio.newMusic(fileHandle);
+            preparedMusic.setLooping(true);
+            preparedMusic.setVolume(MENU_MUSIC_VOLUME);
+            if (requestId != menuMusicLoadGeneration) {
+                preparedMusic.stop();
+                preparedMusic.dispose();
+                deleteMenuMusicFile(preparedMusicFile);
+                return;
+            }
+            menuMusicFile = preparedMusicFile;
+            menuMusic = preparedMusic;
+            preparedMusic.play();
+        } catch (RuntimeException exception) {
+            logMenuMusicError("Failed to initialize menu music", exception);
+            deleteMenuMusicFile(preparedMusicFile);
+        }
+    }
+
+    private void stopMenuMusic() {
+        menuMusicLoadGeneration++;
+        if (menuMusic != null) {
+            menuMusic.stop();
+            menuMusic.dispose();
+            menuMusic = null;
+        }
+        if (menuMusicFile != null) {
+            deleteMenuMusicFile(menuMusicFile);
+            menuMusicFile = null;
+        }
+    }
+
+    private void deleteMenuMusicFile(Path musicFilePath) {
+        try {
+            Files.deleteIfExists(musicFilePath);
+        } catch (IOException exception) {
+            logMenuMusicError("Failed to delete temporary menu music file", exception);
+        }
+    }
+
+    private void logMenuMusicError(String message, Exception exception) {
+        if (Gdx.app != null) {
+            Gdx.app.error("MainMenuScreen", message, exception);
+        }
+    }
+
+    static short[] menuMusicSamples(int sampleRateHz) {
+        int[] noteDurationsMs = {180, 180, 180, 220, 180, 180, 180, 320};
+        float[] noteFrequenciesHz = {392f, 493.88f, 587.33f, 659.25f, 587.33f, 493.88f, 440f, 392f};
+        int totalSamples = 0;
+        for (int noteDurationMs : noteDurationsMs) {
+            totalSamples += Math.max(1, sampleRateHz * noteDurationMs / 1000);
+        }
+
+        short[] samples = new short[totalSamples];
+        int sampleOffset = 0;
+        for (int noteIndex = 0; noteIndex < noteDurationsMs.length; noteIndex++) {
+            int noteSampleCount = Math.max(1, sampleRateHz * noteDurationsMs[noteIndex] / 1000);
+            float frequencyHz = noteFrequenciesHz[noteIndex];
+            for (int i = 0; i < noteSampleCount; i++) {
+                float progress = (float) i / (float) noteSampleCount;
+                float attack = Math.min(1f, progress * 12f);
+                float release = Math.min(1f, (1f - progress) * 12f);
+                float envelope = Math.min(attack, release);
+                double phase = 2d * Math.PI * frequencyHz * i / sampleRateHz;
+                float value = (float) Math.sin(phase) * envelope * MENU_MUSIC_VOLUME;
+                samples[sampleOffset + i] = (short) (value * Short.MAX_VALUE);
+            }
+            sampleOffset += noteSampleCount;
+        }
+        return samples;
+    }
+
+    static byte[] menuMusicWavBytes(int sampleRateHz) {
+        short[] samples = menuMusicSamples(sampleRateHz);
+        int dataSize = samples.length * Short.BYTES;
+
+        try (var outputStream = new ByteArrayOutputStream(44 + dataSize)) {
+            writeAscii(outputStream, "RIFF");
+            writeLittleEndianInt(outputStream, 36 + dataSize);
+            writeAscii(outputStream, "WAVE");
+            writeAscii(outputStream, "fmt ");
+            writeLittleEndianInt(outputStream, 16);
+            writeLittleEndianShort(outputStream, (short) 1);
+            writeLittleEndianShort(outputStream, (short) 1);
+            writeLittleEndianInt(outputStream, sampleRateHz);
+            writeLittleEndianInt(outputStream, sampleRateHz * Short.BYTES);
+            writeLittleEndianShort(outputStream, (short) Short.BYTES);
+            writeLittleEndianShort(outputStream, (short) 16);
+            writeAscii(outputStream, "data");
+            writeLittleEndianInt(outputStream, dataSize);
+
+            for (short sample : samples) {
+                writeLittleEndianShort(outputStream, sample);
+            }
+            return outputStream.toByteArray();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Failed to build menu music wav bytes", exception);
+        }
+    }
+
+    private static void writeAscii(ByteArrayOutputStream outputStream, String value) throws IOException {
+        outputStream.write(value.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    private static void writeLittleEndianInt(ByteArrayOutputStream outputStream, int value) throws IOException {
+        outputStream.write(value & 0xFF);
+        outputStream.write((value >>> 8) & 0xFF);
+        outputStream.write((value >>> 16) & 0xFF);
+        outputStream.write((value >>> 24) & 0xFF);
+    }
+
+    private static void writeLittleEndianShort(ByteArrayOutputStream outputStream, short value) throws IOException {
+        outputStream.write(value & 0xFF);
+        outputStream.write((value >>> 8) & 0xFF);
     }
 }
 

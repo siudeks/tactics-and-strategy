@@ -15,9 +15,35 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class MainMenuScreenFlowTest {
+
+    @Test
+    void menuMusicSamples_returnsNonEmptyPcmData() {
+        short[] samples = MainMenuScreen.menuMusicSamples(22050);
+
+        assertNotNull(samples);
+        assertTrue(samples.length > 0);
+    }
+
+    @Test
+    void menuMusicWavBytes_containsWaveHeader() {
+        byte[] wavBytes = MainMenuScreen.menuMusicWavBytes(22050);
+
+        assertNotNull(wavBytes);
+        assertTrue(wavBytes.length > 44);
+        assertEquals('R', wavBytes[0]);
+        assertEquals('I', wavBytes[1]);
+        assertEquals('F', wavBytes[2]);
+        assertEquals('F', wavBytes[3]);
+        assertEquals('W', wavBytes[8]);
+        assertEquals('A', wavBytes[9]);
+        assertEquals('V', wavBytes[10]);
+        assertEquals('E', wavBytes[11]);
+    }
 
     @Test
     void launchSelected_handsSelectedScenarioToBattlefieldScreen() {

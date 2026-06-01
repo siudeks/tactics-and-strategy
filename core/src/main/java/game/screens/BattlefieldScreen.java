@@ -3,7 +3,8 @@ package game.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.audio.AudioDevice;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -33,6 +34,11 @@ import game.scenario.LoadedScenario;
 import game.terrain.GeneratedTerrainData;
 import org.jspecify.annotations.Nullable;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -72,7 +78,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         MOVE_CONFIRM_SOUND_DURATION_MS,
         MOVE_CONFIRM_SOUND_FREQUENCY_HZ
     );
-    private static final AudioDevice NO_OP_AUDIO_DEVICE = new NoOpAudioDevice();
+    private static final byte[] MOVE_CONFIRM_SOUND_WAV_BYTES = moveConfirmSoundWavBytes(MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ);
 
     private final Game game;
     private final LoadedScenario loadedScenario;
@@ -90,7 +96,8 @@ public class BattlefieldScreen extends ScreenAdapter {
     private TextButton menuButton;
     private @Nullable Map<UnitType, Texture> unitIconTextures;
     private @Nullable Texture unidentifiedIconTexture;
-    private AudioDevice moveConfirmAudioDevice = NO_OP_AUDIO_DEVICE;
+    private @Nullable Sound moveConfirmSound;
+    private @Nullable Path moveConfirmSoundFile;
     private @Nullable PhaseOverlayState phaseOverlayState;
 
     @SuppressWarnings("NullAway.Init")
@@ -536,49 +543,113 @@ public class BattlefieldScreen extends ScreenAdapter {
 
     private void initializeMoveConfirmationAudio() {
         disposeMoveConfirmationAudio();
-        moveConfirmAudioDevice = createMoveConfirmationAudioDevice(BattlefieldScreen::createLibGdxMoveConfirmationAudioDevice);
+        if (Gdx.audio == null) {
+            return;
+        }
+        try {
+            moveConfirmSoundFile = Files.createTempFile("tactics-and-strategy-move-confirm-sound", ".wav");
+            Files.write(moveConfirmSoundFile, MOVE_CONFIRM_SOUND_WAV_BYTES);
+            FileHandle fileHandle = Gdx.files.absolute(moveConfirmSoundFile.toString());
+            moveConfirmSound = createMoveConfirmationSound(() -> Objects.requireNonNull(Gdx.audio,
+                "audio service must be available").newSound(fileHandle));
+        } catch (IOException | RuntimeException exception) {
+            logMoveConfirmationAudioError("Failed to initialize move confirmation sound", exception);
+            disposeMoveConfirmationAudio();
+        }
     }
 
     private void playMoveConfirmationSound() {
-        playMoveConfirmationSound(moveConfirmAudioDevice);
+        Sound sound = moveConfirmSound;
+        if (sound == null) {
+            return;
+        }
+        playMoveConfirmationSound(sound);
     }
 
-    static void playMoveConfirmationSound(AudioDevice audioDevice) {
+    static void playMoveConfirmationSound(Sound moveConfirmationSound) {
         try {
-            audioDevice.setVolume(MOVE_CONFIRM_SOUND_VOLUME);
-            audioDevice.writeSamples(MOVE_CONFIRM_SOUND_SAMPLES, 0, MOVE_CONFIRM_SOUND_SAMPLES.length);
+            moveConfirmationSound.stop();
+            moveConfirmationSound.play(MOVE_CONFIRM_SOUND_VOLUME);
         } catch (RuntimeException exception) {
             logMoveConfirmationAudioError("Failed to play move confirmation sound", exception);
         }
     }
 
-    static AudioDevice createMoveConfirmationAudioDevice(MoveConfirmationAudioDeviceFactory factory) {
+    static @Nullable Sound createMoveConfirmationSound(MoveConfirmationSoundFactory factory) {
         Objects.requireNonNull(factory, "factory must not be null");
         try {
-            return Objects.requireNonNull(factory.create(), "factory must not create a null audio device");
+            return Objects.requireNonNull(factory.create(), "factory must not create a null sound instance");
         } catch (RuntimeException exception) {
-            logMoveConfirmationAudioError("Failed to initialize move confirmation audio device", exception);
-            return NO_OP_AUDIO_DEVICE;
+            logMoveConfirmationAudioError("Failed to initialize move confirmation sound", exception);
+            return null;
         }
     }
 
-    private static AudioDevice createLibGdxMoveConfirmationAudioDevice() {
-        if (Gdx.audio == null) {
-            return NO_OP_AUDIO_DEVICE;
-        }
-        return Objects.requireNonNull(Gdx.audio, "audio service must be available")
-            .newAudioDevice(MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ, false);
-    }
-
-    private static void logMoveConfirmationAudioError(String message, RuntimeException exception) {
+    private static void logMoveConfirmationAudioError(String message, Exception exception) {
         if (Gdx.app != null) {
             Gdx.app.error("BattlefieldScreen", message, exception);
         }
     }
 
     private void disposeMoveConfirmationAudio() {
-        moveConfirmAudioDevice.dispose();
-        moveConfirmAudioDevice = NO_OP_AUDIO_DEVICE;
+        if (moveConfirmSound != null) {
+            moveConfirmSound.stop();
+            moveConfirmSound.dispose();
+            moveConfirmSound = null;
+        }
+        if (moveConfirmSoundFile != null) {
+            try {
+                Files.deleteIfExists(moveConfirmSoundFile);
+            } catch (IOException exception) {
+                if (Gdx.app != null) {
+                    Gdx.app.error("BattlefieldScreen", "Failed to delete move confirmation sound temp file", exception);
+                }
+            }
+            moveConfirmSoundFile = null;
+        }
+    }
+
+    static byte[] moveConfirmSoundWavBytes(int sampleRateHz) {
+        short[] samples = MOVE_CONFIRM_SOUND_SAMPLES;
+        int dataSize = samples.length * Short.BYTES;
+
+        try (var outputStream = new ByteArrayOutputStream(44 + dataSize)) {
+            writeAscii(outputStream, "RIFF");
+            writeLittleEndianInt(outputStream, 36 + dataSize);
+            writeAscii(outputStream, "WAVE");
+            writeAscii(outputStream, "fmt ");
+            writeLittleEndianInt(outputStream, 16);
+            writeLittleEndianShort(outputStream, (short) 1);
+            writeLittleEndianShort(outputStream, (short) 1);
+            writeLittleEndianInt(outputStream, sampleRateHz);
+            writeLittleEndianInt(outputStream, sampleRateHz * Short.BYTES);
+            writeLittleEndianShort(outputStream, (short) Short.BYTES);
+            writeLittleEndianShort(outputStream, (short) 16);
+            writeAscii(outputStream, "data");
+            writeLittleEndianInt(outputStream, dataSize);
+            for (short sample : samples) {
+                writeLittleEndianShort(outputStream, sample);
+            }
+            return outputStream.toByteArray();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Failed to build move confirmation wav bytes", exception);
+        }
+    }
+
+    private static void writeAscii(ByteArrayOutputStream outputStream, String value) throws IOException {
+        outputStream.write(value.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    private static void writeLittleEndianInt(ByteArrayOutputStream outputStream, int value) throws IOException {
+        outputStream.write(value & 0xFF);
+        outputStream.write((value >>> 8) & 0xFF);
+        outputStream.write((value >>> 16) & 0xFF);
+        outputStream.write((value >>> 24) & 0xFF);
+    }
+
+    private static void writeLittleEndianShort(ByteArrayOutputStream outputStream, short value) throws IOException {
+        outputStream.write(value & 0xFF);
+        outputStream.write((value >>> 8) & 0xFF);
     }
 
     static @Nullable TileCoord movePreviewTile(boolean moveModeActive,
@@ -640,44 +711,8 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     @FunctionalInterface
-    interface MoveConfirmationAudioDeviceFactory {
-        AudioDevice create();
-    }
-
-    static final class NoOpAudioDevice implements AudioDevice {
-        @Override
-        public boolean isMono() {
-            return false;
-        }
-
-        @Override
-        public void writeSamples(short[] samples, int offset, int numSamples) {
-        }
-
-        @Override
-        public void writeSamples(float[] samples, int offset, int numSamples) {
-        }
-
-        @Override
-        public int getLatency() {
-            return 0;
-        }
-
-        @Override
-        public void pause() {
-        }
-
-        @Override
-        public void resume() {
-        }
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public void setVolume(float volume) {
-        }
+    interface MoveConfirmationSoundFactory {
+        Sound create();
     }
 
     static EndTurnRequestResult processEndTurnRequest(@Nullable PhaseOverlayState currentOverlayState,
