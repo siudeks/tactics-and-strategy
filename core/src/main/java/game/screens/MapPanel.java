@@ -56,6 +56,7 @@ final class MapPanel extends Actor {
     private float movePreviewBlinkTimer;
     private boolean movePreviewVisible;
     private boolean inputLocked;
+    private Side commandSide;
 
     private final int mapWidthTiles;
     private final int mapHeightTiles;
@@ -66,6 +67,12 @@ final class MapPanel extends Actor {
         ZOOM,
         KEY_SHORTCUT,
         SELECTION
+    }
+
+    enum EnterIssuingOrdersOutcome {
+        NO_PROGRESS,
+        SWITCH_COMMAND_SIDE,
+        END_TURN
     }
 
     @SuppressWarnings("NullAway.Init")
@@ -97,6 +104,7 @@ final class MapPanel extends Actor {
         );
         this.moveTargetsByUnit = new HashMap<>();
         this.inputLocked = false;
+        this.commandSide = campaignStateSupplier.get().activeSide();
 
         setTouchable(Touchable.enabled);
         this.debugGridOverlay = false;
@@ -162,10 +170,7 @@ final class MapPanel extends Actor {
                     selectionState.deactivateMoveMode();
                     clearMovePreview();
                     CampaignState state = campaignStateSupplier.get();
-                    List<Unit> activeUnits = state.units().stream()
-                        .filter(unit -> unit.side() == state.activeSide())
-                        .toList();
-                    selectUnit(BattlefieldScreen.nextUnassignedUnitId(activeUnits, selectedUnitId, moveTargetsByUnit));
+                    selectUnit(BattlefieldScreen.nextUnassignedUnitId(unitsForCommandSide(state), selectedUnitId, moveTargetsByUnit));
                     return;
                 }
                 if (BattlefieldScreen.shouldConsumeClickInMoveMode(selectionState.isMoveModeActive())) {
@@ -185,7 +190,7 @@ final class MapPanel extends Actor {
                     cameraController.cameraX(),
                     cameraController.cameraY(),
                     cameraController.zoomLevel());
-                selectUnit(BattlefieldScreen.unitIdAtScreenPoint(placements, sx, sy, state.activeSide()));
+                selectUnit(BattlefieldScreen.unitIdAtScreenPoint(placements, sx, sy, commandSide));
             }
 
             @Override
@@ -237,7 +242,7 @@ final class MapPanel extends Actor {
                     return true;
                 }
                 if (keycode == Input.Keys.ENTER) {
-                    onEndTurn.run();
+                    handleEnterKey();
                     return true;
                 }
                 if (keycode == Input.Keys.TAB) {
@@ -426,10 +431,10 @@ final class MapPanel extends Actor {
                 selectedPlacement = placement;
                 continue;
             }
-            drawUnitPlacement(batch, placement, campaignState.activeSide());
+            drawUnitPlacement(batch, placement, commandSide);
         }
         if (selectedPlacement != null) {
-            drawUnitPlacement(batch, selectedPlacement, campaignState.activeSide());
+            drawUnitPlacement(batch, selectedPlacement, commandSide);
         }
     }
 
@@ -525,18 +530,83 @@ final class MapPanel extends Actor {
     void resetSelection() {
         clearMovePreview();
         CampaignState state = campaignStateSupplier.get();
-        List<Unit> active = state.units().stream()
-            .filter(u -> u.side() == state.activeSide())
-            .toList();
+        moveTargetsByUnit.clear();
+        commandSide = state.activeSide();
+        List<Unit> active = unitsForCommandSide(state);
         selectUnit(active.isEmpty() ? null : active.getFirst().id());
     }
 
     private void cycleSelectedUnit() {
         CampaignState state = campaignStateSupplier.get();
-        List<Unit> active = state.units().stream()
-            .filter(u -> u.side() == state.activeSide())
-            .toList();
+        List<Unit> active = unitsForCommandSide(state);
         selectUnit(BattlefieldScreen.nextSelectedUnitId(active, selectionState.selectedUnitId()));
+    }
+
+    private void handleEnterKey() {
+        CampaignState state = campaignStateSupplier.get();
+        EnterIssuingOrdersOutcome outcome = enterIssuingOrdersOutcome(
+            areAllMoveOrdersAssignedForCommandSide(state),
+            commandSide,
+            state.activeSide()
+        );
+        applyEnterIssuingOrdersOutcome(
+            outcome,
+            () -> switchCommandSideForIssuingOrders(state),
+            onEndTurn
+        );
+    }
+
+    static EnterIssuingOrdersOutcome enterIssuingOrdersOutcome(boolean currentCommandSideComplete,
+                                                               Side commandSide,
+                                                               Side initialActiveSide) {
+        if (!currentCommandSideComplete) {
+            return EnterIssuingOrdersOutcome.NO_PROGRESS;
+        }
+        return commandSide == initialActiveSide
+            ? EnterIssuingOrdersOutcome.SWITCH_COMMAND_SIDE
+            : EnterIssuingOrdersOutcome.END_TURN;
+    }
+
+    static void applyEnterIssuingOrdersOutcome(EnterIssuingOrdersOutcome outcome,
+                                               Runnable onSwitchCommandSide,
+                                               Runnable onEndTurn) {
+        Objects.requireNonNull(outcome, "outcome must not be null");
+        Objects.requireNonNull(onSwitchCommandSide, "onSwitchCommandSide must not be null");
+        Objects.requireNonNull(onEndTurn, "onEndTurn must not be null");
+        switch (outcome) {
+            case NO_PROGRESS -> {
+                return;
+            }
+            case SWITCH_COMMAND_SIDE -> onSwitchCommandSide.run();
+            case END_TURN -> onEndTurn.run();
+        }
+    }
+
+    private void switchCommandSideForIssuingOrders(CampaignState state) {
+        commandSide = oppositeCommandSide(commandSide);
+        selectionState.deactivateMoveMode();
+        clearMovePreview();
+        selectUnit(BattlefieldScreen.nextUnassignedUnitId(unitsForCommandSide(state), null, moveTargetsByUnit));
+    }
+
+    private boolean areAllMoveOrdersAssignedForCommandSide(CampaignState state) {
+        return unitsForCommandSide(state).stream()
+            .map(Unit::id)
+            .allMatch(moveTargetsByUnit::containsKey);
+    }
+
+    private List<Unit> unitsForCommandSide(CampaignState state) {
+        return state.units().stream()
+            .filter(unit -> unit.side() == commandSide)
+            .toList();
+    }
+
+    private static Side oppositeCommandSide(Side side) {
+        return switch (side) {
+            case ALLIES -> Side.AXIS;
+            case AXIS -> Side.ALLIES;
+            case NEUTRAL -> Side.NEUTRAL;
+        };
     }
 
     @Override
