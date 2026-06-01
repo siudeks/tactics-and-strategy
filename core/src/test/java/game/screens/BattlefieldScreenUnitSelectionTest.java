@@ -1,5 +1,6 @@
 package game.screens;
 
+import com.badlogic.gdx.audio.AudioDevice;
 import org.junit.jupiter.api.Test;
 import game.domain.Side;
 import game.domain.Unit;
@@ -10,8 +11,10 @@ import game.terrain.GeneratedTerrainData;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -308,6 +311,43 @@ class BattlefieldScreenUnitSelectionTest {
     }
 
     @Test
+    void createMoveConfirmationAudioDevice_returnsFactoryDevice_whenFactorySucceeds() {
+        RecordingAudioDevice audioDevice = new RecordingAudioDevice();
+
+        AudioDevice result = BattlefieldScreen.createMoveConfirmationAudioDevice(() -> audioDevice);
+
+        assertEquals(audioDevice, result);
+    }
+
+    @Test
+    void createMoveConfirmationAudioDevice_returnsNoOp_whenFactoryThrows() {
+        AudioDevice result = BattlefieldScreen.createMoveConfirmationAudioDevice(
+            () -> {
+                throw new IllegalStateException("boom");
+            }
+        );
+
+        assertInstanceOf(BattlefieldScreen.NoOpAudioDevice.class, result);
+    }
+
+    @Test
+    void playMoveConfirmationSound_writesSamplesToAudioDevice() {
+        RecordingAudioDevice audioDevice = new RecordingAudioDevice();
+
+        BattlefieldScreen.playMoveConfirmationSound(audioDevice);
+
+        assertEquals(1, audioDevice.setVolumeCalls);
+        assertEquals(1, audioDevice.writeShortCalls);
+        assertTrue(audioDevice.lastVolume > 0f);
+        assertTrue(audioDevice.lastShortSampleCount > 0);
+    }
+
+    @Test
+    void playMoveConfirmationSound_acceptsNoOpAudioDevice() {
+        assertDoesNotThrow(() -> BattlefieldScreen.playMoveConfirmationSound(new BattlefieldScreen.NoOpAudioDevice()));
+    }
+
+    @Test
     void movePreviewTile_returnsHoveredTile_whenMoveModeSelectionAndTerrainAreValid() {
         BattlefieldScreen.TileCoord previewTile = BattlefieldScreen.movePreviewTile(
             true,
@@ -363,5 +403,50 @@ class BattlefieldScreenUnitSelectionTest {
 
     private static Unit unit(String id, Side side) {
         return new Unit(id, side, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 0, 0);
+    }
+
+    private static final class RecordingAudioDevice implements AudioDevice {
+        private int setVolumeCalls;
+        private int writeShortCalls;
+        private float lastVolume;
+        private int lastShortSampleCount;
+
+        @Override
+        public boolean isMono() {
+            return false;
+        }
+
+        @Override
+        public void writeSamples(short[] samples, int offset, int numSamples) {
+            writeShortCalls++;
+            lastShortSampleCount = numSamples;
+        }
+
+        @Override
+        public void writeSamples(float[] samples, int offset, int numSamples) {
+        }
+
+        @Override
+        public int getLatency() {
+            return 0;
+        }
+
+        @Override
+        public void pause() {
+        }
+
+        @Override
+        public void resume() {
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public void setVolume(float volume) {
+            setVolumeCalls++;
+            lastVolume = volume;
+        }
     }
 }

@@ -72,6 +72,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         MOVE_CONFIRM_SOUND_DURATION_MS,
         MOVE_CONFIRM_SOUND_FREQUENCY_HZ
     );
+    private static final AudioDevice NO_OP_AUDIO_DEVICE = new NoOpAudioDevice();
 
     private final Game game;
     private final LoadedScenario loadedScenario;
@@ -89,7 +90,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     private TextButton menuButton;
     private @Nullable Map<UnitType, Texture> unitIconTextures;
     private @Nullable Texture unidentifiedIconTexture;
-    private @Nullable AudioDevice moveConfirmAudioDevice;
+    private AudioDevice moveConfirmAudioDevice = NO_OP_AUDIO_DEVICE;
     private @Nullable PhaseOverlayState phaseOverlayState;
 
     @SuppressWarnings("NullAway.Init")
@@ -105,6 +106,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         font = new BitmapFont();
         whiteTexture = createWhiteTexture();
         phaseOverlayState = null;
+        initializeMoveConfirmationAudio();
         loadUnitIcons();
         var icons = Objects.requireNonNull(unitIconTextures, "unitIconTextures must be initialized");
         var unidentifiedIcon = Objects.requireNonNull(unidentifiedIconTexture, "unidentifiedIconTexture must be initialized");
@@ -532,45 +534,51 @@ public class BattlefieldScreen extends ScreenAdapter {
         return samples;
     }
 
+    private void initializeMoveConfirmationAudio() {
+        disposeMoveConfirmationAudio();
+        moveConfirmAudioDevice = createMoveConfirmationAudioDevice(BattlefieldScreen::createLibGdxMoveConfirmationAudioDevice);
+    }
+
     private void playMoveConfirmationSound() {
-        AudioDevice audioDevice = getMoveConfirmationAudioDevice();
-        if (audioDevice == null) {
-            return;
-        }
+        playMoveConfirmationSound(moveConfirmAudioDevice);
+    }
+
+    static void playMoveConfirmationSound(AudioDevice audioDevice) {
         try {
             audioDevice.setVolume(MOVE_CONFIRM_SOUND_VOLUME);
             audioDevice.writeSamples(MOVE_CONFIRM_SOUND_SAMPLES, 0, MOVE_CONFIRM_SOUND_SAMPLES.length);
         } catch (RuntimeException exception) {
-            if (Gdx.app != null) {
-                Gdx.app.error("BattlefieldScreen", "Failed to play move confirmation sound", exception);
-            }
+            logMoveConfirmationAudioError("Failed to play move confirmation sound", exception);
         }
     }
 
-    private @Nullable AudioDevice getMoveConfirmationAudioDevice() {
-        if (moveConfirmAudioDevice != null) {
-            return moveConfirmAudioDevice;
-        }
-        if (Gdx.audio == null) {
-            return null;
-        }
+    static AudioDevice createMoveConfirmationAudioDevice(MoveConfirmationAudioDeviceFactory factory) {
+        Objects.requireNonNull(factory, "factory must not be null");
         try {
-            moveConfirmAudioDevice = Gdx.audio.newAudioDevice(MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ, false);
-            return moveConfirmAudioDevice;
+            return Objects.requireNonNull(factory.create(), "factory must not create a null audio device");
         } catch (RuntimeException exception) {
-            if (Gdx.app != null) {
-                Gdx.app.error("BattlefieldScreen", "Failed to initialize move confirmation audio device", exception);
-            }
-            return null;
+            logMoveConfirmationAudioError("Failed to initialize move confirmation audio device", exception);
+            return NO_OP_AUDIO_DEVICE;
+        }
+    }
+
+    private static AudioDevice createLibGdxMoveConfirmationAudioDevice() {
+        if (Gdx.audio == null) {
+            return NO_OP_AUDIO_DEVICE;
+        }
+        return Objects.requireNonNull(Gdx.audio, "audio service must be available")
+            .newAudioDevice(MOVE_CONFIRM_SOUND_SAMPLE_RATE_HZ, false);
+    }
+
+    private static void logMoveConfirmationAudioError(String message, RuntimeException exception) {
+        if (Gdx.app != null) {
+            Gdx.app.error("BattlefieldScreen", message, exception);
         }
     }
 
     private void disposeMoveConfirmationAudio() {
-        if (moveConfirmAudioDevice == null) {
-            return;
-        }
         moveConfirmAudioDevice.dispose();
-        moveConfirmAudioDevice = null;
+        moveConfirmAudioDevice = NO_OP_AUDIO_DEVICE;
     }
 
     static @Nullable TileCoord movePreviewTile(boolean moveModeActive,
@@ -629,6 +637,47 @@ public class BattlefieldScreen extends ScreenAdapter {
     @FunctionalInterface
     interface TurnSimulationAction {
         GameRuntime.TurnSimulationResult simulateOneTurn();
+    }
+
+    @FunctionalInterface
+    interface MoveConfirmationAudioDeviceFactory {
+        AudioDevice create();
+    }
+
+    static final class NoOpAudioDevice implements AudioDevice {
+        @Override
+        public boolean isMono() {
+            return false;
+        }
+
+        @Override
+        public void writeSamples(short[] samples, int offset, int numSamples) {
+        }
+
+        @Override
+        public void writeSamples(float[] samples, int offset, int numSamples) {
+        }
+
+        @Override
+        public int getLatency() {
+            return 0;
+        }
+
+        @Override
+        public void pause() {
+        }
+
+        @Override
+        public void resume() {
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public void setVolume(float volume) {
+        }
     }
 
     static EndTurnRequestResult processEndTurnRequest(@Nullable PhaseOverlayState currentOverlayState,
