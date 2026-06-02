@@ -3,11 +3,6 @@ package game.terrain;
 import com.badlogic.gdx.graphics.Color;
 
 public final class TerrainMapDefinition {
-    public enum PaletteMode {
-        ORIGINAL,
-        IMPROVED
-    }
-
     private static final int TILE_PATTERN_PIXELS = GeneratedTerrainData.SOURCE_TILE_SIZE * GeneratedTerrainData.SOURCE_TILE_SIZE;
 
     private final int widthTiles;
@@ -16,7 +11,6 @@ public final class TerrainMapDefinition {
     private final byte[][] uniqueTilePatterns;
     private final byte[] tileDominantTerrain;
     private Color[] terrainColors;
-    private PaletteMode paletteMode;
 
     public TerrainMapDefinition() {
         this.widthTiles = GeneratedTerrainData.MAP_WIDTH_TILES;
@@ -24,8 +18,7 @@ public final class TerrainMapDefinition {
         this.mapTileIds = GeneratedTerrainData.MAP_TILE_IDS;
         this.uniqueTilePatterns = GeneratedTerrainData.UNIQUE_TILE_PATTERNS;
         this.tileDominantTerrain = GeneratedTerrainData.TILE_DOMINANT_TERRAIN;
-        this.paletteMode = PaletteMode.IMPROVED;
-        this.terrainColors = buildTerrainColors(resolvePaletteRgb(paletteMode));
+        this.terrainColors = buildTerrainColors(GeneratedTerrainData.terrainColorsRgbDefault());
 
         validate();
     }
@@ -56,26 +49,6 @@ public final class TerrainMapDefinition {
 
     public int getUniqueTileCount() {
         return uniqueTilePatterns.length;
-    }
-
-    public PaletteMode getPaletteMode() {
-        return paletteMode;
-    }
-
-    public void setPaletteMode(PaletteMode mode) {
-        if (mode == paletteMode) {
-            return;
-        }
-
-        paletteMode = mode;
-        terrainColors = buildTerrainColors(resolvePaletteRgb(mode));
-    }
-
-    private int[][] resolvePaletteRgb(PaletteMode mode) {
-        if (mode == PaletteMode.ORIGINAL) {
-            return GeneratedTerrainData.terrainColorsRgbOriginal();
-        }
-        return GeneratedTerrainData.terrainColorsRgbImproved();
     }
 
     private Color[] buildTerrainColors(int[][] rgb) {

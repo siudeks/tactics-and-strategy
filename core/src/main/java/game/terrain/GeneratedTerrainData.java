@@ -16,23 +16,12 @@ public final class GeneratedTerrainData {
     public static final int TERRAIN_MOUNTAIN = 2;
     public static final int TERRAIN_WATER = 3;
 
-    private static final int[][] TERRAIN_COLORS_RGB_ORIGINAL = new int[][] {
-        {0, 0, 0},
-        {202, 202, 0},
-        {196, 91, 91},
-        {0, 0, 202}
-    };
-
     private static final int[][] TERRAIN_COLORS_RGB_IMPROVED = new int[][] {
         {0, 0, 0},
         {194, 171, 109},
         {146, 96, 78},
         {56, 92, 137}
     };
-
-    public static int[][] terrainColorsRgbOriginal() {
-        return deepCopy2d(TERRAIN_COLORS_RGB_ORIGINAL);
-    }
 
     public static int[][] terrainColorsRgbImproved() {
         return deepCopy2d(TERRAIN_COLORS_RGB_IMPROVED);
