@@ -2,51 +2,67 @@ package game.screens;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MapPanelInputLockIntegrationTest {
 
     @Test
-    void shouldBlockInputPath_returnsTrueForClickDragZoomKeyAndSelection_whenInputIsLocked() {
-        assertTrue(MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.CLICK));
-        assertTrue(MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.DRAG));
-        assertTrue(MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.ZOOM));
-        assertTrue(MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.KEY_SHORTCUT));
-        assertTrue(MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.SELECTION));
+    void shouldBlockInputPath_blocksAllMapPathsDuringPhaseNotification() {
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.PHASE_NOTIFICATION, MapPanel.InputPath.CLICK));
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.PHASE_NOTIFICATION, MapPanel.InputPath.DRAG));
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.PHASE_NOTIFICATION, MapPanel.InputPath.ZOOM));
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.PHASE_NOTIFICATION, MapPanel.InputPath.KEY_SHORTCUT));
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.PHASE_NOTIFICATION, MapPanel.InputPath.SELECTION));
     }
 
     @Test
-    void shouldBlockInputPath_returnsFalseForClickDragZoomKeyAndSelection_whenInputIsUnlocked() {
-        assertFalse(MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.CLICK));
-        assertFalse(MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.DRAG));
-        assertFalse(MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.ZOOM));
-        assertFalse(MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.KEY_SHORTCUT));
-        assertFalse(MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.SELECTION));
+    void shouldBlockInputPath_allowsOnlyDragAndZoomDuringMovementPlayback() {
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.MOVEMENT_PLAYBACK, MapPanel.InputPath.CLICK));
+        assertFalse(MapPanel.shouldBlockInputPath(InteractionLockState.MOVEMENT_PLAYBACK, MapPanel.InputPath.DRAG));
+        assertFalse(MapPanel.shouldBlockInputPath(InteractionLockState.MOVEMENT_PLAYBACK, MapPanel.InputPath.ZOOM));
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.MOVEMENT_PLAYBACK, MapPanel.InputPath.KEY_SHORTCUT));
+        assertTrue(MapPanel.shouldBlockInputPath(InteractionLockState.MOVEMENT_PLAYBACK, MapPanel.InputPath.SELECTION));
     }
 
     @Test
-    void shouldBlockInputPath_unlockLifecycle_releasesAllInputPathsAfterOverlayLockEnds() {
-        boolean clickBlockedDuringOverlay = MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.CLICK);
-        boolean clickBlockedAfterOverlay = MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.CLICK);
-        boolean dragBlockedDuringOverlay = MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.DRAG);
-        boolean dragBlockedAfterOverlay = MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.DRAG);
-        boolean zoomBlockedDuringOverlay = MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.ZOOM);
-        boolean zoomBlockedAfterOverlay = MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.ZOOM);
-        boolean keyBlockedDuringOverlay = MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.KEY_SHORTCUT);
-        boolean keyBlockedAfterOverlay = MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.KEY_SHORTCUT);
-        boolean selectionBlockedDuringOverlay = MapPanel.shouldBlockInputPath(true, MapPanel.InputPath.SELECTION);
-        boolean selectionBlockedAfterOverlay = MapPanel.shouldBlockInputPath(false, MapPanel.InputPath.SELECTION);
+    void movementPlaybackPointerDrag_initializesDragStateAndPansCamera() {
+        CameraController controller = new CameraController(320f, 320f, 0.5f, 3f, 0.1f);
 
-        assertTrue(clickBlockedDuringOverlay);
-        assertFalse(clickBlockedAfterOverlay);
-        assertTrue(dragBlockedDuringOverlay);
-        assertFalse(dragBlockedAfterOverlay);
-        assertTrue(zoomBlockedDuringOverlay);
-        assertFalse(zoomBlockedAfterOverlay);
-        assertTrue(keyBlockedDuringOverlay);
-        assertFalse(keyBlockedAfterOverlay);
-        assertTrue(selectionBlockedDuringOverlay);
-        assertFalse(selectionBlockedAfterOverlay);
+        boolean dragInitialized = MapPanel.initializePointerDrag(
+            InteractionLockState.MOVEMENT_PLAYBACK,
+            controller,
+            60f,
+            70f
+        );
+        controller.dragTo(20f, 30f, 80f, 80f);
+
+        assertTrue(dragInitialized);
+        assertAll(
+            () -> assertEquals(20f, controller.lastDragX()),
+            () -> assertEquals(30f, controller.lastDragY()),
+            () -> assertEquals(40f, controller.cameraX()),
+            () -> assertEquals(40f, controller.cameraY())
+        );
+    }
+
+    @Test
+    void shouldBlockInputPath_releasesAllPathsWhenUnlocked() {
+        assertFalse(MapPanel.shouldBlockInputPath(InteractionLockState.NONE, MapPanel.InputPath.CLICK));
+        assertFalse(MapPanel.shouldBlockInputPath(InteractionLockState.NONE, MapPanel.InputPath.DRAG));
+        assertFalse(MapPanel.shouldBlockInputPath(InteractionLockState.NONE, MapPanel.InputPath.ZOOM));
+        assertFalse(MapPanel.shouldBlockInputPath(InteractionLockState.NONE, MapPanel.InputPath.KEY_SHORTCUT));
+        assertFalse(MapPanel.shouldBlockInputPath(InteractionLockState.NONE, MapPanel.InputPath.SELECTION));
+    }
+
+    @Test
+    void interactionLockState_blocksHudActionsAndEndTurnUntilUnlocked() {
+        assertTrue(InteractionLockState.TURN_COMMIT.blocksHudActions());
+        assertTrue(InteractionLockState.MOVEMENT_PLAYBACK.blocksHudActions());
+        assertTrue(InteractionLockState.MOVEMENT_PLAYBACK.blocksEndTurn());
+        assertFalse(InteractionLockState.NONE.blocksHudActions());
+        assertFalse(InteractionLockState.NONE.blocksEndTurn());
     }
 }

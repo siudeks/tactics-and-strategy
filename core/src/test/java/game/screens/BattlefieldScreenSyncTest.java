@@ -1,18 +1,26 @@
 package game.screens;
 
-import game.engine.TurnPhase;
-import game.engine.TurnResult;
+import game.domain.CampaignState;
+import game.domain.Order;
+import game.domain.OrderType;
+import game.domain.ScenarioDefinition;
+import game.domain.Side;
+import game.domain.TerrainType;
+import game.domain.Unit;
+import game.domain.UnitSize;
+import game.domain.UnitType;
 import game.engine.GameRuntime;
+import game.scenario.LoadedScenario;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
-import game.scenario.ScenarioLoader;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -71,178 +79,104 @@ class BattlefieldScreenSyncTest {
     }
 
     @Test
-    void initializePhaseOverlayState_usesPhaseTraceOrderAndStartsAtFirstPhase() {
-        TurnResult turnResult = new TurnResult(
-            ScenarioLoader.loadBootstrapScenario().campaignState(),
-            List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.SIMULTANEOUS_MOVE, TurnPhase.COMBAT, TurnPhase.RETREAT, TurnPhase.END_TURN),
-            7L,
-            5L,
-            "snapshot"
-        );
-
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(turnResult.phaseTrace());
-
-        assertNotNull(overlayState);
-        assertEquals(TurnPhase.ISSUE_ORDERS, BattlefieldScreen.activeOverlayPhase(overlayState));
-        assertEquals(
-            List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.SIMULTANEOUS_MOVE, TurnPhase.COMBAT, TurnPhase.RETREAT, TurnPhase.END_TURN),
-            overlayState.phaseTrace()
-        );
+    void phaseOverlayLabel_mapsRuntimePhasesToUserFacingLabels() {
+        assertEquals("ISSUE ORDERS", BattlefieldScreen.phaseOverlayLabel(game.engine.TurnPhase.ISSUE_ORDERS));
+        assertEquals("SIMULTANEOUS MOVE", BattlefieldScreen.phaseOverlayLabel(game.engine.TurnPhase.SIMULTANEOUS_MOVE));
+        assertEquals("COMBAT", BattlefieldScreen.phaseOverlayLabel(game.engine.TurnPhase.COMBAT));
+        assertEquals("RETREAT", BattlefieldScreen.phaseOverlayLabel(game.engine.TurnPhase.RETREAT));
+        assertEquals("END TURN", BattlefieldScreen.phaseOverlayLabel(game.engine.TurnPhase.END_TURN));
     }
 
     @Test
-    void advancePhaseOverlayState_followsPhaseTraceOrderIncludingRetreat_withThreeSecondBoundaries() {
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(
-            List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.SIMULTANEOUS_MOVE, TurnPhase.COMBAT, TurnPhase.RETREAT, TurnPhase.END_TURN)
-        );
-        assertNotNull(overlayState);
-        assertEquals(TurnPhase.ISSUE_ORDERS, BattlefieldScreen.activeOverlayPhase(overlayState));
+    void phaseOverlayDimColor_returnsConfiguredOverlayColor() {
+        var dimColor = BattlefieldScreen.phaseOverlayDimColor();
 
-        BattlefieldScreen.PhaseOverlayState afterThreeSeconds = BattlefieldScreen.advancePhaseOverlayState(overlayState, 3.0f);
-        assertNotNull(afterThreeSeconds);
-        assertEquals(TurnPhase.SIMULTANEOUS_MOVE, BattlefieldScreen.activeOverlayPhase(afterThreeSeconds));
-
-        BattlefieldScreen.PhaseOverlayState afterSixSeconds = BattlefieldScreen.advancePhaseOverlayState(afterThreeSeconds, 3.0f);
-        assertNotNull(afterSixSeconds);
-        assertEquals(TurnPhase.COMBAT, BattlefieldScreen.activeOverlayPhase(afterSixSeconds));
-
-        BattlefieldScreen.PhaseOverlayState afterNineSeconds = BattlefieldScreen.advancePhaseOverlayState(afterSixSeconds, 3.0f);
-        assertNotNull(afterNineSeconds);
-        assertEquals(TurnPhase.RETREAT, BattlefieldScreen.activeOverlayPhase(afterNineSeconds));
-
-        BattlefieldScreen.PhaseOverlayState afterTwelveSeconds = BattlefieldScreen.advancePhaseOverlayState(afterNineSeconds, 3.0f);
-        assertNotNull(afterTwelveSeconds);
-        assertEquals(TurnPhase.END_TURN, BattlefieldScreen.activeOverlayPhase(afterTwelveSeconds));
-
-        BattlefieldScreen.PhaseOverlayState completed = BattlefieldScreen.advancePhaseOverlayState(afterTwelveSeconds, 3.0f);
-        assertNull(completed);
+        assertEquals(0f, dimColor.r);
+        assertEquals(0f, dimColor.g);
+        assertEquals(0f, dimColor.b);
+        assertTrue(dimColor.a > 0f);
     }
 
     @Test
-    void advancePhaseOverlayState_keepsEachPhaseVisibleForThreeSeconds_andThenCompletesSequence() {
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(
-            List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.RETREAT)
-        );
+    void runtimeStatusSummary_reflectsCurrentRuntimeTurnAndActiveSide() {
+        var runtime = new GameRuntime(game.scenario.ScenarioLoader.loadBootstrapScenario());
 
-        BattlefieldScreen.PhaseOverlayState beforeBoundary = BattlefieldScreen.advancePhaseOverlayState(overlayState, 2.99f);
-        assertNotNull(beforeBoundary);
-        assertEquals(TurnPhase.ISSUE_ORDERS, BattlefieldScreen.activeOverlayPhase(beforeBoundary));
-
-        BattlefieldScreen.PhaseOverlayState secondPhase = BattlefieldScreen.advancePhaseOverlayState(beforeBoundary, 0.02f);
-        assertNotNull(secondPhase);
-        assertEquals(TurnPhase.RETREAT, BattlefieldScreen.activeOverlayPhase(secondPhase));
-
-        BattlefieldScreen.PhaseOverlayState completed = BattlefieldScreen.advancePhaseOverlayState(secondPhase, 3.0f);
-        assertNull(completed);
+        assertEquals(1, runtime.getTurnNumber());
+        assertEquals("ALLIES", runtime.getActiveSideCode());
     }
 
     @Test
-    void shouldBlockInteractions_returnsTrue_whenOverlayStateIsActive() {
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(
-            List.of(TurnPhase.ISSUE_ORDERS)
-        );
+    void endTurnButton_click_isBlockedDuringMovementPlayback() {
+        var game = new RecordingGame();
+        var screen = new BattlefieldScreen(game, loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
+        var runtime = new GameRuntime(loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
 
-        boolean blocked = BattlefieldScreen.shouldBlockInteractions(overlayState);
+        setField(screen, "gameRuntime", runtime);
 
-        assertTrue(blocked);
+        var phasePlaybackController = readField(screen, "phasePlaybackController", BattlefieldPhasePlaybackController.class);
+        phasePlaybackController.start(runtime);
+        phasePlaybackController.advance(runtime, 6.1f);
+
+        assertEquals(InteractionLockState.MOVEMENT_PLAYBACK, phasePlaybackController.interactionLockState());
+
+        assertDoesNotThrow(() -> invokeEndTurn(screen));
+        assertEquals(InteractionLockState.MOVEMENT_PLAYBACK, phasePlaybackController.interactionLockState());
     }
 
-    @Test
-    void shouldAcceptEndTurn_returnsFalse_whenOverlaySequenceIsActive() {
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(
-            List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.END_TURN)
-        );
-
-        boolean accepted = BattlefieldScreen.shouldAcceptEndTurn(overlayState);
-
-        assertFalse(accepted);
+    private static void invokeEndTurn(BattlefieldScreen screen) throws ReflectiveOperationException {
+        Method endTurn = BattlefieldScreen.class.getDeclaredMethod("endTurn");
+        endTurn.setAccessible(true);
+        endTurn.invoke(screen);
     }
 
-    @Test
-    void shouldAcceptEndTurn_staysFalseAcrossRepeatedAttempts_whenOverlayRemainsActive() {
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(
-            List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.END_TURN)
-        );
-
-        boolean firstAttempt = BattlefieldScreen.shouldAcceptEndTurn(overlayState);
-        boolean secondAttempt = BattlefieldScreen.shouldAcceptEndTurn(overlayState);
-
-        assertFalse(firstAttempt);
-        assertFalse(secondAttempt);
+    private static <T> T readField(Object target, String fieldName, Class<T> fieldType) {
+        try {
+            Field field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return fieldType.cast(field.get(target));
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
-    @Test
-    void shouldAcceptEndTurn_returnsTrue_afterOverlaySequenceCompletes() {
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(
-            List.of(TurnPhase.ISSUE_ORDERS)
-        );
-        BattlefieldScreen.PhaseOverlayState completed = BattlefieldScreen.advancePhaseOverlayState(overlayState, 3.0f);
-
-        boolean accepted = BattlefieldScreen.shouldAcceptEndTurn(completed);
-
-        assertTrue(accepted);
+    private static void setField(Object target, String fieldName, Object value) {
+        try {
+            Field field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
-    @Test
-    void shouldAcceptEndTurn_remainsFalse_forEntireActiveOverlayLifecycle_thenTurnsTrueAfterCompletion() {
-        BattlefieldScreen.PhaseOverlayState overlayState = BattlefieldScreen.initializePhaseOverlayState(
-            List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.RETREAT)
+    private static LoadedScenario loadedScenarioWithPendingMove(String unitId,
+                                                                int startTileX,
+                                                                int startTileY,
+                                                                int targetTileX,
+                                                                int targetTileY) {
+        Unit unit = new Unit(unitId, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, startTileX, startTileY);
+        ScenarioDefinition scenarioDefinition = new ScenarioDefinition(
+            "screen-runtime",
+            "Screen Runtime",
+            10,
+            10,
+            TerrainType.SAND,
+            List.of(unit)
         );
-        assertNotNull(overlayState);
-
-        assertFalse(BattlefieldScreen.shouldAcceptEndTurn(overlayState));
-
-        BattlefieldScreen.PhaseOverlayState midFirstPhase = BattlefieldScreen.advancePhaseOverlayState(overlayState, 1.5f);
-        assertNotNull(midFirstPhase);
-        assertFalse(BattlefieldScreen.shouldAcceptEndTurn(midFirstPhase));
-
-        BattlefieldScreen.PhaseOverlayState secondPhase = BattlefieldScreen.advancePhaseOverlayState(midFirstPhase, 1.5f);
-        assertNotNull(secondPhase);
-        assertFalse(BattlefieldScreen.shouldAcceptEndTurn(secondPhase));
-
-        BattlefieldScreen.PhaseOverlayState nearCompletion = BattlefieldScreen.advancePhaseOverlayState(secondPhase, 2.99f);
-        assertNotNull(nearCompletion);
-        assertFalse(BattlefieldScreen.shouldAcceptEndTurn(nearCompletion));
-
-        BattlefieldScreen.PhaseOverlayState completed = BattlefieldScreen.advancePhaseOverlayState(nearCompletion, 0.01f);
-        assertNull(completed);
-        assertTrue(BattlefieldScreen.shouldAcceptEndTurn(completed));
+        CampaignState campaignState = new CampaignState(
+            "test-campaign",
+            "screen-runtime",
+            1,
+            Side.ALLIES,
+            List.of(unit),
+            List.of(new Order("move-1", unitId, Side.ALLIES, OrderType.MOVE, targetTileX, targetTileY))
+        );
+        return new LoadedScenario(scenarioDefinition, campaignState);
     }
 
-    @Test
-    void processEndTurnRequest_invokedTwiceDuringActiveOverlay_advancesSimulationOnlyOnce() {
-        AtomicInteger simulationCalls = new AtomicInteger(0);
-
-        BattlefieldScreen.EndTurnRequestResult firstRequest = BattlefieldScreen.processEndTurnRequest(
-            null,
-            () -> {
-                simulationCalls.incrementAndGet();
-                return new GameRuntime.TurnSimulationResult(new TurnResult(
-                    ScenarioLoader.loadBootstrapScenario().campaignState(),
-                    List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.END_TURN),
-                    11L,
-                    7L,
-                    "snapshot-1"
-                ));
-            }
-        );
-
-        BattlefieldScreen.EndTurnRequestResult secondRequest = BattlefieldScreen.processEndTurnRequest(
-            firstRequest.overlayState(),
-            () -> {
-                simulationCalls.incrementAndGet();
-                return new GameRuntime.TurnSimulationResult(new TurnResult(
-                    ScenarioLoader.loadBootstrapScenario().campaignState(),
-                    List.of(TurnPhase.ISSUE_ORDERS, TurnPhase.END_TURN),
-                    12L,
-                    8L,
-                    "snapshot-2"
-                ));
-            }
-        );
-
-        assertTrue(firstRequest.turnAdvanced());
-        assertFalse(secondRequest.turnAdvanced());
-        assertEquals(1, simulationCalls.get());
+    private static final class RecordingGame extends com.badlogic.gdx.Game {
+        @Override
+        public void create() {
+        }
     }
 }

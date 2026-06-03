@@ -2,6 +2,9 @@ package game;
 
 import org.junit.jupiter.api.Test;
 import game.engine.DeterministicContext;
+import game.engine.PhaseStepResult;
+import game.engine.RuntimePhase;
+import game.engine.TurnExecutionSession;
 import game.engine.TurnEngine;
 import game.engine.TurnPhase;
 import game.engine.TurnResult;
@@ -52,5 +55,29 @@ class OneTurnSimulationTest {
         TurnResult result = engine().runOneTurn(loaded.campaignState());
 
         assertEquals(initialUnitCount, result.state().units().size());
+    }
+
+    @Test
+    void oneTurn_stepwiseSessionMatchesMonolithicRun() {
+        var loaded = ScenarioLoader.loadBootstrapScenario();
+        var startState = loaded.campaignState();
+        var engine = engine();
+
+        TurnExecutionSession session = engine.beginExecution(startState);
+        TurnResult stepwiseResult = null;
+        while (!session.isComplete()) {
+            PhaseStepResult stepResult = session.advance();
+            assertEquals(stepResult.phase(), RuntimePhase.fromTurnPhase(stepResult.phase().turnPhase()));
+            if (stepResult.phase() == RuntimePhase.SIMULTANEOUS_MOVE) {
+                assertEquals(startState.units().size(), stepResult.movementPlayback().size());
+            }
+            if (stepResult.turnCompleted()) {
+                stepwiseResult = stepResult.completedTurnResult().orElseThrow();
+            }
+        }
+
+        TurnResult monolithicResult = engine.runOneTurn(startState);
+        assertNotNull(stepwiseResult);
+        assertTrue(TurnEngine.areSemanticallyEquivalent(stepwiseResult, monolithicResult));
     }
 }

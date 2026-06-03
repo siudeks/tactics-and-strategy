@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
+
 public final class GameRuntime {
 
     /**
@@ -23,6 +25,8 @@ public final class GameRuntime {
 
     private LoadedScenario loadedScenario;
     private final TurnEngine engine;
+    @Nullable
+    private TurnExecutionSession activeTurnExecution;
 
     public GameRuntime(LoadedScenario loadedScenario) {
         this.loadedScenario = Objects.requireNonNull(loadedScenario, "loadedScenario must not be null");
@@ -30,31 +34,68 @@ public final class GameRuntime {
         this.engine = TurnEngine.fixedContext(ctx, loadedScenario.scenarioDefinition());
     }
 
+    public TurnExecutionSession beginTurnExecution() {
+        if (activeTurnExecution != null && !activeTurnExecution.isComplete()) {
+            throw new IllegalStateException("Turn execution is already active");
+        }
+        activeTurnExecution = engine.beginExecution(currentCampaignState());
+        return activeTurnExecution;
+    }
+
+    public PhaseStepResult advanceTurnExecution() {
+        if (activeTurnExecution == null) {
+            throw new IllegalStateException("No active turn execution");
+        }
+        PhaseStepResult stepResult = activeTurnExecution.advance();
+        if (stepResult.completedTurnResult().isPresent()) {
+            loadedScenario = new LoadedScenario(
+                loadedScenario.scenarioDefinition(),
+                stepResult.completedTurnResult().orElseThrow().state()
+            );
+            activeTurnExecution = null;
+        }
+        return stepResult;
+    }
+
+    public boolean hasActiveTurnExecution() {
+        return activeTurnExecution != null;
+    }
+
+    public RuntimePhase currentRuntimePhase() {
+        if (activeTurnExecution == null) {
+            throw new IllegalStateException("No active turn execution");
+        }
+        return activeTurnExecution.currentPhase();
+    }
+
     public TurnSimulationResult simulateOneTurn() {
-        TurnResult result = engine.runOneTurn(loadedScenario.campaignState());
-        // Update internal campaign state to the result state
-        loadedScenario = new LoadedScenario(
-            loadedScenario.scenarioDefinition(),
-            result.state()
-        );
-        return new TurnSimulationResult(result);
+        if (activeTurnExecution == null) {
+            beginTurnExecution();
+        }
+
+        PhaseStepResult stepResult;
+        do {
+            stepResult = advanceTurnExecution();
+        } while (!stepResult.turnCompleted());
+
+        return new TurnSimulationResult(stepResult.completedTurnResult().orElseThrow());
     }
 
     public int getTurnNumber() {
-        return loadedScenario.campaignState().turnNumber();
+        return currentCampaignState().turnNumber();
     }
 
     public CampaignState getCurrentCampaignState() {
-        return loadedScenario.campaignState();
+        return currentCampaignState();
     }
 
     public String getActiveSideCode() {
-        return loadedScenario.campaignState().activeSide().name();
+        return currentCampaignState().activeSide().name();
     }
 
     public void assignMoveTarget(String unitId, int tileX, int tileY) {
         Objects.requireNonNull(unitId, "unitId");
-        CampaignState state = loadedScenario.campaignState();
+        CampaignState state = currentCampaignState();
         Unit unit = state.units().stream()
             .filter(u -> u.id().equals(unitId))
             .findFirst()
@@ -78,6 +119,21 @@ public final class GameRuntime {
             state.units(),
             next
         );
-        loadedScenario = new LoadedScenario(loadedScenario.scenarioDefinition(), updated);
+        updateCurrentCampaignState(updated);
+    }
+
+    private CampaignState currentCampaignState() {
+        if (activeTurnExecution != null) {
+            return activeTurnExecution.currentState();
+        }
+        return loadedScenario.campaignState();
+    }
+
+    private void updateCurrentCampaignState(CampaignState updatedState) {
+        if (activeTurnExecution != null) {
+            activeTurnExecution.replaceCurrentState(updatedState);
+            return;
+        }
+        loadedScenario = new LoadedScenario(loadedScenario.scenarioDefinition(), updatedState);
     }
 }

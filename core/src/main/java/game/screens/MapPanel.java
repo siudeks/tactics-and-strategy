@@ -40,7 +40,9 @@ final class MapPanel extends Actor {
     private final TerrainTileAtlas tileAtlas;
     private final Runnable onEndTurn;
     private final Supplier<CampaignState> campaignStateSupplier;
+    private final MovementPlaybackStateSource movementPlaybackStateSource;
     private final int scenarioMapHeightTiles;
+    private final MoveTargetRecorder moveTargetRecorder;
     private final Runnable onMoveTargetConfirmed;
     private final Map<UnitType, Texture> unitIcons;
     private final Texture unidentifiedIcon;
@@ -55,7 +57,7 @@ final class MapPanel extends Actor {
     private @Nullable TileCoord movePreviewTile;
     private float movePreviewBlinkTimer;
     private boolean movePreviewVisible;
-    private boolean inputLocked;
+    private InteractionLockState interactionLockState;
     private Side commandSide;
 
     private final int mapWidthTiles;
@@ -79,14 +81,19 @@ final class MapPanel extends Actor {
     MapPanel(Texture pixel,
              Runnable onEndTurn,
              Supplier<CampaignState> campaignStateSupplier,
+             MovementPlaybackStateSource movementPlaybackStateSource,
              int scenarioMapHeightTiles,
+             MoveTargetRecorder moveTargetRecorder,
              Runnable onMoveTargetConfirmed,
              Map<UnitType, Texture> unitIcons,
              Texture unidentifiedIcon) {
         this.pixel = pixel;
         this.onEndTurn = onEndTurn;
         this.campaignStateSupplier = Objects.requireNonNull(campaignStateSupplier, "campaignStateSupplier must not be null");
+        this.movementPlaybackStateSource = Objects.requireNonNull(movementPlaybackStateSource,
+            "movementPlaybackStateSource must not be null");
         this.scenarioMapHeightTiles = scenarioMapHeightTiles;
+        this.moveTargetRecorder = Objects.requireNonNull(moveTargetRecorder, "moveTargetRecorder must not be null");
         this.onMoveTargetConfirmed = Objects.requireNonNull(onMoveTargetConfirmed, "onMoveTargetConfirmed must not be null");
         this.unitIcons = Objects.requireNonNull(unitIcons, "unitIcons must not be null");
         this.unidentifiedIcon = Objects.requireNonNull(unidentifiedIcon, "unidentifiedIcon must not be null");
@@ -103,7 +110,7 @@ final class MapPanel extends Actor {
             ZOOM_STEP_PERCENT
         );
         this.moveTargetsByUnit = new HashMap<>();
-        this.inputLocked = false;
+        this.interactionLockState = InteractionLockState.NONE;
         this.commandSide = campaignStateSupplier.get().activeSide();
 
         setTouchable(Touchable.enabled);
@@ -116,10 +123,7 @@ final class MapPanel extends Actor {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (shouldBlockInputPath(inputLocked, InputPath.CLICK)) {
-                    return true;
-                }
-                cameraController.startDrag(x, y);
+                initializePointerDrag(interactionLockState, cameraController, x, y);
                 if (getStage() != null) {
                     getStage().setKeyboardFocus(MapPanel.this);
                     getStage().setScrollFocus(MapPanel.this);
@@ -129,7 +133,7 @@ final class MapPanel extends Actor {
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                if (shouldBlockInputPath(inputLocked, InputPath.DRAG)) {
+                if (shouldBlockInputPath(interactionLockState, InputPath.DRAG)) {
                     return;
                 }
                 cameraController.dragTo(x, y, getWidth(), getHeight());
@@ -137,7 +141,7 @@ final class MapPanel extends Actor {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (shouldBlockInputPath(inputLocked, InputPath.CLICK)) {
+                if (shouldBlockInputPath(interactionLockState, InputPath.CLICK)) {
                     return;
                 }
                 float dx = x - cameraController.lastDragX();
@@ -163,6 +167,7 @@ final class MapPanel extends Actor {
                 );
                 if (assignment != null) {
                     moveTargetsByUnit.put(assignment.unitId(), assignment.tile());
+                    moveTargetRecorder.assign(assignment.unitId(), assignment.tile());
                     if (BattlefieldScreen.shouldPlayMoveConfirmationSound(assignment)) {
                         onMoveTargetConfirmed.run();
                     }
@@ -182,6 +187,7 @@ final class MapPanel extends Actor {
                 CampaignState state = campaignStateSupplier.get();
                 List<UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
                     state,
+                    movementPlaybackStateSource.get(),
                     mapHeightTiles,
                     getX(),
                     getY(),
@@ -195,7 +201,7 @@ final class MapPanel extends Actor {
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
-                if (shouldBlockInputPath(inputLocked, InputPath.SELECTION)) {
+                if (shouldBlockInputPath(interactionLockState, InputPath.SELECTION)) {
                     clearMovePreview();
                     return true;
                 }
@@ -221,7 +227,7 @@ final class MapPanel extends Actor {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                if (shouldBlockInputPath(inputLocked, InputPath.ZOOM)) {
+                if (shouldBlockInputPath(interactionLockState, InputPath.ZOOM)) {
                     return true;
                 }
                 boolean ctrlPressed = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)
@@ -234,7 +240,7 @@ final class MapPanel extends Actor {
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (shouldBlockInputPath(inputLocked, InputPath.KEY_SHORTCUT)) {
+                if (shouldBlockInputPath(interactionLockState, InputPath.KEY_SHORTCUT)) {
                     return true;
                 }
                 if (keycode == Input.Keys.G) {
@@ -262,17 +268,32 @@ final class MapPanel extends Actor {
         });
     }
 
-    void setInputLocked(boolean inputLocked) {
-        this.inputLocked = inputLocked;
-        if (inputLocked) {
+    void setInteractionLockState(InteractionLockState interactionLockState) {
+        this.interactionLockState = Objects.requireNonNull(interactionLockState, "interactionLockState must not be null");
+        if (shouldBlockInputPath(interactionLockState, InputPath.CLICK)
+            || shouldBlockInputPath(interactionLockState, InputPath.SELECTION)) {
             selectionState.deactivateMoveMode();
             clearMovePreview();
         }
     }
 
-    static boolean shouldBlockInputPath(boolean inputLocked, InputPath inputPath) {
+    static boolean shouldBlockInputPath(InteractionLockState interactionLockState, InputPath inputPath) {
+        Objects.requireNonNull(interactionLockState, "interactionLockState must not be null");
         Objects.requireNonNull(inputPath, "inputPath must not be null");
-        return inputLocked;
+        return interactionLockState.blocks(inputPath);
+    }
+
+    static boolean initializePointerDrag(InteractionLockState interactionLockState,
+                                         CameraController cameraController,
+                                         float x,
+                                         float y) {
+        Objects.requireNonNull(interactionLockState, "interactionLockState must not be null");
+        Objects.requireNonNull(cameraController, "cameraController must not be null");
+        if (shouldBlockInputPath(interactionLockState, InputPath.DRAG)) {
+            return false;
+        }
+        cameraController.startDrag(x, y);
+        return true;
     }
 
     @Override
@@ -416,6 +437,7 @@ final class MapPanel extends Actor {
         float zoomLevel = cameraController.zoomLevel();
         List<UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
             campaignState,
+            movementPlaybackStateSource.get(),
             scenarioMapHeightTiles,
             panelX,
             panelY,
@@ -607,6 +629,16 @@ final class MapPanel extends Actor {
             case AXIS -> Side.ALLIES;
             case NEUTRAL -> Side.NEUTRAL;
         };
+    }
+
+    @FunctionalInterface
+    interface MoveTargetRecorder {
+        void assign(String unitId, TileCoord tileCoord);
+    }
+
+    @FunctionalInterface
+    interface MovementPlaybackStateSource {
+        @Nullable MovementPlaybackRenderState get();
     }
 
     @Override

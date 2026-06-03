@@ -6,10 +6,18 @@ import java.util.*;
 public final class TurnEngine {
     private final DeterministicContext context;
     private final ScenarioDefinition scenarioDefinition;
+    private final Map<TurnPhase, TurnPhaseExecutor> phaseExecutors;
 
     private TurnEngine(DeterministicContext context, ScenarioDefinition scenarioDefinition) {
         this.context = Objects.requireNonNull(context);
         this.scenarioDefinition = Objects.requireNonNull(scenarioDefinition);
+        this.phaseExecutors = Map.of(
+            TurnPhase.ISSUE_ORDERS, new IssueOrdersPhaseExecutor(),
+            TurnPhase.SIMULTANEOUS_MOVE, new SimultaneousMovePhaseExecutor(this.scenarioDefinition),
+            TurnPhase.COMBAT, new CombatPhaseExecutor(),
+            TurnPhase.RETREAT, new RetreatPhaseExecutor(),
+            TurnPhase.END_TURN, new EndTurnPhaseExecutor()
+        );
     }
 
     public static TurnEngine fixedContext(DeterministicContext context, ScenarioDefinition scenarioDefinition) {
@@ -17,62 +25,43 @@ public final class TurnEngine {
     }
 
     public TurnResult runOneTurn(CampaignState state) {
-        long startTime = System.currentTimeMillis();
-        List<TurnPhase> phaseTrace = new ArrayList<>();
+        TurnExecutionSession session = beginExecution(state);
+        PhaseStepResult stepResult = session.advance();
+        while (!session.isComplete()) {
+            stepResult = session.advance();
+        }
+        return stepResult.completedTurnResult().orElseThrow();
+    }
 
-        // Phase 1: ISSUE_ORDERS (no-op for v0 - orders already in state.pendingOrders())
-        phaseTrace.add(TurnPhase.ISSUE_ORDERS);
+    public TurnExecutionSession beginExecution(CampaignState state) {
+        return new TurnExecutionSession(this, Objects.requireNonNull(state));
+    }
 
-        // Phase 2: SIMULTANEOUS_MOVE - apply all MOVE orders
-        List<Unit> updatedUnits = applyMoveOrders(state);
-        phaseTrace.add(TurnPhase.SIMULTANEOUS_MOVE);
+    PhaseExecution executePhase(TurnPhase phase, CampaignState state) {
+        TurnPhaseExecutor executor = phaseExecutors.get(Objects.requireNonNull(phase));
+        if (executor == null) {
+            throw new IllegalArgumentException("No executor registered for phase " + phase);
+        }
+        return executor.execute(state);
+    }
 
-        // Phase 3: COMBAT (no-op for v0)
-        phaseTrace.add(TurnPhase.COMBAT);
-
-        // Phase 4: RETREAT (no-op for v0)
-        phaseTrace.add(TurnPhase.RETREAT);
-
-        // Phase 5: END_TURN - increment turn, flip side, clear orders
-        Side nextSide = flipSide(state.activeSide());
-        CampaignState newState = new CampaignState(
-            state.campaignId(),
-            state.scenarioId(),
-            state.turnNumber() + 1,
-            nextSide,
-            updatedUnits,
-            List.of()  // clear pending orders
-        );
-        phaseTrace.add(TurnPhase.END_TURN);
-
-        String snapshot = buildCanonicalSnapshot(newState);
+    TurnResult buildTurnResult(CampaignState state, List<TurnPhase> phaseTrace, long startTime) {
         long elapsed = System.currentTimeMillis() - startTime;
-
-        return new TurnResult(newState, phaseTrace, context.seed(), elapsed, snapshot);
+        String snapshot = buildCanonicalSnapshot(state);
+        return new TurnResult(state, phaseTrace, context.seed(), elapsed, snapshot);
     }
 
-    private List<Unit> applyMoveOrders(CampaignState state) {
-        // Build map of unitId -> target from MOVE orders
-        Map<String, int[]> moveTargets = new HashMap<>();
-        for (Order order : state.pendingOrders()) {
-            if (order.type() == OrderType.MOVE) {
-                moveTargets.put(order.unitId(), new int[]{order.targetX(), order.targetY()});
-            }
-        }
-
-        List<Unit> result = new ArrayList<>();
-        for (Unit unit : state.units()) {
-            int[] target = moveTargets.get(unit.id());
-            if (target != null && isValidMove(target[0], target[1])) {
-                result.add(new Unit(unit.id(), unit.side(), unit.type(), unit.size(), target[0], target[1]));
-            } else {
-                result.add(unit);
-            }
-        }
-        return result;
+    static List<TurnPhase> phaseSequence() {
+        return List.of(
+            TurnPhase.ISSUE_ORDERS,
+            TurnPhase.SIMULTANEOUS_MOVE,
+            TurnPhase.COMBAT,
+            TurnPhase.RETREAT,
+            TurnPhase.END_TURN
+        );
     }
 
-    private boolean isValidMove(int x, int y) {
+    static boolean isValidMove(ScenarioDefinition scenarioDefinition, int x, int y) {
         if (x < 0 || y < 0 || x >= scenarioDefinition.mapWidth() || y >= scenarioDefinition.mapHeight()) {
             return false;
         }
@@ -80,15 +69,15 @@ public final class TurnEngine {
         return terrain != TerrainType.VOID && terrain != TerrainType.WATER;
     }
 
-    private Side flipSide(Side side) {
-        return switch (side) {
+    static Side flipSide(Side side) {
+        return switch (Objects.requireNonNull(side)) {
             case ALLIES -> Side.AXIS;
             case AXIS -> Side.ALLIES;
             case NEUTRAL -> throw new IllegalStateException("Cannot flip NEUTRAL side in turn engine");
         };
     }
 
-    private String buildCanonicalSnapshot(CampaignState state) {
+    static String buildCanonicalSnapshot(CampaignState state) {
         StringBuilder sb = new StringBuilder();
         sb.append("turn=").append(state.turnNumber());
         sb.append(",side=").append(state.activeSide());

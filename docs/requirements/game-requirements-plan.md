@@ -124,14 +124,14 @@ This document defines functional requirements for a turn-based tactical strategy
 ## Phase Visualization Decisions (Plan 20260531-phase-visualization)
 - Canonical implemented requirement IDs for this decision set are `REQ-UI-PHASE-001` and `REQ-UI-LOCK-001` (normative definitions are maintained in `game-requirements-functional.md`).
 - UI-only phase timing is used; no engine-level delays are introduced.
-- Overlay order is sourced from runtime `phaseTrace`.
+- Overlay order is sourced from the live runtime phase sequence as the active turn-execution session advances.
 - Overlay display duration is uniform at 3 seconds for every phase, including not-yet-implemented logic phases.
-- Full input lock is enforced for the complete overlay sequence.
+- Movement playback keeps map drag/zoom enabled while click, selection, shortcuts, HUD commands, and End Turn remain locked.
 - Duration and phase labels are centralized as constants.
 
 ### Consistency Notes (Implemented)
-- `REQ-UI-PHASE-001`: End Turn advances simulation first, then the UI renders a dimmed phase overlay sequence in `phaseTrace` order, 3.0 seconds per phase including `RETREAT`.
-- `REQ-UI-LOCK-001`: During that sequence, map input paths and key shortcuts are locked, HUD action availability follows overlay lock state, and repeated End Turn requests do not advance simulation again until overlay completion.
+- `REQ-UI-PHASE-001`: End Turn begins a live runtime turn-execution session; the UI advances that session one phase at a time and renders a dimmed phase overlay sequence for each phase notification, 3.0 seconds per phase including `RETREAT`.
+- `REQ-UI-LOCK-001`: During phase playback, notifications/commit steps lock map input paths and key shortcuts, while movement playback keeps drag/zoom available but still blocks click, selection, shortcuts, HUD commands, and repeated End Turn requests until playback completion.
 
 ## Confidence Levels by Section
 - High confidence: gameplay loop, scenario objective model, map/control-point concept.
