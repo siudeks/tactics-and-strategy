@@ -133,6 +133,79 @@ This document defines functional requirements for a turn-based tactical strategy
 - `REQ-UI-PHASE-001`: End Turn begins a live runtime turn-execution session; the UI advances that session one phase at a time and renders a dimmed phase overlay sequence for each phase notification, 3.0 seconds per phase including `RETREAT`.
 - `REQ-UI-LOCK-001`: During phase playback, notifications/commit steps lock map input paths and key shortcuts, while movement playback keeps drag/zoom available but still blocks click, selection, shortcuts, HUD commands, and repeated End Turn requests until playback completion.
 
+## Architecture: LibGDX Separation (Planned)
+
+### Problem
+The `core` module mixes pure game-logic classes (`game.domain`, `game.engine`) with
+libGDX-coupled classes scattered across `game`, `game.scenario`, `game.screens`, and
+`game.terrain`. This coupling prevents testing game logic without a graphical backend
+and makes the dependency boundary implicit and unguarded.
+
+### Architectural Decisions (Resolved)
+- **Platform package**: `game.platform` — a new, dedicated package in `core` that contains
+  all classes with a direct compile-time dependency on `com.badlogic.gdx.*`.
+- **ScenarioLoader migration**: `ScenarioLoader` is migrated to `game.platform`; the
+  `gdx.utils.JsonReader` dependency is kept (no stdlib replacement in this iteration).
+- **Domain color abstraction**: `TerrainMapDefinition` receives a new `game.domain.RgbaColor`
+  record to break the `gdx.graphics.Color` dependency, allowing `TerrainMapDefinition` to
+  stay in `game.terrain` as a pure class.
+- **Isolation scope**: full isolation — `game.domain`, `game.engine`, `game.scenario`, and
+  `game.terrain` shall all be free of `com.badlogic.gdx.*` dependencies after the refactor.
+  The ArchUnit rule covers all four packages.
+
+### Planned Requirement Candidates
+- REQ-ARCH-001: The `core` module shall contain a dedicated `game.platform` package that
+  holds all classes with a direct dependency on `com.badlogic.gdx.*`.
+- REQ-ARCH-002: Classes in `game.domain`, `game.engine`, `game.scenario`, and `game.terrain`
+  shall have zero direct dependencies on `com.badlogic.gdx.*`; this boundary shall be enforced
+  by an ArchUnit rule that fails the build if violated.
+- REQ-ARCH-003: A `game.domain.RgbaColor` record shall replace `gdx.graphics.Color` as the
+  color type in `TerrainMapDefinition`, preserving the class in the pure-logic layer.
+
+### Draft Acceptance Criteria
+- AC-ARCH-001 (ArchUnit rule present and green):
+  Given the `core` test suite,
+  when `./gradlew test` is executed,
+  then an ArchUnit rule shall exist asserting that no class in
+  `game.domain..`, `game.engine..`, `game.scenario..`, or `game.terrain..`
+  depends on any class in `com.badlogic.gdx..`, and the rule shall pass.
+- AC-ARCH-002 (Platform package populated):
+  Given the refactored `core` module,
+  when all main-source files are inspected,
+  then every class that imports `com.badlogic.gdx.*` shall reside in `game.platform`
+  or `game.screens` (existing UI layer), and none shall reside in `game.domain`,
+  `game.engine`, `game.scenario`, or `game.terrain`.
+- AC-ARCH-003 (Domain color record):
+  Given `TerrainMapDefinition`,
+  when its source is inspected,
+  then it shall use `game.domain.RgbaColor` instead of `gdx.graphics.Color`,
+  and it shall carry no `com.badlogic.gdx.*` imports.
+- AC-ARCH-004 (No regression):
+  Given the refactored module,
+  when `./gradlew test` is executed,
+  then all previously passing tests shall continue to pass.
+- AC-ARCH-005 (NullMarked preserved):
+  Given all affected packages,
+  when their `package-info.java` files are inspected,
+  then each shall retain `@NullMarked`.
+
+### Migration Scope Summary
+The following classes require action:
+
+| Class | Current package | Action |
+|---|---|---|
+| `TacticsGame` | `game` | move to `game.platform` |
+| `ScenarioLoader` | `game.scenario` | move to `game.platform` |
+| `TerrainMapDefinition` | `game.terrain` | introduce `RgbaColor`; stays in `game.terrain` |
+| `TerrainTileAtlas` | `game.terrain` | move to `game.platform` |
+| `BattlefieldScreen`, `MainMenuScreen`, `MapPanel`, `AsyncAudio`, `CameraController` | `game.screens` | no move required; `game.screens` is an accepted UI/platform layer |
+
+### Out of Scope for This Iteration
+- Replacing `gdx.utils.JsonReader` with a stdlib-only JSON parser.
+- Moving game logic to a separate Gradle module.
+- Changes to `headless` or `lwjgl3` module Gradle configuration.
+- Visual or audio system redesign.
+
 ## Confidence Levels by Section
 - High confidence: gameplay loop, scenario objective model, map/control-point concept.
 - Medium confidence: supply behavior details, stacking granularity, full HUD composition.
