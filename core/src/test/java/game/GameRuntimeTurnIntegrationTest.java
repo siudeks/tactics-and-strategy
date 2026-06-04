@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import game.domain.CampaignState;
 import game.engine.GameRuntime;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import static org.junit.jupiter.api.Assertions.*;
 

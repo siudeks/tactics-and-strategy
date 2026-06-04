@@ -6,7 +6,7 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import game.engine.GameRuntime;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import static org.junit.jupiter.api.Assertions.*;
 

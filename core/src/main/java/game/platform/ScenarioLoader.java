@@ -1,8 +1,18 @@
-package game.scenario;
+package game.platform;
 
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import game.domain.*;
+import game.domain.CampaignState;
+import game.domain.Order;
+import game.domain.OrderType;
+import game.domain.ScenarioDefinition;
+import game.domain.Side;
+import game.domain.TerrainType;
+import game.domain.Unit;
+import game.domain.UnitSize;
+import game.domain.UnitType;
+import game.scenario.LoadedScenario;
+import game.scenario.ScenarioEntry;
 
 import java.io.IOException;
 import java.io.InputStream;

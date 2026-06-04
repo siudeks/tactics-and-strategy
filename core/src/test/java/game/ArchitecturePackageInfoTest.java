@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @AnalyzeClasses(packages = "game", importOptions = {
     ImportOption.DoNotIncludeTests.class,
@@ -32,6 +33,17 @@ class ArchitecturePackageInfoTest {
         .that().haveSimpleName("package-info")
         .and().resideInAPackage("game..")
         .should().beAnnotatedWith(NullMarked.class);
+
+    @ArchTest
+    static final ArchRule domainEngineScenarioAndTerrainMustNotDependOnGdx = noClasses()
+        .that().resideInAnyPackage("game.domain..", "game.engine..", "game.scenario..", "game.terrain..")
+        .should().dependOnClassesThat().resideInAPackage("com.badlogic.gdx..");
+
+    @ArchTest
+    static final ArchRule gdxDependentClassesMustResideInPlatformOrScreens = noClasses()
+        .that().resideInAPackage("game..")
+        .and().resideOutsideOfPackages("game.platform..", "game.screens..")
+        .should().dependOnClassesThat().resideInAPackage("com.badlogic.gdx..");
 
     private static ArchCondition<JavaClass> resideInPackageWithPackageInfo() {
         return new ArchCondition<>("reside in package with package-info") {

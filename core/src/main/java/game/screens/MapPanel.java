@@ -19,7 +19,7 @@ import game.screens.BattlefieldScreen.TileCoord;
 import game.screens.BattlefieldScreen.UnitIconPalette;
 import game.screens.BattlefieldScreen.UnitRenderPlacement;
 import game.terrain.TerrainMapDefinition;
-import game.terrain.TerrainTileAtlas;
+import game.platform.TerrainTileAtlas;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;

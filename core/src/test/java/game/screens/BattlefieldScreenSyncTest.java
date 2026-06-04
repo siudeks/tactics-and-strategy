@@ -99,7 +99,7 @@ class BattlefieldScreenSyncTest {
 
     @Test
     void runtimeStatusSummary_reflectsCurrentRuntimeTurnAndActiveSide() {
-        var runtime = new GameRuntime(game.scenario.ScenarioLoader.loadBootstrapScenario());
+        var runtime = new GameRuntime(game.platform.ScenarioLoader.loadBootstrapScenario());
 
         assertEquals(1, runtime.getTurnNumber());
         assertEquals("ALLIES", runtime.getActiveSideCode());

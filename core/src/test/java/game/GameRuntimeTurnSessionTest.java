@@ -5,7 +5,7 @@ import game.engine.MovementPlaybackOutcome;
 import game.engine.RuntimePhase;
 import game.engine.PhaseStepResult;
 import game.engine.TurnExecutionSession;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

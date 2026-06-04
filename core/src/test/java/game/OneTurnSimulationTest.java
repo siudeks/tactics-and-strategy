@@ -8,7 +8,7 @@ import game.engine.TurnExecutionSession;
 import game.engine.TurnEngine;
 import game.engine.TurnPhase;
 import game.engine.TurnResult;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import java.util.List;
 

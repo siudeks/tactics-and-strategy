@@ -1,5 +1,5 @@
 /**
- * Scenario loading and scenario runtime DTOs.
+ * Scenario metadata and runtime DTOs.
  */
 @org.jspecify.annotations.NullMarked
 package game.scenario;
