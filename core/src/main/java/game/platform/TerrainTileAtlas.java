@@ -1,9 +1,12 @@
-package game.terrain;
+package game.platform;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
+import game.domain.RgbaColor;
+import game.terrain.GeneratedTerrainData;
+import game.terrain.TerrainMapDefinition;
 
 public final class TerrainTileAtlas implements Disposable {
     private static final int SOURCE_TILE_SIZE = GeneratedTerrainData.SOURCE_TILE_SIZE;
@@ -55,7 +58,13 @@ public final class TerrainTileAtlas implements Disposable {
                     }
 
                     // Pixmap RGBA8888 expects RGBA-packed int, not ABGR.
-                    int packedColor = com.badlogic.gdx.graphics.Color.rgba8888(mapDefinition.getTerrainColor(terrainCode));
+                    RgbaColor terrainColor = mapDefinition.getTerrainColor(terrainCode);
+                    int packedColor = com.badlogic.gdx.graphics.Color.rgba8888(
+                        terrainColor.r(),
+                        terrainColor.g(),
+                        terrainColor.b(),
+                        terrainColor.a()
+                    );
                     atlas.drawPixel(atlasX + x, atlasY + y, packedColor);
                 }
             }

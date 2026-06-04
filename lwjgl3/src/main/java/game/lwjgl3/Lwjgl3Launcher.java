@@ -2,7 +2,7 @@ package game.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import game.TacticsGame;
+import game.platform.TacticsGame;
 
 public class Lwjgl3Launcher {
     public static void main(String[] args) {

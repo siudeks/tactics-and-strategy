@@ -6,7 +6,7 @@ import game.domain.CampaignState;
 import game.domain.Side;
 import game.domain.Unit;
 import game.scenario.LoadedScenario;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ import game.engine.DeterministicContext;
 import game.engine.TurnEngine;
 import game.engine.TurnResult;
 import game.scenario.LoadedScenario;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import static org.junit.jupiter.api.Assertions.*;
 

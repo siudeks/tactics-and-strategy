@@ -6,7 +6,7 @@ import game.domain.TerrainType;
 import game.domain.UnitType;
 import game.scenario.ScenarioEntry;
 import game.scenario.LoadedScenario;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
