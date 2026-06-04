@@ -1,6 +1,6 @@
 package game.terrain;
 
-import com.badlogic.gdx.graphics.Color;
+import game.domain.RgbaColor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,11 +12,11 @@ class TerrainMapDefinitionTest {
     void constructor_usesImprovedPaletteForSandColor() {
         TerrainMapDefinition definition = new TerrainMapDefinition();
 
-        Color sand = definition.getTerrainColor(GeneratedTerrainData.TERRAIN_SAND);
+        RgbaColor sand = definition.getTerrainColor(GeneratedTerrainData.TERRAIN_SAND);
 
-        assertEquals(194f / 255f, sand.r, 0.0001f);
-        assertEquals(171f / 255f, sand.g, 0.0001f);
-        assertEquals(109f / 255f, sand.b, 0.0001f);
+        assertEquals(194f / 255f, sand.r(), 0.0001f);
+        assertEquals(171f / 255f, sand.g(), 0.0001f);
+        assertEquals(109f / 255f, sand.b(), 0.0001f);
     }
 
     @Test

@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import game.scenario.LoadedScenario;
 import game.scenario.ScenarioEntry;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import java.util.List;
 import java.lang.reflect.Field;

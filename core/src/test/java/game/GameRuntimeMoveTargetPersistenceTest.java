@@ -6,7 +6,7 @@ import game.domain.OrderType;
 import game.domain.Side;
 import game.domain.Unit;
 import game.engine.GameRuntime;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

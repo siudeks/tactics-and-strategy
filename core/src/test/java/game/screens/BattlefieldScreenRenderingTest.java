@@ -12,7 +12,7 @@ import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
 import game.scenario.LoadedScenario;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 
 import java.util.List;
 import java.util.Map;

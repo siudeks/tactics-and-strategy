@@ -1,4 +1,4 @@
-package game;
+package game.platform;
 
 import com.badlogic.gdx.Game;
 import game.screens.MainMenuScreen;

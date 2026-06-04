@@ -18,6 +18,9 @@ Status legend:
 | REQ-SCEN-001 | Scenario objective/failure model | Partial | `ScenarioLoaderTest.loadBootstrapScenario_parsesScenarioId`, `ScenarioLoaderTest.listAvailableScenarios_allBundledScenarioResourcesLoad` | Scenario loading works; objective/failure runtime evaluation is missing. |
 | REQ-CBT-001 | Contextual combat resolution | Partial | `OneTurnSimulationTest.oneTurn_phaseTraceContainsAllFivePhases` | Combat phase exists as turn placeholder only. |
 | NFR-MNT-003 | Compilation-time nullability checks via package `@NullMarked` defaults | Implemented | `ArchitecturePackageInfoTest.allApplicationPackagesMustDefinePackageInfo`, `ArchitecturePackageInfoTest.allApplicationPackagesMustBeNullMarked`, Gradle task `nullabilityCheck` | Build enables Error Prone + NullAway for `compileJava` and `compileTestJava` with `NullAway:AnnotatedPackages=game`, and applies `-Werror` so diagnostics fail the build. |
+| REQ-ARCH-001 | Dedicated `game.platform` package for libGDX-dependent classes | Implemented | `ArchitecturePackageInfoTest.libGdxDependentClassesMustResideInPlatformOrScreens` | `TacticsGame`, `ScenarioLoader`, and `TerrainTileAtlas` are in `game.platform`, while existing UI classes remain in `game.screens`. |
+| REQ-ARCH-002 | Pure-logic packages isolated from `com.badlogic.gdx.*` with enforced boundary | Implemented | `ArchitecturePackageInfoTest.pureLogicPackagesMustNotDependOnLibGdx`, `ArchitecturePackageInfoTest.libGdxDependentClassesMustResideInPlatformOrScreens` | ArchUnit rules enforce that `game.domain`, `game.engine`, `game.scenario`, and `game.terrain` do not depend on libGDX and keep libGDX-dependent classes in platform/UI layers. |
+| REQ-ARCH-003 | `TerrainMapDefinition` uses domain `RgbaColor` instead of libGDX `Color` | Implemented | `TerrainMapDefinitionTest.constructor_usesImprovedPaletteForSandColor` | `TerrainMapDefinition` now exposes `game.domain.RgbaColor` and carries no `com.badlogic.gdx.*` imports. |
 | REQ-SUP-001 | Supply continuity and penalties | Not in v1 scope | None | Not implemented in engine runtime. |
 | REQ-STACK-001 | Stacking constraints | Not in v1 scope | None | Not implemented in engine runtime. |
 | REQ-HUD-001 | HUD operational readability | Not in v1 scope | None in this package | UI-specific behavior is outside this engine mechanics package. |
@@ -49,9 +52,11 @@ Status legend:
 - Turn phases: `core/src/main/java/game/engine/TurnPhase.java`
 - Turn result contract: `core/src/main/java/game/engine/TurnResult.java`
 - Deterministic seed contract: `core/src/main/java/game/engine/DeterministicContext.java`
-- Scenario loading: `core/src/main/java/game/scenario/ScenarioLoader.java`
+- Scenario loading: `core/src/main/java/game/platform/ScenarioLoader.java`
 - Game runtime and order persistence: `core/src/main/java/game/engine/GameRuntime.java`
 - Battlefield UI behaviors: `core/src/main/java/game/screens/BattlefieldScreen.java`, `core/src/main/java/game/screens/MapPanel.java`, `core/src/main/java/game/screens/SelectionState.java`, `core/src/main/java/game/screens/CameraController.java`
+- Platform adapters and rendering atlas: `core/src/main/java/game/platform/TacticsGame.java`, `core/src/main/java/game/platform/TerrainTileAtlas.java`
+- Domain color abstraction: `core/src/main/java/game/domain/RgbaColor.java`
 
 ## 4. Matrix Governance
 1. Every new normative rule MUST add at least one executable evidence reference.

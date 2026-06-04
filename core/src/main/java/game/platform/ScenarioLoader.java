@@ -1,8 +1,10 @@
-package game.scenario;
+package game.platform;
 
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import game.domain.*;
+import game.scenario.LoadedScenario;
+import game.scenario.ScenarioEntry;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import game.scenario.ScenarioEntry;
-import game.scenario.ScenarioLoader;
+import game.platform.ScenarioLoader;
 import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;

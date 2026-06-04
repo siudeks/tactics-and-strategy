@@ -1,6 +1,6 @@
 package game.terrain;
 
-import com.badlogic.gdx.graphics.Color;
+import game.domain.RgbaColor;
 
 public final class TerrainMapDefinition {
     private static final int TILE_PATTERN_PIXELS = GeneratedTerrainData.SOURCE_TILE_SIZE * GeneratedTerrainData.SOURCE_TILE_SIZE;
@@ -10,7 +10,7 @@ public final class TerrainMapDefinition {
     private final short[] mapTileIds;
     private final byte[][] uniqueTilePatterns;
     private final byte[] tileDominantTerrain;
-    private Color[] terrainColors;
+    private RgbaColor[] terrainColors;
 
     public TerrainMapDefinition() {
         this.widthTiles = GeneratedTerrainData.MAP_WIDTH_TILES;
@@ -43,7 +43,7 @@ public final class TerrainMapDefinition {
         return tileDominantTerrain[mapIndex] & 0xFF;
     }
 
-    public Color getTerrainColor(int terrainCode) {
+    public RgbaColor getTerrainColor(int terrainCode) {
         return terrainColors[terrainCode];
     }
 
@@ -51,10 +51,10 @@ public final class TerrainMapDefinition {
         return uniqueTilePatterns.length;
     }
 
-    private Color[] buildTerrainColors(int[][] rgb) {
-        Color[] colors = new Color[rgb.length];
+    private RgbaColor[] buildTerrainColors(int[][] rgb) {
+        RgbaColor[] colors = new RgbaColor[rgb.length];
         for (int i = 0; i < rgb.length; i++) {
-            colors[i] = new Color(rgb[i][0] / 255f, rgb[i][1] / 255f, rgb[i][2] / 255f, 1f);
+            colors[i] = new RgbaColor(rgb[i][0] / 255f, rgb[i][1] / 255f, rgb[i][2] / 255f, 1f);
         }
         return colors;
     }
