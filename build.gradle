@@ -15,6 +15,7 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'net.ltgt.errorprone'
+    apply plugin: 'checkstyle'
 
     dependencies {
         compileOnly 'org.jspecify:jspecify:1.0.0'
@@ -45,5 +46,10 @@ subprojects {
         group = 'verification'
         description = 'Compile main and test Java sources with NullAway checks enabled.'
         dependsOn tasks.named('compileJava'), tasks.named('compileTestJava')
+    }
+
+    checkstyle {
+        toolVersion = '10.17.0'
+        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
     }
 }
