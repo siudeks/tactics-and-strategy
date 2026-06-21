@@ -52,4 +52,23 @@ class GameRuntimeTurnIntegrationTest {
         assertIterableEquals(initialState.units(), updatedState.units());
     }
 
+    @Test
+    void gameRuntime_assignMoveTarget_isAcceptedWhileClockIsAdvancing() {
+        // REQ-RTS-003: movement commands must be accepted at any point during real-time play,
+        // with no phase gate blocking the assignment.
+        String unitId = runtime.getCurrentCampaignState().units().stream()
+            .filter(u -> u.side().name().equals("ALLIES"))
+            .findFirst()
+            .map(game.domain.Unit::id)
+            .orElseThrow(() -> new AssertionError("Expected at least one ALLIES unit"));
+
+        runtime.advanceClock(0.5f);
+        runtime.assignMoveTarget(unitId, 2, 3);
+        runtime.advanceClock(0.5f);
+
+        boolean orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
+            .anyMatch(o -> o.unitId().equals(unitId) && o.type() == game.domain.OrderType.MOVE);
+        assertTrue(orderPresent, "MOVE order should persist after clock advances");
+    }
+
 }

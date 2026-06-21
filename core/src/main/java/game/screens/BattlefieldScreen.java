@@ -87,10 +87,10 @@ public class BattlefieldScreen extends ScreenAdapter {
     private MapPanel mapPanel;
     private GameRuntime gameRuntime;
     private Label statusLabel;
+    private Label timeLabel;
     private Label unitNameLabel;
     private Table unitInfoSection;
     private TextButton moveButton;
-    private TextButton endTurnButton;
     private TextButton menuButton;
     private @Nullable Map<UnitType, Texture> unitIconTextures;
     private @Nullable Texture unidentifiedIconTexture;
@@ -143,6 +143,7 @@ public class BattlefieldScreen extends ScreenAdapter {
 
         Table topArea = new Table();
         topArea.add(mapPanel).grow().pad(8f);
+        timeLabel = new Label(gameRuntime.formattedInGameTime(), labelStyle);
         topArea.add(createCommandPanel(labelStyle, buttonStyle, base.tint(PANEL_BG), mapPanel)).width(300f).growY().pad(8f, 0f, 8f, 8f);
 
         statusLabel = new Label(runtimeStatusSummary(), labelStyle);
@@ -168,7 +169,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         panel.setBackground(background);
         panel.defaults().growX().pad(8f);
 
-        panel.add(new Label("Command Panel", labelStyle)).left().padTop(10f).row();
+        panel.add(timeLabel).growX().right().padTop(10f).row();
         unitNameLabel = new Label("", labelStyle);
         unitInfoSection = new Table();
         unitInfoSection.add(unitNameLabel).left();
@@ -194,15 +195,6 @@ public class BattlefieldScreen extends ScreenAdapter {
         holdButton.setTouchable(Touchable.disabled);
         panel.add(holdButton).row();
         panel.add().growY().row();
-
-        endTurnButton = new TextButton("End Turn  [Enter]", buttonStyle);
-        endTurnButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                endTurn();
-            }
-        });
-        panel.add(endTurnButton).padBottom(4f).row();
 
         menuButton = new TextButton("Menu", buttonStyle);
         menuButton.addListener(new ClickListener() {
@@ -241,6 +233,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     public void render(float delta) {
         GameRuntime runtime = Objects.requireNonNull(gameRuntime, "gameRuntime must be initialized before render");
         ScreenUtils.clear(BG);
+        runtime.advanceClock(delta);
         phasePlaybackController.advance(runtime, delta);
         if (phasePlaybackController.consumeTurnCompletedThisFrame()) {
             mapPanel.resetSelection();
@@ -250,6 +243,9 @@ public class BattlefieldScreen extends ScreenAdapter {
         stage.act(delta);
         syncHudActionState(phasePlaybackController.hudActionsEnabled());
         syncMoveButtonState();
+        if (timeLabel != null) {
+            timeLabel.setText(runtime.formattedInGameTime());
+        }
         if (statusLabel != null) {
             statusLabel.setText(runtimeStatusSummary());
         }
@@ -728,11 +724,9 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     private void syncHudActionState(boolean enabled) {
-        if (endTurnButton == null || menuButton == null) {
+        if (menuButton == null) {
             return;
         }
-        endTurnButton.setDisabled(!enabled);
-        endTurnButton.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
         menuButton.setDisabled(!enabled);
         menuButton.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
     }
