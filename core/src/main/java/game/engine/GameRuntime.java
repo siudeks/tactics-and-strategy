@@ -25,6 +25,7 @@ public final class GameRuntime {
 
     private LoadedScenario loadedScenario;
     private final TurnEngine engine;
+    private final GameClock gameClock;
     @Nullable
     private TurnExecutionSession activeTurnExecution;
 
@@ -32,6 +33,7 @@ public final class GameRuntime {
         this.loadedScenario = Objects.requireNonNull(loadedScenario, "loadedScenario must not be null");
         DeterministicContext ctx = DeterministicContext.withSeed(0L);
         this.engine = TurnEngine.fixedContext(ctx, loadedScenario.scenarioDefinition());
+        this.gameClock = new GameClock();
     }
 
     public TurnExecutionSession beginTurnExecution() {
@@ -91,6 +93,23 @@ public final class GameRuntime {
 
     public String getActiveSideCode() {
         return currentCampaignState().activeSide().name();
+    }
+
+    /**
+     * Advances the in-game clock by the given real-time delta.
+     * Call once per render frame with the frame's delta time.
+     *
+     * @param deltaSeconds real-time seconds elapsed since the last frame
+     */
+    public void advanceClock(float deltaSeconds) {
+        gameClock.advance(deltaSeconds);
+    }
+
+    /**
+     * Returns the current in-game time as a human-readable string (e.g. {@code "Day 1  06:00"}).
+     */
+    public String formattedInGameTime() {
+        return gameClock.formattedTime();
     }
 
     public void assignMoveTarget(String unitId, int tileX, int tileY) {

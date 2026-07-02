@@ -28,12 +28,10 @@ This document defines non-functional requirements that reflect quality attribute
 - NFR-USAB-003: MOVE target planning and confirmation provide unambiguous visual state feedback: valid destinations blink while previewed, and confirmed destinations replace preview with a persistent marker.
 - MOVE target confirmation now also includes a short audio cue to strengthen immediate feedback without changing turn-state determinism.
 
-## Planned Non-Functional Requirements (Pending Implementation)
-The following quality requirements are approved for next implementation increment and are not part of implemented v1 baseline yet.
-
-- NFR-USAB-004: Destination preview animation must stay visually consistent with selected-unit highlighting while remaining independently adjustable for future UI revisions.
-- NFR-USAB-005: Destination preview must not appear for invalid terrain, so the UI never suggests an illegal movement target as selectable.
-- NFR-DET-004: Target assignment and movement-phase consumption must remain deterministic for identical inputs.
+## Future Backlog Location
+Future non-functional backlog items are tracked in
+[game-requirements-plan.md](game-requirements-plan.md) to keep all pending scope
+in a single planning document.
 
 ## Related Documents
 - Functional requirements: [game-requirements-functional.md](game-requirements-functional.md)
