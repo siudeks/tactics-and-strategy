@@ -115,7 +115,7 @@ public class MainMenuScreen extends ScreenAdapter {
         y -= LINE_HEIGHT * 1.2f;
 
         for (int i = 0; i < entries.size(); i++) {
-            String line = (i + 1) + ") " + entries.get(i).name().toUpperCase(Locale.ROOT);
+            String line = menuScenarioLine(i, entries.get(i));
             font.setColor(i == selectedIndex ? COLOR_HIGHLIGHT : COLOR_ITEM);
             font.draw(batch, line, MARGIN_LEFT, y);
             y -= LINE_HEIGHT;
@@ -299,6 +299,10 @@ public class MainMenuScreen extends ScreenAdapter {
     private static void writeLittleEndianShort(ByteArrayOutputStream outputStream, short value) throws IOException {
         outputStream.write(value & 0xFF);
         outputStream.write((value >>> 8) & 0xFF);
+    }
+
+    public static String menuScenarioLine(int zeroBasedIndex, ScenarioEntry entry) {
+        return (zeroBasedIndex + 1) + ") " + entry.name().toUpperCase(Locale.ROOT);
     }
 }
 
