@@ -69,14 +69,6 @@ public final class TurnEngine {
         return terrain != TerrainType.VOID && terrain != TerrainType.WATER;
     }
 
-    static Side flipSide(Side side) {
-        return switch (Objects.requireNonNull(side)) {
-            case ALLIES -> Side.AXIS;
-            case AXIS -> Side.ALLIES;
-            case NEUTRAL -> throw new IllegalStateException("Cannot flip NEUTRAL side in turn engine");
-        };
-    }
-
     static String buildCanonicalSnapshot(CampaignState state) {
         StringBuilder sb = new StringBuilder();
         sb.append("turn=").append(state.turnNumber());

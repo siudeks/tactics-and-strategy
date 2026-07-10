@@ -46,7 +46,7 @@ class GameRuntimeTurnSessionTest {
         assertNotNull(finalStep);
         assertTrue(finalStep.turnCompleted());
         assertEquals(2, runtime.getTurnNumber());
-        assertEquals("AXIS", runtime.getActiveSideCode());
+        assertEquals("ALLIES", runtime.getActiveSideCode());
         assertNotNull(finalStep.completedTurnResult().orElseThrow());
     }
 }

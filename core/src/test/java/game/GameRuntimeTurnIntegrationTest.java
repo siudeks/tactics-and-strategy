@@ -34,9 +34,9 @@ class GameRuntimeTurnIntegrationTest {
     }
 
     @Test
-    void gameRuntime_simulateOneTurn_flipsActiveSide() {
+    void gameRuntime_simulateOneTurn_keepsSameActiveSide() {
         runtime.simulateOneTurn();
-        assertEquals("AXIS", runtime.getActiveSideCode());
+        assertEquals("ALLIES", runtime.getActiveSideCode());
     }
 
     @Test
@@ -48,7 +48,7 @@ class GameRuntimeTurnIntegrationTest {
         CampaignState updatedState = runtime.getCurrentCampaignState();
         assertEquals(1, initialState.turnNumber());
         assertEquals(2, updatedState.turnNumber());
-        assertEquals("AXIS", updatedState.activeSide().name());
+        assertEquals("ALLIES", updatedState.activeSide().name());
         assertIterableEquals(initialState.units(), updatedState.units());
     }
 

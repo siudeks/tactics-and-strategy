@@ -71,12 +71,6 @@ final class MapPanel extends Actor {
         SELECTION
     }
 
-    enum EnterIssuingOrdersOutcome {
-        NO_PROGRESS,
-        SWITCH_COMMAND_SIDE,
-        END_TURN
-    }
-
     @SuppressWarnings("NullAway.Init")
     MapPanel(Texture pixel,
              Runnable onEndTurn,
@@ -111,7 +105,7 @@ final class MapPanel extends Actor {
         );
         this.moveTargetsByUnit = new HashMap<>();
         this.interactionLockState = InteractionLockState.NONE;
-        this.commandSide = campaignStateSupplier.get().activeSide();
+        this.commandSide = Side.ALLIES;
 
         setTouchable(Touchable.enabled);
         this.debugGridOverlay = false;
@@ -553,7 +547,7 @@ final class MapPanel extends Actor {
         clearMovePreview();
         CampaignState state = campaignStateSupplier.get();
         moveTargetsByUnit.clear();
-        commandSide = state.activeSide();
+        commandSide = Side.ALLIES;
         List<Unit> active = unitsForCommandSide(state);
         selectUnit(active.isEmpty() ? null : active.getFirst().id());
     }
@@ -565,70 +559,13 @@ final class MapPanel extends Actor {
     }
 
     private void handleEnterKey() {
-        CampaignState state = campaignStateSupplier.get();
-        EnterIssuingOrdersOutcome outcome = enterIssuingOrdersOutcome(
-            areAllMoveOrdersAssignedForCommandSide(state),
-            commandSide,
-            state.activeSide()
-        );
-        applyEnterIssuingOrdersOutcome(
-            outcome,
-            () -> switchCommandSideForIssuingOrders(state),
-            onEndTurn
-        );
-    }
-
-    static EnterIssuingOrdersOutcome enterIssuingOrdersOutcome(boolean currentCommandSideComplete,
-                                                               Side commandSide,
-                                                               Side initialActiveSide) {
-        if (!currentCommandSideComplete) {
-            return EnterIssuingOrdersOutcome.NO_PROGRESS;
-        }
-        return commandSide == initialActiveSide
-            ? EnterIssuingOrdersOutcome.SWITCH_COMMAND_SIDE
-            : EnterIssuingOrdersOutcome.END_TURN;
-    }
-
-    static void applyEnterIssuingOrdersOutcome(EnterIssuingOrdersOutcome outcome,
-                                               Runnable onSwitchCommandSide,
-                                               Runnable onEndTurn) {
-        Objects.requireNonNull(outcome, "outcome must not be null");
-        Objects.requireNonNull(onSwitchCommandSide, "onSwitchCommandSide must not be null");
-        Objects.requireNonNull(onEndTurn, "onEndTurn must not be null");
-        switch (outcome) {
-            case NO_PROGRESS -> {
-                return;
-            }
-            case SWITCH_COMMAND_SIDE -> onSwitchCommandSide.run();
-            case END_TURN -> onEndTurn.run();
-        }
-    }
-
-    private void switchCommandSideForIssuingOrders(CampaignState state) {
-        commandSide = oppositeCommandSide(commandSide);
-        selectionState.deactivateMoveMode();
-        clearMovePreview();
-        selectUnit(BattlefieldScreen.nextUnassignedUnitId(unitsForCommandSide(state), null, moveTargetsByUnit));
-    }
-
-    private boolean areAllMoveOrdersAssignedForCommandSide(CampaignState state) {
-        return unitsForCommandSide(state).stream()
-            .map(Unit::id)
-            .allMatch(moveTargetsByUnit::containsKey);
+        onEndTurn.run();
     }
 
     private List<Unit> unitsForCommandSide(CampaignState state) {
         return state.units().stream()
             .filter(unit -> unit.side() == commandSide)
             .toList();
-    }
-
-    private static Side oppositeCommandSide(Side side) {
-        return switch (side) {
-            case ALLIES -> Side.AXIS;
-            case AXIS -> Side.ALLIES;
-            case NEUTRAL -> Side.NEUTRAL;
-        };
     }
 
     @FunctionalInterface
