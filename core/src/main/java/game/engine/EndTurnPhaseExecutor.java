@@ -16,7 +16,7 @@ final class EndTurnPhaseExecutor implements TurnPhaseExecutor {
             state.campaignId(),
             state.scenarioId(),
             state.turnNumber() + 1,
-            state.activeSide(),
+            TurnEngine.flipSide(state.activeSide()),
             state.units(),
             List.of()
         );

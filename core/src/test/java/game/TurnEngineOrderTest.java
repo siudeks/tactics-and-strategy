@@ -109,13 +109,13 @@ class TurnEngineOrderTest {
     }
 
     @Test
-    void activeSide_remainsUnchangedAfterRunOneTurn() {
+    void activeSide_flipsAfterRunOneTurn() {
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(), List.of()
         );
 
         TurnResult result = engineFor(sandMap()).runOneTurn(state);
 
-        assertEquals(Side.ALLIES, result.state().activeSide());
+        assertEquals(Side.AXIS, result.state().activeSide());
     }
 }

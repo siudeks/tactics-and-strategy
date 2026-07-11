@@ -25,13 +25,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import game.domain.CampaignState;
-import game.domain.Order;
 import game.domain.Side;
 import game.domain.Unit;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
-import game.engine.NoOpTurnPlanningStrategy;
-import game.engine.TurnPlanningStrategy;
 import game.scenario.LoadedScenario;
 import game.terrain.GeneratedTerrainData;
 import org.jspecify.annotations.Nullable;
@@ -99,7 +96,6 @@ public class BattlefieldScreen extends ScreenAdapter {
     private @Nullable Texture unidentifiedIconTexture;
     private @Nullable Sound moveConfirmSound;
     private @Nullable Path moveConfirmSoundFile;
-    private @Nullable Map<Side, TurnPlanningStrategy> planningStrategies;
     private BattlefieldPhasePlaybackController phasePlaybackController;
 
     @SuppressWarnings("NullAway.Init")
@@ -116,7 +112,6 @@ public class BattlefieldScreen extends ScreenAdapter {
         font = new BitmapFont();
         whiteTexture = createWhiteTexture();
         phasePlaybackController = new BattlefieldPhasePlaybackController();
-        planningStrategies = Map.of(Side.AXIS, new NoOpTurnPlanningStrategy());
         initializeMoveConfirmationAudio();
         loadUnitIcons();
         var icons = Objects.requireNonNull(unitIconTextures, "unitIconTextures must be initialized");
@@ -227,15 +222,6 @@ public class BattlefieldScreen extends ScreenAdapter {
         GameRuntime runtime = Objects.requireNonNull(gameRuntime, "gameRuntime must be initialized before endTurn");
         if (!phasePlaybackController.shouldAcceptEndTurn()) {
             return;
-        }
-        if (planningStrategies != null) {
-            TurnPlanningStrategy axisStrategy = planningStrategies.get(Side.AXIS);
-            if (axisStrategy != null) {
-                List<Order> axisOrders = axisStrategy.planOrders(runtime.getCurrentCampaignState(), Side.AXIS);
-                for (Order order : axisOrders) {
-                    runtime.assignMoveTarget(order.unitId(), order.targetX(), order.targetY());
-                }
-            }
         }
         phasePlaybackController.start(runtime);
         mapPanel.setInteractionLockState(phasePlaybackController.interactionLockState());

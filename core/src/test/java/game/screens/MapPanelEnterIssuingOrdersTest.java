@@ -1,46 +1,89 @@
 package game.screens;
 
+import game.domain.Side;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.concurrent.atomic.AtomicInteger;
 
-// Note: the ENTER key now calls onEndTurn.run() directly (no completeness check or side-switching
-// logic). Because MapPanel is a libGDX Actor requiring a full graphical context, that callback
-// path is covered by the headless/integration smoke tests rather than here.
-//
-// This class retains unit tests for the remaining package-private static helpers that are
-// exercisable without a running libGDX context (coverage of NONE / blocked-drag branches not
-// duplicated in MapPanelInputLockIntegrationTest).
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class MapPanelEnterIssuingOrdersTest {
 
     @Test
-    void shouldBlockInputPath_neverBlocks_whenLockStateIsNone() {
-        for (var path : MapPanel.InputPath.values()) {
-            assertFalse(
-                MapPanel.shouldBlockInputPath(InteractionLockState.NONE, path),
-                "Expected NONE to allow " + path
-            );
-        }
+    void enterIssuingOrdersOutcome_returnsNoProgress_whenCurrentCommandSideIsIncomplete() {
+        MapPanel.EnterIssuingOrdersOutcome outcome = MapPanel.enterIssuingOrdersOutcome(
+            false,
+            Side.ALLIES,
+            Side.ALLIES
+        );
+
+        assertEquals(MapPanel.EnterIssuingOrdersOutcome.NO_PROGRESS, outcome);
     }
 
     @Test
-    void initializePointerDrag_returnsFalse_andDoesNotMoveCameraOrigin_whenDragIsBlocked() {
-        var controller = new CameraController(320f, 320f, 0.5f, 3f, 0.1f);
-
-        // TURN_COMMIT blocks all input paths including DRAG
-        boolean result = MapPanel.initializePointerDrag(
-            InteractionLockState.TURN_COMMIT,
-            controller,
-            50f,
-            60f
+    void enterIssuingOrdersOutcome_switchesCommandSide_whenCurrentSideIsCompleteAndMatchesInitialActiveSide() {
+        MapPanel.EnterIssuingOrdersOutcome outcome = MapPanel.enterIssuingOrdersOutcome(
+            true,
+            Side.ALLIES,
+            Side.ALLIES
         );
 
-        assertFalse(result, "initializePointerDrag must return false when drag is blocked");
-        // Verify startDrag was not called: a subsequent dragTo from origin (0,0) should
-        // behave as if lastDrag was never set (remains at default 0,0).
-        controller.dragTo(0f, 0f, 80f, 80f); // drag from (0,0) → no camera movement
-        assertTrue(controller.cameraX() == 0f && controller.cameraY() == 0f,
-            "Camera must remain at origin when drag was never initialised");
+        assertEquals(MapPanel.EnterIssuingOrdersOutcome.SWITCH_COMMAND_SIDE, outcome);
+    }
+
+    @Test
+    void enterIssuingOrdersOutcome_endsTurn_whenCurrentSideIsCompleteAndIsSecondCommandSide() {
+        MapPanel.EnterIssuingOrdersOutcome outcome = MapPanel.enterIssuingOrdersOutcome(
+            true,
+            Side.AXIS,
+            Side.ALLIES
+        );
+
+        assertEquals(MapPanel.EnterIssuingOrdersOutcome.END_TURN, outcome);
+    }
+
+    @Test
+    void applyEnterIssuingOrdersOutcome_doesNotInvokeCallbacks_whenOutcomeIsNoProgress() {
+        AtomicInteger sideSwitchCalls = new AtomicInteger();
+        AtomicInteger endTurnCalls = new AtomicInteger();
+
+        MapPanel.applyEnterIssuingOrdersOutcome(
+            MapPanel.EnterIssuingOrdersOutcome.NO_PROGRESS,
+            sideSwitchCalls::incrementAndGet,
+            endTurnCalls::incrementAndGet
+        );
+
+        assertEquals(0, sideSwitchCalls.get());
+        assertEquals(0, endTurnCalls.get());
+    }
+
+    @Test
+    void applyEnterIssuingOrdersOutcome_invokesOnlySideSwitch_whenOutcomeIsSwitchCommandSide() {
+        AtomicInteger sideSwitchCalls = new AtomicInteger();
+        AtomicInteger endTurnCalls = new AtomicInteger();
+
+        MapPanel.applyEnterIssuingOrdersOutcome(
+            MapPanel.EnterIssuingOrdersOutcome.SWITCH_COMMAND_SIDE,
+            sideSwitchCalls::incrementAndGet,
+            endTurnCalls::incrementAndGet
+        );
+
+        assertEquals(1, sideSwitchCalls.get());
+        assertEquals(0, endTurnCalls.get());
+    }
+
+    @Test
+    void applyEnterIssuingOrdersOutcome_invokesOnlyEndTurn_whenOutcomeIsEndTurn() {
+        AtomicInteger sideSwitchCalls = new AtomicInteger();
+        AtomicInteger endTurnCalls = new AtomicInteger();
+
+        MapPanel.applyEnterIssuingOrdersOutcome(
+            MapPanel.EnterIssuingOrdersOutcome.END_TURN,
+            sideSwitchCalls::incrementAndGet,
+            endTurnCalls::incrementAndGet
+        );
+
+        assertEquals(0, sideSwitchCalls.get());
+        assertEquals(1, endTurnCalls.get());
     }
 }

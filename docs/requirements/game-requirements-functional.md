@@ -11,7 +11,7 @@ This document defines functional requirements that reflect currently implemented
 1. Load scenario and initial campaign state from JSON resources.
 2. Run one full turn through engine phases.
 3. Apply movement orders and validate movement bounds and terrain passability.
-4. End turn by incrementing turn number and clearing pending orders. Active side remains constant per turn (no side flip).
+4. End turn by flipping active side, incrementing turn number, and clearing pending orders.
 5. Expose updated state through runtime for subsequent turns.
 
 ## Turn Structure
@@ -25,7 +25,8 @@ The engine executes a fixed five-phase sequence:
 Behavior notes:
 - ISSUE_ORDERS is a structural phase (orders are read from campaign state).
 - COMBAT and RETREAT phases are executed as structural phases in the turn pipeline.
-- END_TURN always increments turn number by 1 and clears pending orders. Active side is not flipped between turns.
+- END_TURN always increments turn number by 1, flips side ALLIES <-> AXIS, and clears pending orders.
+- NEUTRAL is not a valid active turn side for side flipping.
 
 ## Map and Terrain
 - Unit placement uses square-tile coordinates from scenario definitions.
@@ -85,7 +86,6 @@ The following functional behaviors are implemented and are part of this baseline
 - REQ-ORD-MOVE-001: A confirmed MOVE target is persisted as a unit-scoped `MOVE` order in `CampaignState.pendingOrders` for the current turn, keyed by `unitId`. Re-assigning a target for the same unit replaces the prior order (at most one MOVE order per unit), and persisted orders are cleared automatically at end of turn.
 - REQ-ORD-MOVE-002: Movement phase executes during turn simulation and consumes pending `MOVE` orders assigned in the command phase. Each order is validated at execution time (not at assignment time): the target coordinates must lie within map bounds and the scenario's default terrain must be traversable (not `VOID` or `WATER`). Invalid targets are silently dropped — no exception is raised, no partial move occurs, the order is not surfaced as cancelled to the caller, and the unit remains in place. During stepwise runtime execution the movement step updates the in-session state first and emits `MovementPlayback` for UI choreography before final end-turn commit. Implementation: `TurnEngine.applyMoveOrders` consumes `CampaignState.pendingOrders`.
 - REQ-ORD-MOVE-003: Multiple units on the same side may each receive an independent `MOVE` target during a single command phase. During movement-phase execution each unit is resolved against its own target; assignments do not interfere across units.
-- REQ-STRAT-001: Movement plan ordering model. Player A (ALLIES) builds a movement plan via the UI; the plan is applied to runtime as MOVE orders before turn execution. Player B (AXIS) uses a `NoOpTurnPlanningStrategy` that generates no orders, with the strategy interface defined in `game.engine.TurnPlanningStrategy` for future extension.
 
 ## Related Documents
 - Deferred scope: [game-requirements-plan.md](game-requirements-plan.md)
