@@ -718,13 +718,19 @@ final class MapPanel extends Actor {
             mapWidthTiles,
             mapHeightTiles
         );
+        return scenarioTileFromTerrainTile(terrainTile, mapWidthTiles, mapHeightTiles, scenarioMapHeightTiles);
+    }
+
+    static @Nullable TileCoord scenarioTileFromTerrainTile(@Nullable TileCoord terrainTile,
+                                                           int mapWidthTiles,
+                                                           int mapHeightTiles,
+                                                           int scenarioMapHeightTiles) {
         if (terrainTile == null) {
             return null;
         }
         int scenarioTileX = terrainTile.tileX();
         int scenarioTileY = terrainTile.tileY() - (mapHeightTiles - scenarioMapHeightTiles);
-        // Allow targeting across the full visible terrain area.
-        // Y may be outside the original scenario band; this keeps click area aligned with what is rendered.
+        // Keep full horizontal terrain coverage clickable; Y may be outside the original scenario band.
         if (scenarioTileX < 0 || scenarioTileX >= mapWidthTiles) {
             return null;
         }
