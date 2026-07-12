@@ -134,6 +134,9 @@ final class MapPanel extends Actor {
                     getStage().setKeyboardFocus(MapPanel.this);
                     getStage().setScrollFocus(MapPanel.this);
                 }
+                if (!shouldBlockInputPath(interactionLockState, InputPath.SELECTION)) {
+                    refreshMovePreviewAtPointer(x, y);
+                }
                 return true;
             }
 
@@ -154,15 +157,7 @@ final class MapPanel extends Actor {
                 float dy = y - cameraController.lastDragY();
                 if (dx * dx + dy * dy >= 100f) return; // drag, not a click
 
-                TileCoord clickedTile = BattlefieldScreen.mapTileAtPanelPoint(
-                    x,
-                    y,
-                    cameraController.cameraX(),
-                    cameraController.cameraY(),
-                    cameraController.zoomLevel(),
-                    mapWidthTiles,
-                    mapHeightTiles
-                );
+                TileCoord clickedTile = scenarioTileAtPanelPoint(x, y);
                 boolean clickedTilePassable = isTilePassable(clickedTile);
                 MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
                     selectionState.isMoveModeActive(),
@@ -195,7 +190,7 @@ final class MapPanel extends Actor {
                     state,
                     rtsPositionsSource.get(),
                     movementPlaybackStateSource.get(),
-                    mapHeightTiles,
+                    scenarioMapHeightTiles,
                     getX(),
                     getY(),
                     getWidth(),
@@ -212,23 +207,7 @@ final class MapPanel extends Actor {
                     clearMovePreview();
                     return true;
                 }
-                TileCoord hoveredTile = BattlefieldScreen.mapTileAtPanelPoint(
-                    x,
-                    y,
-                    cameraController.cameraX(),
-                    cameraController.cameraY(),
-                    cameraController.zoomLevel(),
-                    mapWidthTiles,
-                    mapHeightTiles
-                );
-                movePreviewTile = BattlefieldScreen.movePreviewTile(
-                    selectionState.isMoveModeActive(),
-                    selectionState.selectedUnitId(),
-                    hoveredTile,
-                    isTilePassable(hoveredTile)
-                );
-                movePreviewVisible = true;
-                movePreviewBlinkTimer = 0f;
+                refreshMovePreviewAtPointer(x, y);
                 return movePreviewTile != null;
             }
 
@@ -396,7 +375,7 @@ final class MapPanel extends Actor {
         float scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
         float previewDrawSize = scaledTileSize * UNIT_SIZE_IN_TILES;
         float screenX = panelX + (movePreviewTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
-        float worldY = (mapHeightTiles - movePreviewTile.tileY() - UNIT_SIZE_IN_TILES) * DRAW_TILE_SIZE;
+        float worldY = (scenarioMapHeightTiles - movePreviewTile.tileY() - UNIT_SIZE_IN_TILES) * DRAW_TILE_SIZE;
         float screenY = panelY + (worldY - cameraY) * zoomLevel;
         float border = previewDrawSize / 16f;
         float borderX = screenX - border;
@@ -425,7 +404,7 @@ final class MapPanel extends Actor {
 
         for (TileCoord targetTile : moveTargetsByUnit.values()) {
             float tileScreenX = panelX + (targetTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
-            float worldY = (mapHeightTiles - targetTile.tileY() - 1f) * DRAW_TILE_SIZE;
+            float worldY = (scenarioMapHeightTiles - targetTile.tileY() - 1f) * DRAW_TILE_SIZE;
             float tileScreenY = panelY + (worldY - cameraY) * zoomLevel;
 
             float poleX = tileScreenX + scaledTileSize * 0.15f;
@@ -716,8 +695,52 @@ final class MapPanel extends Actor {
         if (tile == null) {
             return false;
         }
-        int mapIndex = tile.tileY() * mapWidthTiles + tile.tileX();
+        // Convert scenario tile coordinates to terrain tile coordinates for passability lookup.
+        // Scenario tileY 0 corresponds to terrain row (mapHeightTiles - scenarioMapHeightTiles + 0),
+        // increasing linearly: terrainTileY = mapHeightTiles - scenarioMapHeightTiles + scenarioTileY.
+        int terrainTileX = tile.tileX();
+        int terrainTileY = mapHeightTiles - scenarioMapHeightTiles + tile.tileY();
+        if (terrainTileX < 0 || terrainTileX >= mapWidthTiles
+            || terrainTileY < 0 || terrainTileY >= mapHeightTiles) {
+            return false;
+        }
+        int mapIndex = terrainTileY * mapWidthTiles + terrainTileX;
         return BattlefieldScreen.isPassableTerrainCode(mapDefinition.getTerrainCode(mapIndex));
+    }
+
+    private @Nullable TileCoord scenarioTileAtPanelPoint(float panelPointerX, float panelPointerY) {
+        TileCoord terrainTile = BattlefieldScreen.mapTileAtPanelPoint(
+            panelPointerX,
+            panelPointerY,
+            cameraController.cameraX(),
+            cameraController.cameraY(),
+            cameraController.zoomLevel(),
+            mapWidthTiles,
+            mapHeightTiles
+        );
+        if (terrainTile == null) {
+            return null;
+        }
+        int scenarioTileX = terrainTile.tileX();
+        int scenarioTileY = terrainTile.tileY() - (mapHeightTiles - scenarioMapHeightTiles);
+        // Allow targeting across the full visible terrain area.
+        // Y may be outside the original scenario band; this keeps click area aligned with what is rendered.
+        if (scenarioTileX < 0 || scenarioTileX >= mapWidthTiles) {
+            return null;
+        }
+        return new TileCoord(scenarioTileX, scenarioTileY);
+    }
+
+    private void refreshMovePreviewAtPointer(float panelPointerX, float panelPointerY) {
+        TileCoord hoveredTile = scenarioTileAtPanelPoint(panelPointerX, panelPointerY);
+        movePreviewTile = BattlefieldScreen.movePreviewTile(
+            selectionState.isMoveModeActive(),
+            selectionState.selectedUnitId(),
+            hoveredTile,
+            isTilePassable(hoveredTile)
+        );
+        movePreviewVisible = true;
+        movePreviewBlinkTimer = 0f;
     }
 
     private void clearMovePreview() {

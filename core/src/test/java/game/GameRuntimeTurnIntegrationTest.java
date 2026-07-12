@@ -71,4 +71,83 @@ class GameRuntimeTurnIntegrationTest {
         assertTrue(orderPresent, "MOVE order should persist after clock advances");
     }
 
+    @Test
+    void rtsMovement_assignTarget_immediatelyAppearsInRtsPositions() {
+        // REQ-RTS-MOVE-001: unit movement starts immediately on target assignment
+        String unitId = firstAlliesUnitId();
+        game.domain.Unit unit = findUnit(unitId);
+
+        runtime.assignMoveTarget(unitId, unit.tileX() + 4, unit.tileY());
+
+        java.util.Map<String, float[]> positions = runtime.rtsMovementPositions();
+        assertTrue(positions.containsKey(unitId), "Moving unit should appear in RTS positions immediately after assignment");
+    }
+
+    @Test
+    void rtsMovement_afterAdvanceMovements_positionChanges() {
+        // REQ-RTS-MOVE-001: unit moves toward target as time passes
+        String unitId = firstAlliesUnitId();
+        game.domain.Unit unit = findUnit(unitId);
+        int targetX = unit.tileX() + 4; // 4 tiles away → totalSeconds = 4.0
+        runtime.assignMoveTarget(unitId, targetX, unit.tileY());
+
+        runtime.advanceMovements(1f); // 1 second → 25% of the way
+
+        float[] pos = runtime.rtsMovementPositions().get(unitId);
+        assertNotNull(pos, "Unit should still be moving after 1s (out of 4s)");
+        assertEquals(unit.tileX() + 1f, pos[0], 0.0001f, "Unit should be 1 tile closer to target");
+    }
+
+    @Test
+    void rtsMovement_whenClockPaused_positionDoesNotChange() {
+        // REQ-RTS-MOVE-002: movement pauses when game clock is paused
+        String unitId = firstAlliesUnitId();
+        game.domain.Unit unit = findUnit(unitId);
+        runtime.assignMoveTarget(unitId, unit.tileX() + 4, unit.tileY());
+        runtime.togglePause();
+
+        runtime.advanceMovements(2f); // 2 seconds while paused
+
+        float[] pos = runtime.rtsMovementPositions().get(unitId);
+        assertNotNull(pos, "Unit should still have active movement");
+        assertEquals(unit.tileX(), pos[0], 0.0001f, "Position should not change while paused");
+    }
+
+    @Test
+    void rtsMovement_unitArrivesAtTarget_campaignStateUpdated() {
+        // REQ-RTS-MOVE-001: arrived unit's campaign-state position is updated
+        String unitId = firstAlliesUnitId();
+        game.domain.Unit unit = findUnit(unitId);
+        int targetX = unit.tileX() + 2;
+        int targetY = unit.tileY() + 0;
+        runtime.assignMoveTarget(unitId, targetX, targetY);
+
+        runtime.advanceMovements(10f); // well beyond travel time
+
+        game.domain.Unit arrived = runtime.getCurrentCampaignState().units().stream()
+            .filter(u -> u.id().equals(unitId))
+            .findFirst()
+            .orElseThrow();
+        assertAll(
+            () -> assertEquals(targetX, arrived.tileX(), "tileX should be updated to target"),
+            () -> assertEquals(targetY, arrived.tileY(), "tileY should be updated to target"),
+            () -> assertTrue(runtime.rtsMovementPositions().isEmpty(), "No more active RTS movement after arrival")
+        );
+    }
+
+    private String firstAlliesUnitId() {
+        return runtime.getCurrentCampaignState().units().stream()
+            .filter(u -> u.side().name().equals("ALLIES"))
+            .findFirst()
+            .map(game.domain.Unit::id)
+            .orElseThrow(() -> new AssertionError("Expected at least one ALLIES unit"));
+    }
+
+    private game.domain.Unit findUnit(String unitId) {
+        return runtime.getCurrentCampaignState().units().stream()
+            .filter(u -> u.id().equals(unitId))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Unit not found: " + unitId));
+    }
+
 }

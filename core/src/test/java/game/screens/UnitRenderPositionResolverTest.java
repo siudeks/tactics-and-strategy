@@ -71,4 +71,42 @@ class UnitRenderPositionResolverTest {
         assertEquals(4f, position.tileX());
         assertEquals(6f, position.tileY());
     }
+
+    @Test
+    void resolveTilePosition_rtsPositionTakesPriorityOverPlaybackAndStatic() {
+        Unit unit = new Unit("unit", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 4, 6);
+        float[] rtsPos = {2.5f, 3.7f};
+        MovementPlaybackRenderState playback = new MovementPlaybackRenderState(
+            List.of(new MovementPlayback("unit", new TileCoordinate(0, 0), new TileCoordinate(8, 8), MovementPlaybackOutcome.MOVED)),
+            0.5f
+        );
+
+        UnitRenderPositionResolver.RenderTilePosition position = UnitRenderPositionResolver.resolveTilePosition(unit, rtsPos, playback);
+
+        assertEquals(2.5f, position.tileX(), 0.0001f, "RTS position should override both playback and static");
+        assertEquals(3.7f, position.tileY(), 0.0001f);
+    }
+
+    @Test
+    void computeVisibleUnitPlacements_rtsPositionsOverrideStaticTileCoords() {
+        Unit unit = new Unit("moving", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 0, 0);
+        CampaignState campaignState = new CampaignState(
+            "c", "s", 1, Side.ALLIES, List.of(unit), List.of()
+        );
+        // Unit is at tile (0,0) but RTS tracker says it's at (2.0, 0.0)
+        Map<String, float[]> rtsPositions = Map.of("moving", new float[]{2f, 0f});
+
+        Map<String, BattlefieldScreen.UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
+            campaignState,
+            rtsPositions,
+            null,
+            10,
+            0f, 0f, 400f, 400f,
+            0f, 0f, 1f
+        ).stream().collect(Collectors.toMap(p -> p.unit().id(), Function.identity()));
+
+        BattlefieldScreen.UnitRenderPlacement placement = Objects.requireNonNull(placements.get("moving"));
+        // Expected screenX = 2 * DRAW_TILE_SIZE(16) = 32
+        assertEquals(32f, placement.screenX(), 0.0001f, "Should render at RTS float position, not integer tile (0,0)");
+    }
 }

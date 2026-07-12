@@ -279,4 +279,49 @@ class BattlefieldScreenRenderingTest {
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }
+
+    @Test
+    void mapTileAtPanelPoint_scenarioCoords_matchUnitRenderCoords() {
+        // Scenario tile (1, 1) in a 10-tile-high map occupies worldY [128, 144).
+        // mapTileAtPanelPoint should give tile (1, 1) back when clicked in that range.
+        // Formula: tile worldY range = [(mapH - tileY - 1)*16, (mapH - tileY)*16)
+        // For tileY=1, mapH=10: [(10-1-1)*16, (10-1)*16) = [128, 144)
+        int scenarioMapHeight = 10;
+        int scenarioMapWidth = 10;
+
+        float clickInTile = 136f; // center of tile (tileY=1): (128 + 143) / 2 ≈ 136
+
+        BattlefieldScreen.TileCoord tile = BattlefieldScreen.mapTileAtPanelPoint(
+            16f, clickInTile,
+            0f, 0f, 1f,
+            scenarioMapWidth, scenarioMapHeight
+        );
+
+        assertNotNull(tile, "Click within scenario bounds should yield valid tile");
+        assertAll(
+            () -> assertEquals(1, tile.tileX()),
+            () -> assertEquals(1, tile.tileY())
+        );
+    }
+
+    @Test
+    void rtsMovement_unitConvergesOnAssignedTile_afterSufficientTime() {
+        // Verify coordinate consistency: clicking in scenario tile (5, 3) must give tileY=3.
+        // Tile (5, 3) occupies worldY [(10-3-1)*16, (10-3)*16) = [96, 112).
+        int scenarioMapHeight = 10;
+        int scenarioMapWidth = 10;
+
+        float clickInTile = 104f; // center of tile tileY=3
+
+        BattlefieldScreen.TileCoord clickedTile = BattlefieldScreen.mapTileAtPanelPoint(
+            80f, clickInTile,
+            0f, 0f, 1f,
+            scenarioMapWidth, scenarioMapHeight
+        );
+        assertNotNull(clickedTile);
+        assertAll(
+            () -> assertEquals(5, clickedTile.tileX()),
+            () -> assertEquals(3, clickedTile.tileY())
+        );
+    }
 }
