@@ -8,6 +8,7 @@ import game.scenario.LoadedScenario;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
@@ -26,6 +27,7 @@ public final class GameRuntime {
     private LoadedScenario loadedScenario;
     private final TurnEngine engine;
     private final GameClock gameClock;
+    private final RtsMovementTracker rtsMovementTracker = new RtsMovementTracker();
     @Nullable
     private TurnExecutionSession activeTurnExecution;
 
@@ -55,6 +57,7 @@ public final class GameRuntime {
                 stepResult.completedTurnResult().orElseThrow().state()
             );
             activeTurnExecution = null;
+            rtsMovementTracker.clear();
         }
         return stepResult;
     }
@@ -153,6 +156,54 @@ public final class GameRuntime {
             next
         );
         updateCurrentCampaignState(updated);
+        float @Nullable [] existingPos = rtsMovementTracker.currentPosition(unitId);
+        float fromX = existingPos != null ? existingPos[0] : unit.tileX();
+        float fromY = existingPos != null ? existingPos[1] : unit.tileY();
+        rtsMovementTracker.startMovement(unitId, fromX, fromY, tileX, tileY);
+    }
+
+    /**
+     * Advances all active RTS unit movements by {@code deltaSeconds}.
+     * Has no effect while the clock is paused or during an active turn-execution session.
+     * Units that reach their target have their tile coordinates updated in campaign state.
+     *
+     * @param deltaSeconds real-time seconds elapsed since the last frame
+     */
+    public void advanceMovements(float deltaSeconds) {
+        if (gameClock.isPaused() || activeTurnExecution != null) {
+            return;
+        }
+        Map<String, int[]> arrived = rtsMovementTracker.advance(deltaSeconds);
+        if (arrived.isEmpty()) {
+            return;
+        }
+        CampaignState state = currentCampaignState();
+        List<Unit> updatedUnits = new ArrayList<>(state.units().size());
+        for (Unit u : state.units()) {
+            int[] destination = arrived.get(u.id());
+            if (destination != null) {
+                updatedUnits.add(new Unit(u.id(), u.side(), u.type(), u.size(), destination[0], destination[1]));
+            } else {
+                updatedUnits.add(u);
+            }
+        }
+        updateCurrentCampaignState(new CampaignState(
+            state.campaignId(),
+            state.scenarioId(),
+            state.turnNumber(),
+            state.activeSide(),
+            updatedUnits,
+            state.pendingOrders()
+        ));
+    }
+
+    /**
+     * Returns the current interpolated float tile positions ({@code [x, y]}) for all
+     * actively moving units, keyed by unit ID.  Units that are not moving are absent.
+     * Intended for the render layer; not part of deterministic game state.
+     */
+    public Map<String, float[]> rtsMovementPositions() {
+        return rtsMovementTracker.currentPositions();
     }
 
     private CampaignState currentCampaignState() {

@@ -42,6 +42,7 @@ final class MapPanel extends Actor {
     private final Runnable onTogglePause;
     private final Supplier<CampaignState> campaignStateSupplier;
     private final MovementPlaybackStateSource movementPlaybackStateSource;
+    private final RtsPositionsSource rtsPositionsSource;
     private final int scenarioMapHeightTiles;
     private final MoveTargetRecorder moveTargetRecorder;
     private final Runnable onMoveTargetConfirmed;
@@ -84,6 +85,7 @@ final class MapPanel extends Actor {
              Runnable onTogglePause,
              Supplier<CampaignState> campaignStateSupplier,
              MovementPlaybackStateSource movementPlaybackStateSource,
+             RtsPositionsSource rtsPositionsSource,
              int scenarioMapHeightTiles,
              MoveTargetRecorder moveTargetRecorder,
              Runnable onMoveTargetConfirmed,
@@ -95,6 +97,7 @@ final class MapPanel extends Actor {
         this.campaignStateSupplier = Objects.requireNonNull(campaignStateSupplier, "campaignStateSupplier must not be null");
         this.movementPlaybackStateSource = Objects.requireNonNull(movementPlaybackStateSource,
             "movementPlaybackStateSource must not be null");
+        this.rtsPositionsSource = Objects.requireNonNull(rtsPositionsSource, "rtsPositionsSource must not be null");
         this.scenarioMapHeightTiles = scenarioMapHeightTiles;
         this.moveTargetRecorder = Objects.requireNonNull(moveTargetRecorder, "moveTargetRecorder must not be null");
         this.onMoveTargetConfirmed = Objects.requireNonNull(onMoveTargetConfirmed, "onMoveTargetConfirmed must not be null");
@@ -190,6 +193,7 @@ final class MapPanel extends Actor {
                 CampaignState state = campaignStateSupplier.get();
                 List<UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
                     state,
+                    rtsPositionsSource.get(),
                     movementPlaybackStateSource.get(),
                     mapHeightTiles,
                     getX(),
@@ -444,6 +448,7 @@ final class MapPanel extends Actor {
         float zoomLevel = cameraController.zoomLevel();
         List<UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
             campaignState,
+            rtsPositionsSource.get(),
             movementPlaybackStateSource.get(),
             scenarioMapHeightTiles,
             panelX,
@@ -646,6 +651,11 @@ final class MapPanel extends Actor {
     @FunctionalInterface
     interface MovementPlaybackStateSource {
         @Nullable MovementPlaybackRenderState get();
+    }
+
+    @FunctionalInterface
+    interface RtsPositionsSource {
+        java.util.Map<String, float[]> get();
     }
 
     @Override

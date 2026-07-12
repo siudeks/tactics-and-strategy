@@ -66,7 +66,7 @@ class UnitRenderPositionResolverTest {
     void resolveTilePosition_returnsFinalTileWhenNoPlaybackStateExists() {
         Unit unit = new Unit("unit", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 4, 6);
 
-        UnitRenderPositionResolver.RenderTilePosition position = UnitRenderPositionResolver.resolveTilePosition(unit, null);
+        UnitRenderPositionResolver.RenderTilePosition position = UnitRenderPositionResolver.resolveTilePosition(unit, null, null);
 
         assertEquals(4f, position.tileX());
         assertEquals(6f, position.tileY());

@@ -135,6 +135,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             gameRuntime::togglePause,
             gameRuntime::getCurrentCampaignState,
             phasePlaybackController::movementPlaybackRenderState,
+            gameRuntime::rtsMovementPositions,
             loadedScenario.scenarioDefinition().mapHeight(),
             (unitId, tileCoord) -> gameRuntime.assignMoveTarget(unitId, tileCoord.tileX(), tileCoord.tileY()),
             this::playMoveConfirmationSound,
@@ -235,6 +236,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         GameRuntime runtime = Objects.requireNonNull(gameRuntime, "gameRuntime must be initialized before render");
         ScreenUtils.clear(BG);
         runtime.advanceClock(delta);
+        runtime.advanceMovements(delta);
         phasePlaybackController.advance(runtime, delta);
         if (phasePlaybackController.consumeTurnCompletedThisFrame()) {
             mapPanel.resetSelection();
@@ -325,7 +327,12 @@ public class BattlefieldScreen extends ScreenAdapter {
         return texture;
     }
 
+    /**
+     * Master overload: resolves unit render positions using RTS continuous movement data
+     * with fallback to turn-animation playback, then to static integer tile coordinates.
+     */
     static List<UnitRenderPlacement> computeVisibleUnitPlacements(CampaignState campaignState,
+                                                                  Map<String, float[]> rtsPositions,
                                                                   @Nullable MovementPlaybackRenderState movementPlaybackRenderState,
                                                                   int scenarioMapHeightTiles,
                                                                   float panelX,
@@ -336,13 +343,15 @@ public class BattlefieldScreen extends ScreenAdapter {
                                                                   float cameraY,
                                                                   float zoomLevel) {
         Objects.requireNonNull(campaignState, "campaignState must not be null");
+        Objects.requireNonNull(rtsPositions, "rtsPositions must not be null");
 
         float scaledTileSize = MapPanel.DRAW_TILE_SIZE * zoomLevel;
         float unitDrawSize = scaledTileSize * MapPanel.UNIT_SIZE_IN_TILES;
         List<UnitRenderPlacement> placements = new ArrayList<>();
         for (Unit unit : campaignState.units()) {
+            float @Nullable [] rtsPos = rtsPositions.get(unit.id());
             UnitRenderPositionResolver.RenderTilePosition renderTilePosition =
-                UnitRenderPositionResolver.resolveTilePosition(unit, movementPlaybackRenderState);
+                UnitRenderPositionResolver.resolveTilePosition(unit, rtsPos, movementPlaybackRenderState);
             float iconWorldX = renderTilePosition.tileX() * MapPanel.DRAW_TILE_SIZE;
             float iconWorldY = (scenarioMapHeightTiles - renderTilePosition.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
             float iconScreenX = panelX + (iconWorldX - cameraX) * zoomLevel;
@@ -358,6 +367,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     static List<UnitRenderPlacement> computeVisibleUnitPlacements(CampaignState campaignState,
+                                                                  @Nullable MovementPlaybackRenderState movementPlaybackRenderState,
                                                                   int scenarioMapHeightTiles,
                                                                   float panelX,
                                                                   float panelY,
@@ -368,6 +378,31 @@ public class BattlefieldScreen extends ScreenAdapter {
                                                                   float zoomLevel) {
         return computeVisibleUnitPlacements(
             campaignState,
+            Map.of(),
+            movementPlaybackRenderState,
+            scenarioMapHeightTiles,
+            panelX,
+            panelY,
+            panelWidth,
+            panelHeight,
+            cameraX,
+            cameraY,
+            zoomLevel
+        );
+    }
+
+    static List<UnitRenderPlacement> computeVisibleUnitPlacements(CampaignState campaignState,
+                                                                  int scenarioMapHeightTiles,
+                                                                  float panelX,
+                                                                  float panelY,
+                                                                  float panelWidth,
+                                                                  float panelHeight,
+                                                                  float cameraX,
+                                                                  float cameraY,
+                                                                  float zoomLevel) {
+        return computeVisibleUnitPlacements(
+            campaignState,
+            Map.of(),
             null,
             scenarioMapHeightTiles,
             panelX,
