@@ -10,19 +10,32 @@ public final class GameClock {
     static final float REAL_SECONDS_PER_GAME_HOUR = 1f;
 
     private float elapsedSeconds;
+    private boolean paused;
 
     public GameClock() {
         this.elapsedSeconds = 0f;
+        this.paused = false;
     }
 
     /**
      * Advances the clock by the given real-time delta.
-     * Negative or zero values are ignored.
+     * Negative or zero values are ignored. Has no effect when the clock is paused.
      *
      * @param deltaSeconds real-time seconds elapsed since the last advance
      */
     public void advance(float deltaSeconds) {
+        if (paused) return;
         elapsedSeconds += Math.max(0f, deltaSeconds);
+    }
+
+    /** Toggles between paused and running state. */
+    public void togglePause() {
+        paused = !paused;
+    }
+
+    /** Returns {@code true} when the clock is paused and will not advance. */
+    public boolean isPaused() {
+        return paused;
     }
 
     /**

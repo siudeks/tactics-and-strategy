@@ -98,11 +98,25 @@ public final class GameRuntime {
     /**
      * Advances the in-game clock by the given real-time delta.
      * Call once per render frame with the frame's delta time.
+     * Has no effect while the clock is paused.
      *
      * @param deltaSeconds real-time seconds elapsed since the last frame
      */
     public void advanceClock(float deltaSeconds) {
         gameClock.advance(deltaSeconds);
+    }
+
+    /**
+     * Toggles the game clock between paused and running.
+     * When paused, {@link #advanceClock(float)} calls are ignored.
+     */
+    public void togglePause() {
+        gameClock.togglePause();
+    }
+
+    /** Returns {@code true} when the game clock is paused. */
+    public boolean isPaused() {
+        return gameClock.isPaused();
     }
 
     /**

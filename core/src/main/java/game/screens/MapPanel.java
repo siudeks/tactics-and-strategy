@@ -39,6 +39,7 @@ final class MapPanel extends Actor {
     private final TerrainMapDefinition mapDefinition;
     private final TerrainTileAtlas tileAtlas;
     private final Runnable onEndTurn;
+    private final Runnable onTogglePause;
     private final Supplier<CampaignState> campaignStateSupplier;
     private final MovementPlaybackStateSource movementPlaybackStateSource;
     private final int scenarioMapHeightTiles;
@@ -80,6 +81,7 @@ final class MapPanel extends Actor {
     @SuppressWarnings("NullAway.Init")
     MapPanel(Texture pixel,
              Runnable onEndTurn,
+             Runnable onTogglePause,
              Supplier<CampaignState> campaignStateSupplier,
              MovementPlaybackStateSource movementPlaybackStateSource,
              int scenarioMapHeightTiles,
@@ -89,6 +91,7 @@ final class MapPanel extends Actor {
              Texture unidentifiedIcon) {
         this.pixel = pixel;
         this.onEndTurn = onEndTurn;
+        this.onTogglePause = Objects.requireNonNull(onTogglePause, "onTogglePause must not be null");
         this.campaignStateSupplier = Objects.requireNonNull(campaignStateSupplier, "campaignStateSupplier must not be null");
         this.movementPlaybackStateSource = Objects.requireNonNull(movementPlaybackStateSource,
             "movementPlaybackStateSource must not be null");
@@ -240,6 +243,10 @@ final class MapPanel extends Actor {
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.SPACE) {
+                    onTogglePause.run();
+                    return true;
+                }
                 if (shouldBlockInputPath(interactionLockState, InputPath.KEY_SHORTCUT)) {
                     return true;
                 }

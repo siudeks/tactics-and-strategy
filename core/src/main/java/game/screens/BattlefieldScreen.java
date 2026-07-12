@@ -132,6 +132,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         mapPanel = new MapPanel(
             whiteTexture,
             this::endTurn,
+            gameRuntime::togglePause,
             gameRuntime::getCurrentCampaignState,
             phasePlaybackController::movementPlaybackRenderState,
             loadedScenario.scenarioDefinition().mapHeight(),
@@ -244,7 +245,11 @@ public class BattlefieldScreen extends ScreenAdapter {
         syncHudActionState(phasePlaybackController.hudActionsEnabled());
         syncMoveButtonState();
         if (timeLabel != null) {
-            timeLabel.setText(runtime.formattedInGameTime());
+            String timeText = runtime.formattedInGameTime();
+            if (runtime.isPaused()) {
+                timeText += "  [PAUSED]";
+            }
+            timeLabel.setText(timeText);
         }
         if (statusLabel != null) {
             statusLabel.setText(runtimeStatusSummary());
