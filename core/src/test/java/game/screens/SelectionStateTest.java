@@ -18,16 +18,18 @@ final class SelectionStateTest {
     }
 
     @Test
-    void select_thenToggleMoveMode_entersAndExitsTargeting() {
+    void select_entersMoveModeImmediately_andToggleExitsAndReenters() {
         SelectionState state = new SelectionState();
         state.select("u-1");
-
-        state.toggleMoveMode();
         assertTrue(state.isMoveModeActive());
         assertEquals("u-1", state.selectedUnitId());
 
         state.toggleMoveMode();
         assertFalse(state.isMoveModeActive());
+        assertEquals("u-1", state.selectedUnitId());
+
+        state.toggleMoveMode();
+        assertTrue(state.isMoveModeActive());
         assertEquals("u-1", state.selectedUnitId());
     }
 

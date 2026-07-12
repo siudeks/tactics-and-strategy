@@ -23,7 +23,7 @@ final class SelectionState {
     }
 
     void select(@Nullable String unitId) {
-        state = unitId == null ? NoSelectionState.INSTANCE : new UnitSelectedState(unitId);
+        state = unitId == null ? NoSelectionState.INSTANCE : new MoveTargetingState(unitId);
     }
 
     void toggleMoveMode() {
