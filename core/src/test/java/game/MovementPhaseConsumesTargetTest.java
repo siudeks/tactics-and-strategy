@@ -9,6 +9,7 @@ import game.domain.Unit;
 import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
+import game.engine.MoveCommandOutcome;
 import game.scenario.LoadedScenario;
 
 import java.util.List;
@@ -48,7 +49,8 @@ class MovementPhaseConsumesTargetTest {
         int targetX = 2;
         int targetY = 1;
 
-        runtime.assignMoveTarget(UNIT_ID, targetX, targetY);
+        var assignment = runtime.assignMoveTarget(UNIT_ID, targetX, targetY);
+        assertEquals(MoveCommandOutcome.ACCEPTED, assignment.outcome());
         runtime.simulateOneTurn();
 
         Unit moved = unitFrom(runtime);
@@ -61,7 +63,8 @@ class MovementPhaseConsumesTargetTest {
         var runtime = runtimeFor(TerrainType.SAND);
 
         assertDoesNotThrow(() -> {
-            runtime.assignMoveTarget(UNIT_ID, -1, 5);
+            var assignment = runtime.assignMoveTarget(UNIT_ID, -1, 5);
+            assertEquals(MoveCommandOutcome.ACCEPTED, assignment.outcome());
             runtime.simulateOneTurn();
         });
 
@@ -75,7 +78,8 @@ class MovementPhaseConsumesTargetTest {
         var runtime = runtimeFor(TerrainType.VOID);
 
         assertDoesNotThrow(() -> {
-            runtime.assignMoveTarget(UNIT_ID, 3, 3);
+            var assignment = runtime.assignMoveTarget(UNIT_ID, 3, 3);
+            assertEquals(MoveCommandOutcome.ACCEPTED, assignment.outcome());
             runtime.simulateOneTurn();
         });
 

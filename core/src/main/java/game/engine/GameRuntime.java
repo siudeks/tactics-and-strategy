@@ -129,7 +129,7 @@ public final class GameRuntime {
         return gameClock.formattedTime();
     }
 
-    public void assignMoveTarget(String unitId, int tileX, int tileY) {
+    public MoveCommandResult assignMoveTarget(String unitId, int tileX, int tileY) {
         Objects.requireNonNull(unitId, "unitId");
         CampaignState state = currentCampaignState();
         Unit unit = state.units().stream()
@@ -137,11 +137,13 @@ public final class GameRuntime {
             .findFirst()
             .orElse(null);
         if (unit == null) {
-            return;
+            return new MoveCommandResult(MoveCommandOutcome.UNKNOWN_UNIT);
         }
+        boolean replacedExisting = false;
         List<Order> next = new ArrayList<>(state.pendingOrders().size() + 1);
         for (Order existing : state.pendingOrders()) {
             if (existing.type() == OrderType.MOVE && existing.unitId().equals(unitId)) {
+                replacedExisting = true;
                 continue;
             }
             next.add(existing);
@@ -160,6 +162,9 @@ public final class GameRuntime {
         float fromX = existingPos != null ? existingPos[0] : unit.tileX();
         float fromY = existingPos != null ? existingPos[1] : unit.tileY();
         rtsMovementTracker.startMovement(unitId, fromX, fromY, tileX, tileY);
+        return new MoveCommandResult(replacedExisting
+            ? MoveCommandOutcome.REPLACED_EXISTING
+            : MoveCommandOutcome.ACCEPTED);
     }
 
     /**

@@ -7,7 +7,7 @@ import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.MovementPlayback;
 import game.engine.MovementPlaybackOutcome;
-import game.engine.TileCoordinate;
+import game.domain.TileCoordinate;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

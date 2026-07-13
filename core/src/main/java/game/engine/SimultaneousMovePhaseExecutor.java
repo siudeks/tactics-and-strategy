@@ -4,6 +4,7 @@ import game.domain.CampaignState;
 import game.domain.Order;
 import game.domain.OrderType;
 import game.domain.ScenarioDefinition;
+import game.domain.TileCoordinate;
 import game.domain.Unit;
 
 import java.util.ArrayList;

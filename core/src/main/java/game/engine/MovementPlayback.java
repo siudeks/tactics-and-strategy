@@ -1,5 +1,7 @@
 package game.engine;
 
+import game.domain.TileCoordinate;
+
 import java.util.Objects;
 
 public record MovementPlayback(

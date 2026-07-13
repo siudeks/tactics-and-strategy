@@ -29,6 +29,14 @@ The battlefield UI consumes `PhaseStepResult` without adding engine-side delays:
 - HUD/map lock policy is controlled by `InteractionLockState`,
 - camera drag/zoom remain available only during `MOVEMENT_PLAYBACK`.
 
+### 2.4 Runtime MOVE Command Contract
+`GameRuntime.assignMoveTarget(unitId, x, y)` MUST return a `MoveCommandResult` with one of the following outcomes:
+- `ACCEPTED` when a new MOVE target is persisted for a known unit.
+- `REPLACED_EXISTING` when a known unit already had a MOVE order and the target is replaced.
+- `UNKNOWN_UNIT` when the unit id does not exist in the current runtime state.
+
+Validation of target coordinates remains in `SIMULTANEOUS_MOVE` (`isValidMove`); invalid targets are persisted as order intent and ignored during movement resolution.
+
 ## 3. Preconditions
 1. `S_in` MUST be non-null.
 2. `D` MUST be non-null.
