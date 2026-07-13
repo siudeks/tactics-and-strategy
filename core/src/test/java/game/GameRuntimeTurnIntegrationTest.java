@@ -72,6 +72,40 @@ class GameRuntimeTurnIntegrationTest {
     }
 
     @Test
+    void gameRuntime_assignMoveTargetOrder_persistsOrderWithoutStartingProjection() {
+        String unitId = firstAlliesUnitId();
+        game.domain.Unit unit = findUnit(unitId);
+
+        var outcome = runtime.assignMoveTargetOrder(unitId, unit.tileX() + 2, unit.tileY());
+
+        boolean orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
+            .anyMatch(o -> o.unitId().equals(unitId) && o.type() == game.domain.OrderType.MOVE);
+        assertAll(
+            () -> assertEquals(game.engine.MoveCommandOutcome.ACCEPTED, outcome.outcome()),
+            () -> assertTrue(orderPresent, "MOVE order should be persisted in pendingOrders"),
+            () -> assertFalse(runtime.rtsMovementPositions().containsKey(unitId),
+                "Projection should remain inactive until explicitly started")
+        );
+    }
+
+    @Test
+    void gameRuntime_projectMoveTarget_startsProjectionWithoutMutatingPendingOrders() {
+        String unitId = firstAlliesUnitId();
+        game.domain.Unit unit = findUnit(unitId);
+        int ordersBefore = runtime.getCurrentCampaignState().pendingOrders().size();
+
+        boolean projected = runtime.projectMoveTarget(unitId, unit.tileX() + 2, unit.tileY());
+
+        assertAll(
+            () -> assertTrue(projected, "Known unit should start projection"),
+            () -> assertEquals(ordersBefore, runtime.getCurrentCampaignState().pendingOrders().size(),
+                "Projection must not mutate pendingOrders"),
+            () -> assertTrue(runtime.rtsMovementPositions().containsKey(unitId),
+                "Projected unit should appear in RTS positions")
+        );
+    }
+
+    @Test
     void rtsMovement_assignTarget_immediatelyAppearsInRtsPositions() {
         // REQ-RTS-MOVE-001: unit movement starts immediately on target assignment
         String unitId = firstAlliesUnitId();

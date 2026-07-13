@@ -5,7 +5,7 @@ Celem jest podniesienie utrzymywalności i przewidywalności silnika bez przepis
 **Steps**
 1. Faza 1 [ZREALIZOWANE]: Ustalenie kontraktów i inwariantów domeny. Zdefiniować docelowe inwarianty dla komend ruchu i ich wyników (Accepted, UnknownUnit, InvalidTarget, ReplacedExisting) oraz zatwierdzić zakres refaktoru API runtime. Ta faza jest bazą dla wszystkich kolejnych kroków.
 2. Faza 1 [ZREALIZOWANE]: Wprowadzić silniejsze typy wartości w domenie (identyfikatory i współrzędne) oraz ograniczyć primitive obsession w newralgicznych ścieżkach. Krok zależy od kroku 1.
-3. Faza 2: Rozdzielić odpowiedzialności komend i projekcji ruchu: zapis rozkazów do stanu oddzielić od projekcji/interpolacji wykorzystywanej przez render. Krok zależy od kroku 1 i 2.
+3. Faza 2 [ZREALIZOWANE]: Rozdzielić odpowiedzialności komend i projekcji ruchu: zapis rozkazów do stanu oddzielić od projekcji/interpolacji wykorzystywanej przez render. Krok zależy od kroku 1 i 2.
 4. Faza 2: Uporządkować przechowywanie rozkazów do postaci OrderBook z jawną regułą pojedynczego aktywnego MOVE na jednostkę i deterministyczną polityką nadpisania. Krok zależy od kroku 3.
 5. Faza 2: Ujednolicić semantykę UI state machine dla selekcji i trybu ruchu tak, aby nazwy operacji odpowiadały faktycznym przejściom stanów. Krok może iść równolegle z krokiem 4 po zakończeniu kroku 3.
 6. Faza 3: Wyodrębnić resolvery faz (Movement, Combat, Retreat) z jednolitym kontraktem wejście/wyjście i zachować pełną deterministyczność orkiestracji tury. Krok zależy od kroku 4.

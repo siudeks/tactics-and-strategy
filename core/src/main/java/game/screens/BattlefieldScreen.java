@@ -29,6 +29,7 @@ import game.domain.Side;
 import game.domain.Unit;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
+import game.engine.MoveCommandOutcome;
 import game.scenario.LoadedScenario;
 import game.terrain.GeneratedTerrainData;
 import org.jspecify.annotations.Nullable;
@@ -137,7 +138,12 @@ public class BattlefieldScreen extends ScreenAdapter {
             phasePlaybackController::movementPlaybackRenderState,
             gameRuntime::rtsMovementPositions,
             loadedScenario.scenarioDefinition().mapHeight(),
-            (unitId, tileCoord) -> gameRuntime.assignMoveTarget(unitId, tileCoord.tileX(), tileCoord.tileY()),
+            (unitId, tileCoord) -> {
+                var commandResult = gameRuntime.assignMoveTargetOrder(unitId, tileCoord.tileX(), tileCoord.tileY());
+                if (commandResult.outcome() != MoveCommandOutcome.UNKNOWN_UNIT) {
+                    gameRuntime.projectMoveTarget(unitId, tileCoord.tileX(), tileCoord.tileY());
+                }
+            },
             this::playMoveConfirmationSound,
             icons,
             unidentifiedIcon

@@ -130,12 +130,21 @@ public final class GameRuntime {
     }
 
     public MoveCommandResult assignMoveTarget(String unitId, int tileX, int tileY) {
+        MoveCommandResult commandResult = assignMoveTargetOrder(unitId, tileX, tileY);
+        if (commandResult.outcome() != MoveCommandOutcome.UNKNOWN_UNIT) {
+            projectMoveTarget(unitId, tileX, tileY);
+        }
+        return commandResult;
+    }
+
+    /**
+     * Persists or replaces a unit-scoped MOVE order in campaign-state pending orders.
+     * This method updates command state only and does not affect render-side movement projection.
+     */
+    public MoveCommandResult assignMoveTargetOrder(String unitId, int tileX, int tileY) {
         Objects.requireNonNull(unitId, "unitId");
         CampaignState state = currentCampaignState();
-        Unit unit = state.units().stream()
-            .filter(u -> u.id().equals(unitId))
-            .findFirst()
-            .orElse(null);
+        Unit unit = findUnit(state, unitId);
         if (unit == null) {
             return new MoveCommandResult(MoveCommandOutcome.UNKNOWN_UNIT);
         }
@@ -158,13 +167,29 @@ public final class GameRuntime {
             next
         );
         updateCurrentCampaignState(updated);
+        return new MoveCommandResult(replacedExisting
+            ? MoveCommandOutcome.REPLACED_EXISTING
+            : MoveCommandOutcome.ACCEPTED);
+    }
+
+    /**
+     * Starts or replaces render-side movement projection for a unit.
+     * This method does not mutate command orders and may be called independently from command assignment.
+     *
+     * @return {@code true} when projection started for a known unit; {@code false} for unknown units
+     */
+    public boolean projectMoveTarget(String unitId, int tileX, int tileY) {
+        Objects.requireNonNull(unitId, "unitId");
+        CampaignState state = currentCampaignState();
+        Unit unit = findUnit(state, unitId);
+        if (unit == null) {
+            return false;
+        }
         float @Nullable [] existingPos = rtsMovementTracker.currentPosition(unitId);
         float fromX = existingPos != null ? existingPos[0] : unit.tileX();
         float fromY = existingPos != null ? existingPos[1] : unit.tileY();
         rtsMovementTracker.startMovement(unitId, fromX, fromY, tileX, tileY);
-        return new MoveCommandResult(replacedExisting
-            ? MoveCommandOutcome.REPLACED_EXISTING
-            : MoveCommandOutcome.ACCEPTED);
+        return true;
     }
 
     /**
@@ -216,6 +241,13 @@ public final class GameRuntime {
             return activeTurnExecution.currentState();
         }
         return loadedScenario.campaignState();
+    }
+
+    private static @Nullable Unit findUnit(CampaignState state, String unitId) {
+        return state.units().stream()
+            .filter(u -> u.id().equals(unitId))
+            .findFirst()
+            .orElse(null);
     }
 
     private void updateCurrentCampaignState(CampaignState updatedState) {
