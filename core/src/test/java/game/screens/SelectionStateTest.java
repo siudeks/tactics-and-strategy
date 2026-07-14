@@ -18,9 +18,9 @@ final class SelectionStateTest {
     }
 
     @Test
-    void select_entersMoveModeImmediately_andToggleExitsAndReenters() {
+    void selectAndEnterMoveMode_entersMoveModeImmediately_andToggleExitsAndReenters() {
         SelectionState state = new SelectionState();
-        state.select("u-1");
+        state.selectAndEnterMoveMode("u-1");
         assertTrue(state.isMoveModeActive());
         assertEquals("u-1", state.selectedUnitId());
 
@@ -46,7 +46,7 @@ final class SelectionStateTest {
     @Test
     void clearSelection_resetsStateAndDisablesMoveMode() {
         SelectionState state = new SelectionState();
-        state.select("u-2");
+        state.selectAndEnterMoveMode("u-2");
         state.toggleMoveMode();
 
         state.clearSelection();
@@ -58,7 +58,7 @@ final class SelectionStateTest {
     @Test
     void deactivateMoveMode_keepsSelectedUnit() {
         SelectionState state = new SelectionState();
-        state.select("u-3");
+        state.selectAndEnterMoveMode("u-3");
         state.toggleMoveMode();
 
         state.deactivateMoveMode();

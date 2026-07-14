@@ -22,7 +22,12 @@ final class SelectionState {
         state = NoSelectionState.INSTANCE;
     }
 
-    void select(@Nullable String unitId) {
+    /**
+     * Selects the given unit and transitions directly into {@link MoveTargetingState}
+     * (or back to {@link NoSelectionState} when {@code unitId} is {@code null}), so
+     * MOVE targeting is active immediately after selection.
+     */
+    void selectAndEnterMoveMode(@Nullable String unitId) {
         state = unitId == null ? NoSelectionState.INSTANCE : new MoveTargetingState(unitId);
     }
 

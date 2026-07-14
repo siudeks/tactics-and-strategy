@@ -475,7 +475,7 @@ final class MapPanel extends Actor {
     private void selectUnit(@Nullable String unitId) {
         String previousUnitId = selectionState.selectedUnitId();
         if (!Objects.equals(previousUnitId, unitId)) {
-            selectionState.select(unitId);
+            selectionState.selectAndEnterMoveMode(unitId);
             clearMovePreview();
         } else if (unitId == null) {
             selectionState.clearSelection();
