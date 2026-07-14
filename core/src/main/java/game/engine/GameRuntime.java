@@ -1,8 +1,7 @@
 package game.engine;
 
 import game.domain.CampaignState;
-import game.domain.Order;
-import game.domain.OrderType;
+import game.domain.OrderBook;
 import game.domain.Unit;
 import game.scenario.LoadedScenario;
 
@@ -148,26 +147,18 @@ public final class GameRuntime {
         if (unit == null) {
             return new MoveCommandResult(MoveCommandOutcome.UNKNOWN_UNIT);
         }
-        boolean replacedExisting = false;
-        List<Order> next = new ArrayList<>(state.pendingOrders().size() + 1);
-        for (Order existing : state.pendingOrders()) {
-            if (existing.type() == OrderType.MOVE && existing.unitId().equals(unitId)) {
-                replacedExisting = true;
-                continue;
-            }
-            next.add(existing);
-        }
-        next.add(new Order("move-" + unitId, unitId, unit.side(), OrderType.MOVE, tileX, tileY));
+        OrderBook.MoveUpsertResult upsert = new OrderBook(state.pendingOrders())
+            .upsertMove(unitId, unit.side(), tileX, tileY);
         CampaignState updated = new CampaignState(
             state.campaignId(),
             state.scenarioId(),
             state.turnNumber(),
             state.activeSide(),
             state.units(),
-            next
+            upsert.orderBook().asPendingOrders()
         );
         updateCurrentCampaignState(updated);
-        return new MoveCommandResult(replacedExisting
+        return new MoveCommandResult(upsert.replacedExisting()
             ? MoveCommandOutcome.REPLACED_EXISTING
             : MoveCommandOutcome.ACCEPTED);
     }

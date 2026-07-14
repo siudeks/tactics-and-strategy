@@ -2,13 +2,12 @@ package game.engine;
 
 import game.domain.CampaignState;
 import game.domain.Order;
-import game.domain.OrderType;
+import game.domain.OrderBook;
 import game.domain.ScenarioDefinition;
 import game.domain.TileCoordinate;
 import game.domain.Unit;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,12 +25,7 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
 
     @Override
     public PhaseExecution execute(CampaignState state) {
-        Map<String, Order> moveTargets = new HashMap<>();
-        for (Order order : state.pendingOrders()) {
-            if (order.type() == OrderType.MOVE) {
-                moveTargets.put(order.unitId(), order);
-            }
-        }
+        Map<String, Order> moveTargets = new OrderBook(state.pendingOrders()).activeMoveOrdersByUnit();
 
         List<Unit> updatedUnits = new ArrayList<>(state.units().size());
         List<MovementPlayback> movementPlayback = new ArrayList<>(state.units().size());

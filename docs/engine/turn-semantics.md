@@ -35,6 +35,10 @@ The battlefield UI consumes `PhaseStepResult` without adding engine-side delays:
 - `REPLACED_EXISTING` when a known unit already had a MOVE order and the target is replaced.
 - `UNKNOWN_UNIT` when the unit id does not exist in the current runtime state.
 
+MOVE persistence MUST be materialized through `OrderBook`, which enforces:
+- at most one active `MOVE` per `unitId`,
+- deterministic overwrite policy `last-write-wins` for repeated assignments of the same unit.
+
 Validation of target coordinates remains in `SIMULTANEOUS_MOVE` (`isValidMove`); invalid targets are persisted as order intent and ignored during movement resolution.
 
 ## 3. Preconditions
@@ -51,8 +55,8 @@ Every phase step returns a `PhaseExecution` whose state becomes the next in-sess
 - Session effect: the in-session state remains unchanged.
 
 ### 4.2 SIMULTANEOUS_MOVE
-- Input orders are read from the current in-session `pendingOrders`.
-- For each order where `type == MOVE`, engine computes unit target by `unitId`.
+- Input orders are read from the current in-session `pendingOrders` through `OrderBook.activeMoveOrdersByUnit()`.
+- `OrderBook` guarantees a deterministic single active `MOVE` per unit (`last-write-wins` if duplicates exist).
 - For each unit in the in-session `units` list:
   - If a valid MOVE target exists for that `unit.id`, output unit coordinates become target `(x, y)`.
   - Otherwise, output unit coordinates remain unchanged.
