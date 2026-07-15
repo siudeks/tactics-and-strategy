@@ -13,13 +13,16 @@ they are already implemented and covered by executable evidence in the traceabil
 - REQ-UI-PHASE-001, REQ-UI-LOCK-001 (phase overlay playback and interaction lock policy)
 - REQ-ORD-MOVE-001, REQ-ORD-MOVE-002, REQ-ORD-MOVE-003 (MOVE target persistence and consumption)
 - REQ-RTS-001, REQ-RTS-002, REQ-RTS-003 (real-time clock and always-available movement commands)
+- REQ-MOVE-002 (terrain-cost-aware movement route resolution with deterministic tie-break)
 
 ## Planned Requirement Candidates
 
-### Movement Rules v2 (Not Implemented)
+### Movement Rules v2 (Partially Implemented)
 - REQ-MOVE-001: The engine shall enforce per-unit movement allowance.
-- REQ-MOVE-002: The engine shall resolve terrain-cost-aware routes with deterministic tie-breaking.
 - REQ-MOVE-003: The engine shall enforce occupancy and collision rules for conflicting destinations.
+
+Already implemented in current baseline:
+- REQ-MOVE-002: The engine resolves terrain-cost-aware orthogonal routes with deterministic tie-breaking.
 
 Draft acceptance criteria:
 - AC-MOVE-001 (Within allowance):
@@ -49,8 +52,7 @@ Draft acceptance criteria:
 
 Key decisions required:
 - Movement allowance model per unit role.
-- Terrain movement-cost table.
-- Collision policy and deterministic tie-break rules.
+- Collision policy for conflicting destinations.
 
 ### Supply and Stacking (Not Implemented)
 - REQ-SUP-001: Supply continuity must be tracked and penalties applied when disrupted.
@@ -79,7 +81,7 @@ Covered by current implemented behavior (not pending):
 
 High priority:
 - Final combat resolution model and balancing levers.
-- Movement allowance, terrain-cost model, and tie-break policy.
+- Movement allowance finalization.
 - Collision policy for conflicting movement orders.
 - Supply disruption penalties and recovery rules.
 
@@ -92,7 +94,6 @@ Low priority:
 
 ## Example Invocations (REQ Workflow)
 - `/Implement Requirement From Plan REQ-MOVE-001`
-- `/Implement Requirement From Plan REQ-MOVE-002, include terrain cost model + tests`
 - `/Implement Requirement From Plan REQ-MOVE-003, include documentation and traceability update`
 - `/Implement Requirement From Plan REQ-SUP-001, include engine tests and docs updates`
 

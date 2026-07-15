@@ -10,12 +10,13 @@ import game.domain.Unit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
-    private final ScenarioDefinition scenarioDefinition;
+    private final CostAwareMovementResolver movementResolver;
 
     SimultaneousMovePhaseExecutor(ScenarioDefinition scenarioDefinition) {
-        this.scenarioDefinition = scenarioDefinition;
+        this.movementResolver = new CostAwareMovementResolver(scenarioDefinition);
     }
 
     @Override
@@ -31,12 +32,16 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
         List<MovementPlayback> movementPlayback = new ArrayList<>(state.units().size());
         for (Unit unit : state.units()) {
             Order target = moveTargets.get(unit.id());
-            if (target != null && TurnEngine.isValidMove(scenarioDefinition, target.targetX(), target.targetY())) {
-                updatedUnits.add(new Unit(unit.id(), unit.side(), unit.type(), unit.size(), target.targetX(), target.targetY()));
+            Optional<CostAwareMovementResolver.ResolvedMove> resolvedMove = target == null
+                ? Optional.empty()
+                : movementResolver.resolve(unit, target);
+            if (resolvedMove.isPresent()) {
+                TileCoordinate destination = resolvedMove.orElseThrow().destination();
+                updatedUnits.add(new Unit(unit.id(), unit.side(), unit.type(), unit.size(), destination.x(), destination.y()));
                 movementPlayback.add(new MovementPlayback(
                     unit.id(),
                     new TileCoordinate(unit.tileX(), unit.tileY()),
-                    new TileCoordinate(target.targetX(), target.targetY()),
+                    destination,
                     MovementPlaybackOutcome.MOVED
                 ));
             } else {

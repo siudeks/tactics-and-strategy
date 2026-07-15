@@ -58,11 +58,26 @@ Every phase step returns a `PhaseExecution` whose state becomes the next in-sess
 - Input orders are read from the current in-session `pendingOrders` through `OrderBook.activeMoveOrdersByUnit()`.
 - `OrderBook` guarantees a deterministic single active `MOVE` per unit (`last-write-wins` if duplicates exist).
 - For each unit in the in-session `units` list:
-  - If a valid MOVE target exists for that `unit.id`, output unit coordinates become target `(x, y)`.
+  - If a valid MOVE target exists for that `unit.id`, the engine resolves an orthogonal route using terrain-cost-aware shortest-path search.
+  - If a route is found, output unit coordinates become the route destination `(x, y)` from the resolved MOVE order.
   - Otherwise, output unit coordinates remain unchanged.
 - `PhaseStepResult.movementPlayback()` MUST describe the per-unit move/skip outcome for this phase.
 
-#### 4.2.1 Valid MOVE Target Predicate
+#### 4.2.1 Deterministic Tie-Break
+When multiple routes have identical total terrain cost, the resolver MUST pick a deterministic winner by frontier ordering:
+- lower total route cost first,
+- then lower `y`,
+- then lower `x`.
+
+This keeps route choice stable across repeated executions with identical inputs.
+
+#### 4.2.2 Terrain-Cost Model
+Movement cost per orthogonal tile step is derived from scenario default terrain:
+- `SAND` => cost `1`
+- `MOUNTAIN` => cost `3`
+- `VOID`, `WATER` => impassable (no valid route)
+
+#### 4.2.3 Valid MOVE Target Predicate
 `isValidMove(x, y)` is true iff:
 - `x >= 0`
 - `y >= 0`

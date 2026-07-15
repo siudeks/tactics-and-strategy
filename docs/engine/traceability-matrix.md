@@ -21,6 +21,7 @@ Status legend:
 | REQ-ARCH-001 | Dedicated `game.platform` package for libGDX-dependent classes | Implemented | `ArchitecturePackageInfoTest.libGdxDependentClassesMustResideInPlatformOrScreens` | `TacticsGame`, `ScenarioLoader`, and `TerrainTileAtlas` are in `game.platform`, while existing UI classes remain in `game.screens`. |
 | REQ-ARCH-002 | Pure-logic packages isolated from `com.badlogic.gdx.*` with enforced boundary | Implemented | `ArchitecturePackageInfoTest.pureLogicPackagesMustNotDependOnLibGdx`, `ArchitecturePackageInfoTest.libGdxDependentClassesMustResideInPlatformOrScreens` | ArchUnit rules enforce that `game.domain`, `game.engine`, `game.scenario`, and `game.terrain` do not depend on libGDX and keep libGDX-dependent classes in platform/UI layers. |
 | REQ-ARCH-003 | `TerrainMapDefinition` uses domain `RgbaColor` instead of libGDX `Color` | Implemented | `TerrainMapDefinitionTest.constructor_usesImprovedPaletteForSandColor` | `TerrainMapDefinition` now exposes `game.domain.RgbaColor` and carries no `com.badlogic.gdx.*` imports. |
+| REQ-MOVE-002 | Terrain-cost-aware route resolution with deterministic tie-break | Implemented | `CostAwareMovementResolverTest.resolve_withSameDistanceOverDifferentTerrain_assignsDifferentTotalCost`, `CostAwareMovementResolverTest.resolve_equalCostRoute_usesDeterministicTieBreak`, `CostAwareMovementResolverTest.resolve_repeatedRunsReturnIdenticalRouteAndCost`, `MovementPhaseConsumesTargetTest.simulateOneTurn_withAssignedMoveTarget_movesUnitToTarget` | `SimultaneousMovePhaseExecutor` delegates MOVE resolution to `CostAwareMovementResolver`, which computes orthogonal shortest paths with terrain-derived step cost (`SAND=1`, `MOUNTAIN=3`) and deterministic tie-break (`cost`, then `y`, then `x`). |
 | REQ-SUP-001 | Supply continuity and penalties | Not in v1 scope | None | Not implemented in engine runtime. |
 | REQ-STACK-001 | Stacking constraints | Not in v1 scope | None | Not implemented in engine runtime. |
 | REQ-HUD-001 | HUD operational readability | Not in v1 scope | None in this package | UI-specific behavior is outside this engine mechanics package. |
@@ -60,6 +61,7 @@ Status legend:
 - Turn result contract: `core/src/main/java/game/engine/TurnResult.java`
 - Deterministic seed contract: `core/src/main/java/game/engine/DeterministicContext.java`
 - Real-time in-game clock: `core/src/main/java/game/engine/GameClock.java`
+- Cost-aware movement route resolver: `core/src/main/java/game/engine/CostAwareMovementResolver.java`
 - Scenario loading: `core/src/main/java/game/platform/ScenarioLoader.java`
 - Game runtime and order persistence: `core/src/main/java/game/engine/GameRuntime.java`
 - Order persistence model and deterministic overwrite policy: `core/src/main/java/game/domain/OrderBook.java`
