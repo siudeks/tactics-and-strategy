@@ -18,76 +18,76 @@ class ScenarioLoaderTest {
 
     @Test
     void loadBootstrapScenario_returnsNonNull() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertNotNull(loaded);
     }
 
     @Test
     void loadBootstrapScenario_parsesScenarioId() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals("desert-rats-bootstrap", loaded.scenarioDefinition().id());
     }
 
     @Test
     void loadBootstrapScenario_parsesScenarioName() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals("Desert Rats Bootstrap", loaded.scenarioDefinition().name());
     }
 
     @Test
     void loadBootstrapScenario_parsesMapDimensions() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(10, loaded.scenarioDefinition().mapWidth());
         assertEquals(10, loaded.scenarioDefinition().mapHeight());
     }
 
     @Test
     void loadBootstrapScenario_parsesDefaultTerrain() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(TerrainType.SAND, loaded.scenarioDefinition().defaultTerrain());
     }
 
     @Test
     void loadBootstrapScenario_parsesUnitCount() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(4, loaded.scenarioDefinition().units().size());
     }
 
     @Test
     void loadBootstrapScenario_mapsBattalionArmorTypeToLightTank() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(UnitType.LIGHT_TANK, loaded.scenarioDefinition().units().getFirst().type());
     }
 
     @Test
     void loadBootstrapScenario_mapsInfantryTypeToFootInfantry() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(UnitType.FOOT_INFANTRY, loaded.scenarioDefinition().units().get(1).type());
     }
 
     @Test
     void loadOperationCompass_mapsBattalionInfantryTypeToMotorisedInfantry() {
-        LoadedScenario loaded = ScenarioLoader.loadFromResource("scenarios/desert-rats-op-compass.json");
+        var loaded = ScenarioLoader.loadFromResource("scenarios/desert-rats-op-compass.json");
         assertEquals(UnitType.MOTORISED_INFANTRY, loaded.scenarioDefinition().units().getLast().type());
     }
 
     @Test
     void loadBootstrapScenario_parsesActiveSide() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(Side.ALLIES, loaded.campaignState().activeSide());
     }
 
     @Test
     void loadBootstrapScenario_parsesTurnNumber() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         assertEquals(1, loaded.campaignState().turnNumber());
     }
 
         @Test
         void load_rejectsUnitCoordinatesOutsideScenarioBounds() {
-                String json = scenarioJson("invalid-coordinates", 5, 4, 5, -1);
+                var json = scenarioJson("invalid-coordinates", 5, 4, 5, -1);
 
-                IllegalArgumentException exception = assertThrows(
+                var exception = assertThrows(
                         IllegalArgumentException.class,
                         () -> ScenarioLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)))
                 );
@@ -100,9 +100,9 @@ class ScenarioLoaderTest {
 
         @Test
         void load_acceptsUnitCoordinatesWithinScenarioBounds() {
-                String json = scenarioJson("valid-coordinates", 5, 4, 4, 3);
+                var json = scenarioJson("valid-coordinates", 5, 4, 4, 3);
 
-                LoadedScenario loaded = ScenarioLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+                var loaded = ScenarioLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
 
                 assertEquals("valid-coordinates", loaded.scenarioDefinition().id());
                 assertEquals(1, loaded.scenarioDefinition().units().size());
@@ -112,9 +112,9 @@ class ScenarioLoaderTest {
 
             @Test
             void load_rejectsUnitCoordinatesAtUpperYBoundOverflow() {
-                String json = scenarioJson("invalid-upper-y", 5, 4, 0, 4);
+                var json = scenarioJson("invalid-upper-y", 5, 4, 0, 4);
 
-                IllegalArgumentException exception = assertThrows(
+                var exception = assertThrows(
                     IllegalArgumentException.class,
                     () -> ScenarioLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)))
                 );
@@ -127,7 +127,7 @@ class ScenarioLoaderTest {
 
         @Test
         void listAvailableScenarios_allBundledScenarioResourcesLoad() {
-                List<ScenarioEntry> entries = ScenarioLoader.listAvailableScenarios();
+                var entries = ScenarioLoader.listAvailableScenarios();
 
                 assertFalse(entries.isEmpty());
                 for (ScenarioEntry entry : entries) {

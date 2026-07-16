@@ -50,9 +50,9 @@ public final class GameClock {
      * The first in-game day is Day 1, starting at 00:00.
      */
     public String formattedTime() {
-        long totalHours = elapsedHours();
-        long day = totalHours / 24 + 1;
-        long hourOfDay = totalHours % 24;
+        var totalHours = elapsedHours();
+        var day = totalHours / 24 + 1;
+        var hourOfDay = totalHours % 24;
         return String.format("Day %d  %02d:00", day, hourOfDay);
     }
 }

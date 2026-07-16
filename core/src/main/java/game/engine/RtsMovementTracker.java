@@ -24,9 +24,9 @@ final class RtsMovementTracker {
      * at 1 tile per second (Euclidean distance = travel time in seconds).
      */
     void startMovement(String unitId, float fromX, float fromY, int toX, int toY) {
-        float dx = toX - fromX;
-        float dy = toY - fromY;
-        float totalSeconds = (float) Math.sqrt(dx * dx + dy * dy);
+        var dx = toX - fromX;
+        var dy = toY - fromY;
+        var totalSeconds = (float) Math.sqrt(dx * dx + dy * dy);
         entries.put(unitId, new RtsMovementEntry(unitId, fromX, fromY, toX, toY, 0f, totalSeconds));
     }
 
@@ -41,8 +41,8 @@ final class RtsMovementTracker {
         var iter = entries.entrySet().iterator();
         while (iter.hasNext()) {
             var e = iter.next();
-            RtsMovementEntry movement = e.getValue();
-            float newProgress = movement.progressSeconds() + deltaSeconds;
+            var movement = e.getValue();
+            var newProgress = movement.progressSeconds() + deltaSeconds;
             if (newProgress >= movement.totalSeconds()) {
                 arrived.put(movement.unitId(), new int[]{movement.toX(), movement.toY()});
                 iter.remove();
@@ -71,7 +71,7 @@ final class RtsMovementTracker {
      * if the unit has no active movement.
      */
     float @Nullable [] currentPosition(String unitId) {
-        RtsMovementEntry entry = entries.get(unitId);
+        var entry = entries.get(unitId);
         if (entry == null) {
             return null;
         }

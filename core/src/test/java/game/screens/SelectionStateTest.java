@@ -11,7 +11,7 @@ final class SelectionStateTest {
 
     @Test
     void initialState_hasNoSelection_andMoveModeDisabled() {
-        SelectionState state = new SelectionState();
+        var state = new SelectionState();
 
         assertNull(state.selectedUnitId());
         assertFalse(state.isMoveModeActive());
@@ -19,7 +19,7 @@ final class SelectionStateTest {
 
     @Test
     void selectAndEnterMoveMode_entersMoveModeImmediately_andToggleExitsAndReenters() {
-        SelectionState state = new SelectionState();
+        var state = new SelectionState();
         state.selectAndEnterMoveMode("u-1");
         assertTrue(state.isMoveModeActive());
         assertEquals("u-1", state.selectedUnitId());
@@ -35,7 +35,7 @@ final class SelectionStateTest {
 
     @Test
     void toggleMoveMode_withoutSelection_keepsNoSelection() {
-        SelectionState state = new SelectionState();
+        var state = new SelectionState();
 
         state.toggleMoveMode();
 
@@ -45,7 +45,7 @@ final class SelectionStateTest {
 
     @Test
     void clearSelection_resetsStateAndDisablesMoveMode() {
-        SelectionState state = new SelectionState();
+        var state = new SelectionState();
         state.selectAndEnterMoveMode("u-2");
         state.toggleMoveMode();
 
@@ -57,7 +57,7 @@ final class SelectionStateTest {
 
     @Test
     void deactivateMoveMode_keepsSelectedUnit() {
-        SelectionState state = new SelectionState();
+        var state = new SelectionState();
         state.selectAndEnterMoveMode("u-3");
         state.toggleMoveMode();
 

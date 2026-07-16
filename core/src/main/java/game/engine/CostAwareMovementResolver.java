@@ -51,7 +51,7 @@ final class CostAwareMovementResolver {
         if (order.type() != OrderType.MOVE) {
             return Optional.empty();
         }
-        TileCoordinate start = TileCoordinate.of(unit.tileX(), unit.tileY());
+        var start = TileCoordinate.of(unit.tileX(), unit.tileY());
         return resolve(start, order.target());
     }
 
@@ -66,23 +66,23 @@ final class CostAwareMovementResolver {
             return Optional.of(new ResolvedMove(target, 0, List.of(start)));
         }
 
-        int stepCost = terrainStepCost(scenarioDefinition.defaultTerrain());
-        PriorityQueue<FrontierEntry> frontier = new PriorityQueue<>(FRONTIER_ORDER);
-        Map<TileCoordinate, Integer> bestCostByTile = new HashMap<>();
-        Map<TileCoordinate, TileCoordinate> previousByTile = new HashMap<>();
+        var stepCost = terrainStepCost(scenarioDefinition.defaultTerrain());
+        var frontier = new PriorityQueue<FrontierEntry>(FRONTIER_ORDER);
+        var bestCostByTile = new HashMap<TileCoordinate, Integer>();
+        var previousByTile = new HashMap<TileCoordinate, TileCoordinate>();
 
         bestCostByTile.put(start, 0);
         frontier.add(new FrontierEntry(start, 0));
 
         while (!frontier.isEmpty()) {
-            FrontierEntry currentEntry = frontier.poll();
-            Integer knownCost = bestCostByTile.get(currentEntry.tile());
+            var currentEntry = frontier.poll();
+            var knownCost = bestCostByTile.get(currentEntry.tile());
             if (knownCost == null || currentEntry.totalCost() != knownCost) {
                 continue;
             }
 
             for (int[] step : ORTHOGONAL_STEPS) {
-                TileCoordinate neighbour = TileCoordinate.of(
+                var neighbour = TileCoordinate.of(
                     currentEntry.tile().x() + step[0],
                     currentEntry.tile().y() + step[1]
                 );
@@ -90,8 +90,8 @@ final class CostAwareMovementResolver {
                     continue;
                 }
 
-                int candidateCost = currentEntry.totalCost() + stepCost;
-                Integer neighbourCost = bestCostByTile.get(neighbour);
+                var candidateCost = currentEntry.totalCost() + stepCost;
+                var neighbourCost = bestCostByTile.get(neighbour);
                 if (neighbourCost == null || candidateCost < neighbourCost) {
                     bestCostByTile.put(neighbour, candidateCost);
                     previousByTile.put(neighbour, currentEntry.tile());
@@ -107,7 +107,7 @@ final class CostAwareMovementResolver {
             }
         }
 
-        Integer targetCost = bestCostByTile.get(target);
+        var targetCost = bestCostByTile.get(target);
         if (targetCost == null) {
             return Optional.empty();
         }
@@ -119,11 +119,11 @@ final class CostAwareMovementResolver {
         TileCoordinate target,
         Map<TileCoordinate, TileCoordinate> previousByTile
     ) {
-        ArrayDeque<TileCoordinate> reversedRoute = new ArrayDeque<>();
-        TileCoordinate cursor = target;
+        var reversedRoute = new ArrayDeque<TileCoordinate>();
+        var cursor = target;
         reversedRoute.addFirst(cursor);
         while (!cursor.equals(start)) {
-            TileCoordinate predecessor = previousByTile.get(cursor);
+            var predecessor = previousByTile.get(cursor);
             if (predecessor == null) {
                 return List.of();
             }

@@ -23,7 +23,7 @@ class MainMenuScreenFlowTest {
 
     @Test
     void menuMusicSamples_returnsNonEmptyPcmData() {
-        short[] samples = MainMenuScreen.menuMusicSamples(22050);
+        var samples = MainMenuScreen.menuMusicSamples(22050);
 
         assertNotNull(samples);
         assertTrue(samples.length > 0);
@@ -31,7 +31,7 @@ class MainMenuScreenFlowTest {
 
     @Test
     void menuMusicWavBytes_containsWaveHeader() {
-        byte[] wavBytes = MainMenuScreen.menuMusicWavBytes(22050);
+        var wavBytes = MainMenuScreen.menuMusicWavBytes(22050);
 
         assertNotNull(wavBytes);
         assertTrue(wavBytes.length > 44);
@@ -47,16 +47,16 @@ class MainMenuScreenFlowTest {
 
     @Test
     void launchSelected_handsSelectedScenarioToBattlefieldScreen() {
-        RecordingGame game = new RecordingGame();
-        MainMenuScreen menuScreen = new MainMenuScreen(game);
-        List<ScenarioEntry> entries = ScenarioLoader.listAvailableScenarios();
+        var game = new RecordingGame();
+        var menuScreen = new MainMenuScreen(game);
+        var entries = ScenarioLoader.listAvailableScenarios();
 
         injectEntries(menuScreen, entries);
 
         invokeLaunchSelected(menuScreen);
 
-        BattlefieldScreen battlefieldScreen = assertInstanceOf(BattlefieldScreen.class, game.capturedScreen);
-        LoadedScenario loadedScenario = extractLoadedScenario(battlefieldScreen);
+        var battlefieldScreen = assertInstanceOf(BattlefieldScreen.class, game.capturedScreen);
+        var loadedScenario = extractLoadedScenario(battlefieldScreen);
 
         assertEquals(
             entries.getFirst().name(),
@@ -67,20 +67,20 @@ class MainMenuScreenFlowTest {
 
     private static void invokeLaunchSelected(MainMenuScreen menuScreen) {
         try {
-            Method launchSelected = MainMenuScreen.class.getDeclaredMethod("launchSelected");
+            var launchSelected = MainMenuScreen.class.getDeclaredMethod("launchSelected");
             launchSelected.setAccessible(true);
             launchSelected.invoke(menuScreen);
         } catch (NoSuchMethodException | IllegalAccessException exception) {
             fail(exception);
         } catch (InvocationTargetException exception) {
-            Throwable cause = exception.getCause();
+            var cause = exception.getCause();
             fail(cause != null ? cause : exception);
         }
     }
 
     private static void injectEntries(MainMenuScreen menuScreen, List<ScenarioEntry> entries) {
         try {
-            Field entriesField = MainMenuScreen.class.getDeclaredField("entries");
+            var entriesField = MainMenuScreen.class.getDeclaredField("entries");
             entriesField.setAccessible(true);
             entriesField.set(menuScreen, entries);
         } catch (NoSuchFieldException | IllegalAccessException exception) {
@@ -90,7 +90,7 @@ class MainMenuScreenFlowTest {
 
     private static LoadedScenario extractLoadedScenario(BattlefieldScreen battlefieldScreen) {
         try {
-            Field loadedScenarioField = BattlefieldScreen.class.getDeclaredField("loadedScenario");
+            var loadedScenarioField = BattlefieldScreen.class.getDeclaredField("loadedScenario");
             loadedScenarioField.setAccessible(true);
             return (LoadedScenario) loadedScenarioField.get(battlefieldScreen);
         } catch (NoSuchFieldException | IllegalAccessException exception) {

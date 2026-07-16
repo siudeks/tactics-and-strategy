@@ -28,9 +28,9 @@ class BattlefieldScreenRenderingTest {
 
     @Test
     void computeVisibleUnitPlacements_convertsBootstrapUnitsFromTileToScreenCoordinates() {
-        LoadedScenario loadedScenario = ScenarioLoader.loadBootstrapScenario();
+        var loadedScenario = ScenarioLoader.loadBootstrapScenario();
 
-        List<BattlefieldScreen.UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
+        var placements = BattlefieldScreen.computeVisibleUnitPlacements(
             loadedScenario.campaignState(),
             loadedScenario.scenarioDefinition().mapHeight(),
             0f,
@@ -42,7 +42,7 @@ class BattlefieldScreenRenderingTest {
             1f
         );
 
-        Map<String, BattlefieldScreen.UnitRenderPlacement> placementsById = placements.stream()
+        var placementsById = placements.stream()
             .collect(Collectors.toMap(placement -> placement.unit().id(), Function.identity()));
 
         assertEquals(4, placements.size());
@@ -58,14 +58,14 @@ class BattlefieldScreenRenderingTest {
         Map<String, BattlefieldScreen.UnitRenderPlacement> placementsById,
         String unitId
     ) {
-        BattlefieldScreen.UnitRenderPlacement placement = placementsById.get(unitId);
+        var placement = placementsById.get(unitId);
         assertNotNull(placement, "Missing placement for unit: " + unitId);
         return placement;
     }
 
     @Test
     void computeVisibleUnitPlacements_appliesCameraOffsetsAndCullsUnitsOutsideViewport() {
-        CampaignState campaignState = new CampaignState(
+        var campaignState = new CampaignState(
             "test-campaign",
             "test-scenario",
             1,
@@ -77,7 +77,7 @@ class BattlefieldScreenRenderingTest {
             List.of()
         );
 
-        List<BattlefieldScreen.UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
+        var placements = BattlefieldScreen.computeVisibleUnitPlacements(
             campaignState,
             10,
             100f,
@@ -95,9 +95,9 @@ class BattlefieldScreenRenderingTest {
 
     @Test
     void computeVisibleUnitPlacements_usesUpdatedRuntimeCampaignStateAfterTurnSimulation() {
-        GameRuntime runtime = new GameRuntime(loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
+        var runtime = new GameRuntime(loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
 
-        BattlefieldScreen.UnitRenderPlacement initialPlacement = BattlefieldScreen.computeVisibleUnitPlacements(
+        var initialPlacement = BattlefieldScreen.computeVisibleUnitPlacements(
             runtime.getCurrentCampaignState(),
             10,
             0f,
@@ -111,7 +111,7 @@ class BattlefieldScreenRenderingTest {
 
         runtime.simulateOneTurn();
 
-        BattlefieldScreen.UnitRenderPlacement updatedPlacement = BattlefieldScreen.computeVisibleUnitPlacements(
+        var updatedPlacement = BattlefieldScreen.computeVisibleUnitPlacements(
             runtime.getCurrentCampaignState(),
             10,
             0f,
@@ -132,7 +132,7 @@ class BattlefieldScreenRenderingTest {
 
     @Test
     void computeVisibleUnitPlacements_scalesCoordinatesAndSizeForZoom() {
-        CampaignState campaignState = new CampaignState(
+        var campaignState = new CampaignState(
             "test-campaign",
             "test-scenario",
             1,
@@ -141,7 +141,7 @@ class BattlefieldScreenRenderingTest {
             List.of()
         );
 
-        BattlefieldScreen.UnitRenderPlacement placement = BattlefieldScreen.computeVisibleUnitPlacements(
+        var placement = BattlefieldScreen.computeVisibleUnitPlacements(
             campaignState,
             10,
             10f,
@@ -180,9 +180,9 @@ class BattlefieldScreenRenderingTest {
 
     @Test
     void cameraAfterZoom_keepsWorldPointUnderCursorStable() {
-        float cameraAfterZoom = BattlefieldScreen.cameraAfterZoom(40f, 100f, 1f, 2f);
-        float worldBefore = 40f + 100f / 1f;
-        float worldAfter = cameraAfterZoom + 100f / 2f;
+        var cameraAfterZoom = BattlefieldScreen.cameraAfterZoom(40f, 100f, 1f, 2f);
+        var worldBefore = 40f + 100f / 1f;
+        var worldAfter = cameraAfterZoom + 100f / 2f;
 
         assertEquals(worldBefore, worldAfter, 0.0001f);
     }
@@ -199,9 +199,9 @@ class BattlefieldScreenRenderingTest {
 
     @Test
     void isUnitFullyVisibleInViewport_returnsTrue_whenUnitFitsInWorldViewport() {
-        Unit unit = unit("visible", Side.ALLIES, 2, 3);
+        var unit = unit("visible", Side.ALLIES, 2, 3);
 
-        boolean fullyVisible = BattlefieldScreen.isUnitFullyVisibleInViewport(
+        var fullyVisible = BattlefieldScreen.isUnitFullyVisibleInViewport(
             unit,
             10,
             0f,
@@ -216,9 +216,9 @@ class BattlefieldScreenRenderingTest {
 
     @Test
     void isUnitFullyVisibleInViewport_returnsFalse_whenUnitExceedsViewportEdge() {
-        Unit unit = unit("edge", Side.ALLIES, 0, 8);
+        var unit = unit("edge", Side.ALLIES, 0, 8);
 
-        boolean fullyVisible = BattlefieldScreen.isUnitFullyVisibleInViewport(
+        var fullyVisible = BattlefieldScreen.isUnitFullyVisibleInViewport(
             unit,
             10,
             5f,
@@ -261,8 +261,8 @@ class BattlefieldScreenRenderingTest {
                                                                 int startTileY,
                                                                 int targetTileX,
                                                                 int targetTileY) {
-        Unit unit = unit(unitId, Side.ALLIES, startTileX, startTileY);
-        ScenarioDefinition scenarioDefinition = new ScenarioDefinition(
+        var unit = unit(unitId, Side.ALLIES, startTileX, startTileY);
+        var scenarioDefinition = new ScenarioDefinition(
             "render-runtime",
             "Render Runtime",
             10,
@@ -270,7 +270,7 @@ class BattlefieldScreenRenderingTest {
             TerrainType.SAND,
             List.of(unit)
         );
-        CampaignState campaignState = new CampaignState(
+        var campaignState = new CampaignState(
             "test-campaign",
             "render-runtime",
             1,
@@ -287,12 +287,12 @@ class BattlefieldScreenRenderingTest {
         // mapTileAtPanelPoint should give tile (1, 1) back when clicked in that range.
         // Formula: tile worldY range = [(mapH - tileY - 1)*16, (mapH - tileY)*16)
         // For tileY=1, mapH=10: [(10-1-1)*16, (10-1)*16) = [128, 144)
-        int scenarioMapHeight = 10;
-        int scenarioMapWidth = 10;
+        var scenarioMapHeight = 10;
+        var scenarioMapWidth = 10;
 
-        float clickInTile = 136f; // center of tile (tileY=1): (128 + 143) / 2 ≈ 136
+        var clickInTile = 136f; // center of tile (tileY=1): (128 + 143) / 2 ≈ 136
 
-        BattlefieldScreen.TileCoord tile = BattlefieldScreen.mapTileAtPanelPoint(
+        var tile = BattlefieldScreen.mapTileAtPanelPoint(
             16f, clickInTile,
             0f, 0f, 1f,
             scenarioMapWidth, scenarioMapHeight
@@ -309,12 +309,12 @@ class BattlefieldScreenRenderingTest {
     void rtsMovement_unitConvergesOnAssignedTile_afterSufficientTime() {
         // Verify coordinate consistency: clicking in scenario tile (5, 3) must give tileY=3.
         // Tile (5, 3) occupies worldY [(10-3-1)*16, (10-3)*16) = [96, 112).
-        int scenarioMapHeight = 10;
-        int scenarioMapWidth = 10;
+        var scenarioMapHeight = 10;
+        var scenarioMapWidth = 10;
 
-        float clickInTile = 104f; // center of tile tileY=3
+        var clickInTile = 104f; // center of tile tileY=3
 
-        BattlefieldScreen.TileCoord clickedTile = BattlefieldScreen.mapTileAtPanelPoint(
+        var clickedTile = BattlefieldScreen.mapTileAtPanelPoint(
             80f, clickInTile,
             0f, 0f, 1f,
             scenarioMapWidth, scenarioMapHeight

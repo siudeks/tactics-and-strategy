@@ -36,9 +36,9 @@ final class UnitRenderPositionResolver {
             if (!playback.unitId().equals(unit.id()) || !playback.moved()) {
                 continue;
             }
-            float progress = movementState.progress();
-            float tileX = playback.from().x() + (playback.to().x() - playback.from().x()) * progress;
-            float tileY = playback.from().y() + (playback.to().y() - playback.from().y()) * progress;
+            var progress = movementState.progress();
+            var tileX = playback.from().x() + (playback.to().x() - playback.from().x()) * progress;
+            var tileY = playback.from().y() + (playback.to().y() - playback.from().y()) * progress;
             return new RenderTilePosition(tileX, tileY);
         }
         return new RenderTilePosition(unit.tileX(), unit.tileY());

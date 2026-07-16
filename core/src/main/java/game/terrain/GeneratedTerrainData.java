@@ -1277,7 +1277,7 @@ public final class GeneratedTerrainData {
     }
 
     private static short[] createMapTileIds() {
-        short[] data = new short[11859];
+        var data = new short[11859];
         loadMapIds0(data);
         loadMapIds1(data);
         loadMapIds2(data);
@@ -13197,7 +13197,7 @@ public final class GeneratedTerrainData {
     }
 
     private static byte[] createDominantTerrain() {
-        byte[] data = new byte[11859];
+        var data = new byte[11859];
         loadDominantTerrain0(data);
         loadDominantTerrain1(data);
         loadDominantTerrain2(data);

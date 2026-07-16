@@ -25,8 +25,8 @@ class BattlefieldPhasePlaybackControllerTest {
 
     @Test
     void advance_sequencesNotificationsMovementPlaybackAndTurnCompletion() {
-        GameRuntime runtime = new GameRuntime(loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
-        BattlefieldPhasePlaybackController controller = new BattlefieldPhasePlaybackController(1.0f, 0.5f, 0f);
+        var runtime = new GameRuntime(loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
+        var controller = new BattlefieldPhasePlaybackController(1.0f, 0.5f, 0f);
 
         controller.start(runtime);
 
@@ -42,13 +42,13 @@ class BattlefieldPhasePlaybackControllerTest {
 
         controller.advance(runtime, 1.0f);
         assertEquals(InteractionLockState.MOVEMENT_PLAYBACK, controller.interactionLockState());
-        MovementPlaybackRenderState movementState = controller.movementPlaybackRenderState();
+        var movementState = controller.movementPlaybackRenderState();
         assertNotNull(movementState);
         assertTrue(movementState.playback().stream().anyMatch(playback -> playback.unitId().equals("moving-unit") && playback.moved()));
         assertEquals(0f, movementState.progress());
 
         controller.advance(runtime, 0.25f);
-        MovementPlaybackRenderState midPlayback = controller.movementPlaybackRenderState();
+        var midPlayback = controller.movementPlaybackRenderState();
         assertNotNull(midPlayback);
         assertEquals(0.5f, midPlayback.progress(), 0.0001f);
 
@@ -62,8 +62,8 @@ class BattlefieldPhasePlaybackControllerTest {
 
     @Test
     void phaseOverlayRenderContract_isVisibleOnlyDuringPhaseNotifications() {
-        GameRuntime runtime = new GameRuntime(loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
-        BattlefieldPhasePlaybackController controller = new BattlefieldPhasePlaybackController(1.0f, 0.5f, 0f);
+        var runtime = new GameRuntime(loadedScenarioWithPendingMove("moving-unit", 1, 1, 3, 4));
+        var controller = new BattlefieldPhasePlaybackController(1.0f, 0.5f, 0f);
 
         controller.start(runtime);
         controller.advance(runtime, 0f);
@@ -76,7 +76,7 @@ class BattlefieldPhasePlaybackControllerTest {
     }
 
     private static String overlayLabel(BattlefieldPhasePlaybackController controller) {
-        BattlefieldScreen.PhaseOverlayRenderContract renderContract = controller.phaseOverlayRenderContract().orElse(null);
+        var renderContract = controller.phaseOverlayRenderContract().orElse(null);
         assertNotNull(renderContract);
         return renderContract.label();
     }
@@ -86,8 +86,8 @@ class BattlefieldPhasePlaybackControllerTest {
                                                                 int startTileY,
                                                                 int targetTileX,
                                                                 int targetTileY) {
-        Unit unit = new Unit(unitId, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, startTileX, startTileY);
-        ScenarioDefinition scenarioDefinition = new ScenarioDefinition(
+        var unit = new Unit(unitId, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, startTileX, startTileY);
+        var scenarioDefinition = new ScenarioDefinition(
             "controller-runtime",
             "Controller Runtime",
             10,
@@ -95,7 +95,7 @@ class BattlefieldPhasePlaybackControllerTest {
             TerrainType.SAND,
             List.of(unit)
         );
-        CampaignState campaignState = new CampaignState(
+        var campaignState = new CampaignState(
             "test-campaign",
             "controller-runtime",
             1,

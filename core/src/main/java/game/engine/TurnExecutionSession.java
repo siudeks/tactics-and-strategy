@@ -48,13 +48,13 @@ public final class TurnExecutionSession {
         if (isComplete()) {
             throw new IllegalStateException("Turn execution session is already complete");
         }
-        TurnPhase turnPhase = TurnEngine.phaseSequence().get(nextPhaseIndex);
-        PhaseExecution execution = engine.executePhase(turnPhase, currentState);
+        var turnPhase = TurnEngine.phaseSequence().get(nextPhaseIndex);
+        var execution = engine.executePhase(turnPhase, currentState);
         currentState = execution.state();
         phaseTrace.add(turnPhase);
         nextPhaseIndex++;
 
-        Optional<TurnResult> turnResult = Optional.empty();
+        var turnResult = Optional.<TurnResult>empty();
         if (turnPhase == TurnPhase.END_TURN) {
             completedTurnResult = engine.buildTurnResult(currentState, List.copyOf(phaseTrace), startTimeMillis);
             turnResult = Optional.of(completedTurnResult);

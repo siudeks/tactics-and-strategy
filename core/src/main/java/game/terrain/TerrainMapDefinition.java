@@ -52,7 +52,7 @@ public final class TerrainMapDefinition {
     }
 
     private RgbaColor[] buildTerrainColors(int[][] rgb) {
-        RgbaColor[] colors = new RgbaColor[rgb.length];
+        var colors = new RgbaColor[rgb.length];
         for (int i = 0; i < rgb.length; i++) {
             colors[i] = new RgbaColor(rgb[i][0] / 255f, rgb[i][1] / 255f, rgb[i][2] / 255f, 1f);
         }
@@ -75,7 +75,7 @@ public final class TerrainMapDefinition {
         }
 
         for (short mapTileId : mapTileIds) {
-            int tileId = mapTileId & 0xFFFF;
+            var tileId = mapTileId & 0xFFFF;
             if (tileId < 0 || tileId >= uniqueTilePatterns.length) {
                 throw new IllegalStateException("Map references unknown tile id: " + tileId);
             }

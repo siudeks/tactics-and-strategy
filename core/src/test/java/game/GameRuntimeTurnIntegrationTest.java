@@ -41,11 +41,11 @@ class GameRuntimeTurnIntegrationTest {
 
     @Test
     void gameRuntime_currentCampaignState_reflectsPostSimulationState() {
-        CampaignState initialState = runtime.getCurrentCampaignState();
+        var initialState = runtime.getCurrentCampaignState();
 
         runtime.simulateOneTurn();
 
-        CampaignState updatedState = runtime.getCurrentCampaignState();
+        var updatedState = runtime.getCurrentCampaignState();
         assertEquals(1, initialState.turnNumber());
         assertEquals(2, updatedState.turnNumber());
         assertEquals("AXIS", updatedState.activeSide().name());
@@ -56,7 +56,7 @@ class GameRuntimeTurnIntegrationTest {
     void gameRuntime_assignMoveTarget_isAcceptedWhileClockIsAdvancing() {
         // REQ-RTS-003: movement commands must be accepted at any point during real-time play,
         // with no phase gate blocking the assignment.
-        String unitId = runtime.getCurrentCampaignState().units().stream()
+        var unitId = runtime.getCurrentCampaignState().units().stream()
             .filter(u -> u.side().name().equals("ALLIES"))
             .findFirst()
             .map(game.domain.Unit::id)
@@ -66,19 +66,19 @@ class GameRuntimeTurnIntegrationTest {
         runtime.assignMoveTarget(unitId, 2, 3);
         runtime.advanceClock(0.5f);
 
-        boolean orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
+        var orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
             .anyMatch(o -> o.unitId().equals(unitId) && o.type() == game.domain.OrderType.MOVE);
         assertTrue(orderPresent, "MOVE order should persist after clock advances");
     }
 
     @Test
     void gameRuntime_assignMoveTargetOrder_persistsOrderWithoutStartingProjection() {
-        String unitId = firstAlliesUnitId();
-        game.domain.Unit unit = findUnit(unitId);
+        var unitId = firstAlliesUnitId();
+        var unit = findUnit(unitId);
 
         var outcome = runtime.assignMoveTargetOrder(unitId, unit.tileX() + 2, unit.tileY());
 
-        boolean orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
+        var orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
             .anyMatch(o -> o.unitId().equals(unitId) && o.type() == game.domain.OrderType.MOVE);
         assertAll(
             () -> assertEquals(game.engine.MoveCommandOutcome.ACCEPTED, outcome.outcome()),
@@ -90,11 +90,11 @@ class GameRuntimeTurnIntegrationTest {
 
     @Test
     void gameRuntime_projectMoveTarget_startsProjectionWithoutMutatingPendingOrders() {
-        String unitId = firstAlliesUnitId();
-        game.domain.Unit unit = findUnit(unitId);
-        int ordersBefore = runtime.getCurrentCampaignState().pendingOrders().size();
+        var unitId = firstAlliesUnitId();
+        var unit = findUnit(unitId);
+        var ordersBefore = runtime.getCurrentCampaignState().pendingOrders().size();
 
-        boolean projected = runtime.projectMoveTarget(unitId, unit.tileX() + 2, unit.tileY());
+        var projected = runtime.projectMoveTarget(unitId, unit.tileX() + 2, unit.tileY());
 
         assertAll(
             () -> assertTrue(projected, "Known unit should start projection"),
@@ -108,8 +108,8 @@ class GameRuntimeTurnIntegrationTest {
     @Test
     void rtsMovement_assignTarget_immediatelyAppearsInRtsPositions() {
         // REQ-RTS-MOVE-001: unit movement starts immediately on target assignment
-        String unitId = firstAlliesUnitId();
-        game.domain.Unit unit = findUnit(unitId);
+        var unitId = firstAlliesUnitId();
+        var unit = findUnit(unitId);
 
         runtime.assignMoveTarget(unitId, unit.tileX() + 4, unit.tileY());
 
@@ -120,14 +120,14 @@ class GameRuntimeTurnIntegrationTest {
     @Test
     void rtsMovement_afterAdvanceMovements_positionChanges() {
         // REQ-RTS-MOVE-001: unit moves toward target as time passes
-        String unitId = firstAlliesUnitId();
-        game.domain.Unit unit = findUnit(unitId);
-        int targetX = unit.tileX() + 4; // 4 tiles away → totalSeconds = 4.0
+        var unitId = firstAlliesUnitId();
+        var unit = findUnit(unitId);
+        var targetX = unit.tileX() + 4; // 4 tiles away → totalSeconds = 4.0
         runtime.assignMoveTarget(unitId, targetX, unit.tileY());
 
         runtime.advanceMovements(1f); // 1 second → 25% of the way
 
-        float[] pos = runtime.rtsMovementPositions().get(unitId);
+        var pos = runtime.rtsMovementPositions().get(unitId);
         assertNotNull(pos, "Unit should still be moving after 1s (out of 4s)");
         assertEquals(unit.tileX() + 1f, pos[0], 0.0001f, "Unit should be 1 tile closer to target");
     }
@@ -135,14 +135,14 @@ class GameRuntimeTurnIntegrationTest {
     @Test
     void rtsMovement_whenClockPaused_positionDoesNotChange() {
         // REQ-RTS-MOVE-002: movement pauses when game clock is paused
-        String unitId = firstAlliesUnitId();
-        game.domain.Unit unit = findUnit(unitId);
+        var unitId = firstAlliesUnitId();
+        var unit = findUnit(unitId);
         runtime.assignMoveTarget(unitId, unit.tileX() + 4, unit.tileY());
         runtime.togglePause();
 
         runtime.advanceMovements(2f); // 2 seconds while paused
 
-        float[] pos = runtime.rtsMovementPositions().get(unitId);
+        var pos = runtime.rtsMovementPositions().get(unitId);
         assertNotNull(pos, "Unit should still have active movement");
         assertEquals(unit.tileX(), pos[0], 0.0001f, "Position should not change while paused");
     }
@@ -150,15 +150,15 @@ class GameRuntimeTurnIntegrationTest {
     @Test
     void rtsMovement_unitArrivesAtTarget_campaignStateUpdated() {
         // REQ-RTS-MOVE-001: arrived unit's campaign-state position is updated
-        String unitId = firstAlliesUnitId();
-        game.domain.Unit unit = findUnit(unitId);
-        int targetX = unit.tileX() + 2;
-        int targetY = unit.tileY() + 0;
+        var unitId = firstAlliesUnitId();
+        var unit = findUnit(unitId);
+        var targetX = unit.tileX() + 2;
+        var targetY = unit.tileY() + 0;
         runtime.assignMoveTarget(unitId, targetX, targetY);
 
         runtime.advanceMovements(10f); // well beyond travel time
 
-        game.domain.Unit arrived = runtime.getCurrentCampaignState().units().stream()
+        var arrived = runtime.getCurrentCampaignState().units().stream()
             .filter(u -> u.id().equals(unitId))
             .findFirst()
             .orElseThrow();

@@ -38,28 +38,28 @@ public final class TerrainTileAtlas implements Disposable {
             atlasTexture.dispose();
         }
 
-        int rows = (tileCount + columns - 1) / columns;
+        var rows = (tileCount + columns - 1) / columns;
 
-        Pixmap atlas = new Pixmap(columns * SOURCE_TILE_SIZE, rows * SOURCE_TILE_SIZE, Pixmap.Format.RGBA8888);
+        var atlas = new Pixmap(columns * SOURCE_TILE_SIZE, rows * SOURCE_TILE_SIZE, Pixmap.Format.RGBA8888);
         atlas.setColor(0f, 0f, 0f, 0f);
         atlas.fill();
 
         for (int tileId = 0; tileId < tileCount; tileId++) {
-            byte[] pattern = mapDefinition.getTilePattern(tileId);
-            int atlasX = regionX[tileId];
-            int atlasY = regionY[tileId];
+            var pattern = mapDefinition.getTilePattern(tileId);
+            var atlasX = regionX[tileId];
+            var atlasY = regionY[tileId];
 
             for (int y = 0; y < SOURCE_TILE_SIZE; y++) {
                 for (int x = 0; x < SOURCE_TILE_SIZE; x++) {
-                    int terrainCode = pattern[y * SOURCE_TILE_SIZE + x] & 0xFF;
+                    var terrainCode = pattern[y * SOURCE_TILE_SIZE + x] & 0xFF;
                     if (terrainCode == GeneratedTerrainData.TERRAIN_VOID) {
                         atlas.drawPixel(atlasX + x, atlasY + y, 0x00000000);
                         continue;
                     }
 
                     // Pixmap RGBA8888 expects RGBA-packed int, not ABGR.
-                    RgbaColor terrainColor = mapDefinition.getTerrainColor(terrainCode);
-                    int packedColor = com.badlogic.gdx.graphics.Color.rgba8888(
+                    var terrainColor = mapDefinition.getTerrainColor(terrainCode);
+                    var packedColor = com.badlogic.gdx.graphics.Color.rgba8888(
                         terrainColor.r(),
                         terrainColor.g(),
                         terrainColor.b(),

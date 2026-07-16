@@ -17,10 +17,10 @@ class GameRuntimeTurnSessionTest {
 
     @Test
     void beginTurnExecution_advancesStepwise_andCommitsOnlyAfterEndTurn() {
-        GameRuntime runtime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
+        var runtime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
         var initialState = runtime.getCurrentCampaignState();
 
-        TurnExecutionSession session = runtime.beginTurnExecution();
+        var session = runtime.beginTurnExecution();
         assertEquals(RuntimePhase.ISSUE_ORDERS, session.currentPhase());
         assertEquals(1, runtime.getTurnNumber());
         assertFalse(session.isComplete());

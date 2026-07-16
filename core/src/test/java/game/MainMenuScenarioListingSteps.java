@@ -36,7 +36,7 @@ public class MainMenuScenarioListingSteps {
     public void allAvailableScenariosShouldBeShownInOrder() {
         var expectedLines = new ArrayList<String>(availableScenarios.size());
         for (int i = 0; i < availableScenarios.size(); i++) {
-            ScenarioEntry entry = availableScenarios.get(i);
+            var entry = availableScenarios.get(i);
             expectedLines.add((i + 1) + ") " + entry.name().toUpperCase(Locale.ROOT));
         }
 

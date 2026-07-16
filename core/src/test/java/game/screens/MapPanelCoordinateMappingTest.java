@@ -10,7 +10,7 @@ class MapPanelCoordinateMappingTest {
 
     @Test
     void scenarioTileFromTerrainTile_returnsNull_whenTerrainTileIsNull() {
-        BattlefieldScreen.TileCoord result = MapPanel.scenarioTileFromTerrainTile(
+        var result = MapPanel.scenarioTileFromTerrainTile(
             null,
             201,
             59,
@@ -22,7 +22,7 @@ class MapPanelCoordinateMappingTest {
 
     @Test
     void scenarioTileFromTerrainTile_keepsRightSideOfVisibleMapClickable() {
-        BattlefieldScreen.TileCoord result = MapPanel.scenarioTileFromTerrainTile(
+        var result = MapPanel.scenarioTileFromTerrainTile(
             new BattlefieldScreen.TileCoord(180, 52),
             201,
             59,
@@ -35,7 +35,7 @@ class MapPanelCoordinateMappingTest {
 
     @Test
     void scenarioTileFromTerrainTile_acceptsRowsAboveScenarioBand() {
-        BattlefieldScreen.TileCoord result = MapPanel.scenarioTileFromTerrainTile(
+        var result = MapPanel.scenarioTileFromTerrainTile(
             new BattlefieldScreen.TileCoord(50, 20),
             201,
             59,
@@ -49,7 +49,7 @@ class MapPanelCoordinateMappingTest {
 
     @Test
     void scenarioTileFromTerrainTile_returnsNull_whenXOutsideTerrainWidth() {
-        BattlefieldScreen.TileCoord result = MapPanel.scenarioTileFromTerrainTile(
+        var result = MapPanel.scenarioTileFromTerrainTile(
             new BattlefieldScreen.TileCoord(250, 40),
             201,
             59,

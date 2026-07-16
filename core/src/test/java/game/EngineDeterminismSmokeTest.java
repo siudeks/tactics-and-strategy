@@ -14,30 +14,30 @@ class EngineDeterminismSmokeTest {
 
     @Test
     void determinism_sameInputProducesSameCanonicalSnapshot() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
-        CampaignState state = loaded.campaignState();
-        DeterministicContext ctx = DeterministicContext.withSeed(0L);
+        var loaded = ScenarioLoader.loadBootstrapScenario();
+        var state = loaded.campaignState();
+        var ctx = DeterministicContext.withSeed(0L);
 
-        TurnEngine engine1 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
-        TurnEngine engine2 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
+        var engine1 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
+        var engine2 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
 
-        TurnResult result1 = engine1.runOneTurn(state);
-        TurnResult result2 = engine2.runOneTurn(state);
+        var result1 = engine1.runOneTurn(state);
+        var result2 = engine2.runOneTurn(state);
 
         assertEquals(result1.canonicalSnapshot(), result2.canonicalSnapshot());
     }
 
     @Test
     void determinism_areSemanticallyEquivalent_returnsTrueForIdenticalResults() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
-        CampaignState state = loaded.campaignState();
-        DeterministicContext ctx = DeterministicContext.withSeed(0L);
+        var loaded = ScenarioLoader.loadBootstrapScenario();
+        var state = loaded.campaignState();
+        var ctx = DeterministicContext.withSeed(0L);
 
-        TurnEngine engine1 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
-        TurnEngine engine2 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
+        var engine1 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
+        var engine2 = TurnEngine.fixedContext(ctx, loaded.scenarioDefinition());
 
-        TurnResult result1 = engine1.runOneTurn(state);
-        TurnResult result2 = engine2.runOneTurn(state);
+        var result1 = engine1.runOneTurn(state);
+        var result2 = engine2.runOneTurn(state);
 
         assertTrue(TurnEngine.areSemanticallyEquivalent(result1, result2));
     }

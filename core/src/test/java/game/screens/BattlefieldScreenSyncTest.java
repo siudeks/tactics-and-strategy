@@ -48,7 +48,7 @@ class BattlefieldScreenSyncTest {
 
     @Test
     void syncUnitInfoPanel_showsUnitAndSetsId_whenUnitSelected() {
-        FakeView view = new FakeView();
+        var view = new FakeView();
 
         BattlefieldScreen.syncUnitInfoPanel("tank-1", view);
 
@@ -58,7 +58,7 @@ class BattlefieldScreenSyncTest {
 
     @Test
     void syncUnitInfoPanel_hidesSection_whenNoUnitSelected() {
-        FakeView view = new FakeView();
+        var view = new FakeView();
         view.showUnit("tank-1");  // precondition: was visible
 
         BattlefieldScreen.syncUnitInfoPanel(null, view);
@@ -69,7 +69,7 @@ class BattlefieldScreenSyncTest {
 
     @Test
     void syncUnitInfoPanel_updatesId_whenSelectionChanges() {
-        FakeView view = new FakeView();
+        var view = new FakeView();
 
         BattlefieldScreen.syncUnitInfoPanel("unit-A", view);
         assertEquals("unit-A", view.shownId);
@@ -125,14 +125,14 @@ class BattlefieldScreenSyncTest {
     }
 
     private static void invokeEndTurn(BattlefieldScreen screen) throws ReflectiveOperationException {
-        Method endTurn = BattlefieldScreen.class.getDeclaredMethod("endTurn");
+        var endTurn = BattlefieldScreen.class.getDeclaredMethod("endTurn");
         endTurn.setAccessible(true);
         endTurn.invoke(screen);
     }
 
     private static <T> T readField(Object target, String fieldName, Class<T> fieldType) {
         try {
-            Field field = target.getClass().getDeclaredField(fieldName);
+            var field = target.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
             return fieldType.cast(field.get(target));
         } catch (ReflectiveOperationException exception) {
@@ -142,7 +142,7 @@ class BattlefieldScreenSyncTest {
 
     private static void setField(Object target, String fieldName, Object value) {
         try {
-            Field field = target.getClass().getDeclaredField(fieldName);
+            var field = target.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
             field.set(target, value);
         } catch (ReflectiveOperationException exception) {
@@ -155,8 +155,8 @@ class BattlefieldScreenSyncTest {
                                                                 int startTileY,
                                                                 int targetTileX,
                                                                 int targetTileY) {
-        Unit unit = new Unit(unitId, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, startTileX, startTileY);
-        ScenarioDefinition scenarioDefinition = new ScenarioDefinition(
+        var unit = new Unit(unitId, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, startTileX, startTileY);
+        var scenarioDefinition = new ScenarioDefinition(
             "screen-runtime",
             "Screen Runtime",
             10,
@@ -164,7 +164,7 @@ class BattlefieldScreenSyncTest {
             TerrainType.SAND,
             List.of(unit)
         );
-        CampaignState campaignState = new CampaignState(
+        var campaignState = new CampaignState(
             "test-campaign",
             "screen-runtime",
             1,

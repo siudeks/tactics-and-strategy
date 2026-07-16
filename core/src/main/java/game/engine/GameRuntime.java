@@ -33,7 +33,7 @@ public final class GameRuntime {
 
     public GameRuntime(LoadedScenario loadedScenario) {
         this.loadedScenario = Objects.requireNonNull(loadedScenario, "loadedScenario must not be null");
-        DeterministicContext ctx = DeterministicContext.withSeed(0L);
+        var ctx = DeterministicContext.withSeed(0L);
         this.engine = TurnEngine.fixedContext(ctx, loadedScenario.scenarioDefinition());
         this.gameClock = new GameClock();
     }
@@ -50,7 +50,7 @@ public final class GameRuntime {
         if (activeTurnExecution == null) {
             throw new IllegalStateException("No active turn execution");
         }
-        PhaseStepResult stepResult = activeTurnExecution.advance();
+        var stepResult = activeTurnExecution.advance();
         if (stepResult.completedTurnResult().isPresent()) {
             loadedScenario = new LoadedScenario(
                 loadedScenario.scenarioDefinition(),
@@ -130,7 +130,7 @@ public final class GameRuntime {
     }
 
     public MoveCommandResult assignMoveTarget(String unitId, int tileX, int tileY) {
-        MoveCommandResult commandResult = assignMoveTargetOrder(unitId, tileX, tileY);
+        var commandResult = assignMoveTargetOrder(unitId, tileX, tileY);
         if (commandResult.outcome() != MoveCommandOutcome.UNKNOWN_UNIT) {
             projectMoveTarget(unitId, tileX, tileY);
         }
@@ -143,15 +143,15 @@ public final class GameRuntime {
      */
     public MoveCommandResult assignMoveTargetOrder(String unitId, int tileX, int tileY) {
         Objects.requireNonNull(unitId, "unitId");
-        CampaignState state = currentCampaignState();
-        Unit unit = findUnit(state, unitId);
+        var state = currentCampaignState();
+        var unit = findUnit(state, unitId);
         if (unit == null) {
             return new MoveCommandResult(MoveCommandOutcome.UNKNOWN_UNIT);
         }
-        TileCoordinate target = TileCoordinate.of(tileX, tileY);
-        OrderBook.MoveUpsertResult upsert = new OrderBook(state.pendingOrders())
+        var target = TileCoordinate.of(tileX, tileY);
+        var upsert = new OrderBook(state.pendingOrders())
             .upsertMove(unitId, unit.side(), target);
-        CampaignState updated = new CampaignState(
+        var updated = new CampaignState(
             state.campaignId(),
             state.scenarioId(),
             state.turnNumber(),
@@ -173,14 +173,14 @@ public final class GameRuntime {
      */
     public boolean projectMoveTarget(String unitId, int tileX, int tileY) {
         Objects.requireNonNull(unitId, "unitId");
-        CampaignState state = currentCampaignState();
-        Unit unit = findUnit(state, unitId);
+        var state = currentCampaignState();
+        var unit = findUnit(state, unitId);
         if (unit == null) {
             return false;
         }
         float @Nullable [] existingPos = rtsMovementTracker.currentPosition(unitId);
-        float fromX = existingPos != null ? existingPos[0] : unit.tileX();
-        float fromY = existingPos != null ? existingPos[1] : unit.tileY();
+        var fromX = existingPos != null ? existingPos[0] : unit.tileX();
+        var fromY = existingPos != null ? existingPos[1] : unit.tileY();
         rtsMovementTracker.startMovement(unitId, fromX, fromY, tileX, tileY);
         return true;
     }
@@ -196,14 +196,14 @@ public final class GameRuntime {
         if (gameClock.isPaused() || activeTurnExecution != null) {
             return;
         }
-        Map<String, int[]> arrived = rtsMovementTracker.advance(deltaSeconds);
+        var arrived = rtsMovementTracker.advance(deltaSeconds);
         if (arrived.isEmpty()) {
             return;
         }
-        CampaignState state = currentCampaignState();
-        List<Unit> updatedUnits = new ArrayList<>(state.units().size());
+        var state = currentCampaignState();
+        var updatedUnits = new ArrayList<Unit>(state.units().size());
         for (Unit u : state.units()) {
-            int[] destination = arrived.get(u.id());
+            var destination = arrived.get(u.id());
             if (destination != null) {
                 updatedUnits.add(new Unit(u.id(), u.side(), u.type(), u.size(), destination[0], destination[1]));
             } else {

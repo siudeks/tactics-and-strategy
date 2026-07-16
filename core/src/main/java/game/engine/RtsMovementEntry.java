@@ -31,7 +31,7 @@ record RtsMovementEntry(
         if (totalSeconds == 0f) {
             return toX;
         }
-        float t = Math.min(progressSeconds / totalSeconds, 1f);
+        var t = Math.min(progressSeconds / totalSeconds, 1f);
         return fromX + (toX - fromX) * t;
     }
 
@@ -40,7 +40,7 @@ record RtsMovementEntry(
         if (totalSeconds == 0f) {
             return toY;
         }
-        float t = Math.min(progressSeconds / totalSeconds, 1f);
+        var t = Math.min(progressSeconds / totalSeconds, 1f);
         return fromY + (toY - fromY) * t;
     }
 

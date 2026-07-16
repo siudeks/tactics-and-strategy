@@ -15,7 +15,7 @@ public enum UnitType {
     HQ;
 
     public static UnitType fromScenarioValue(String value) {
-        String normalized = value.trim()
+        var normalized = value.trim()
             .toUpperCase(Locale.ROOT)
             .replace(' ', '_')
             .replace('-', '_');

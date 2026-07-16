@@ -76,7 +76,7 @@ public class MainMenuScreen extends ScreenAdapter {
                     launchSelected();
                     return true;
                 }
-                int digit = keycode - Input.Keys.NUM_1;
+                var digit = keycode - Input.Keys.NUM_1;
                 if (digit >= 0 && digit < entries.size()) {
                     selectedIndex = digit;
                     launchSelected();
@@ -88,7 +88,7 @@ public class MainMenuScreen extends ScreenAdapter {
     }
 
     private void launchSelected() {
-        ScenarioEntry entry = entries.get(selectedIndex);
+        var entry = entries.get(selectedIndex);
         stopMenuMusic();
         game.setScreen(new BattlefieldScreen(game, ScenarioLoader.loadFromResource(entry.resourcePath())));
     }
@@ -97,8 +97,8 @@ public class MainMenuScreen extends ScreenAdapter {
     public void render(float delta) {
         ScreenUtils.clear(BG);
 
-        float screenHeight = Gdx.graphics.getHeight();
-        float y = screenHeight - 40f;
+        var screenHeight = Gdx.graphics.getHeight();
+        var y = screenHeight - 40f;
 
         batch.begin();
 
@@ -115,7 +115,7 @@ public class MainMenuScreen extends ScreenAdapter {
         y -= LINE_HEIGHT * 1.2f;
 
         for (int i = 0; i < entries.size(); i++) {
-            String line = menuScenarioLine(i, entries.get(i));
+            var line = menuScenarioLine(i, entries.get(i));
             font.setColor(i == selectedIndex ? COLOR_HIGHLIGHT : COLOR_ITEM);
             font.draw(batch, line, MARGIN_LEFT, y);
             y -= LINE_HEIGHT;
@@ -152,13 +152,13 @@ public class MainMenuScreen extends ScreenAdapter {
             return;
         }
 
-        int requestId = menuMusicLoadGeneration;
+        var requestId = menuMusicLoadGeneration;
         AsyncAudio.runOnAudioIoThread(() -> prepareMenuMusicFile(requestId));
     }
 
     private void prepareMenuMusicFile(int requestId) {
         try {
-            Path preparedMusicFile = Files.createTempFile("tactics-and-strategy-menu-music", ".wav");
+            var preparedMusicFile = Files.createTempFile("tactics-and-strategy-menu-music", ".wav");
             Files.write(preparedMusicFile, MENU_MUSIC_WAV_BYTES);
             AsyncAudio.runOnAppThread(Gdx.app,
                 () -> initializePreparedMenuMusic(requestId, preparedMusicFile));
@@ -184,8 +184,8 @@ public class MainMenuScreen extends ScreenAdapter {
         }
 
         try {
-            FileHandle fileHandle = Gdx.files.absolute(preparedMusicFile.toString());
-            Music preparedMusic = audio.newMusic(fileHandle);
+            var fileHandle = Gdx.files.absolute(preparedMusicFile.toString());
+            var preparedMusic = audio.newMusic(fileHandle);
             preparedMusic.setLooping(true);
             preparedMusic.setVolume(MENU_MUSIC_VOLUME);
             if (requestId != menuMusicLoadGeneration) {
@@ -231,25 +231,25 @@ public class MainMenuScreen extends ScreenAdapter {
     }
 
     static short[] menuMusicSamples(int sampleRateHz) {
-        int[] noteDurationsMs = {180, 180, 180, 220, 180, 180, 180, 320};
-        float[] noteFrequenciesHz = {392f, 493.88f, 587.33f, 659.25f, 587.33f, 493.88f, 440f, 392f};
-        int totalSamples = 0;
+        var noteDurationsMs = new int[] {180, 180, 180, 220, 180, 180, 180, 320};
+        var noteFrequenciesHz = new float[] {392f, 493.88f, 587.33f, 659.25f, 587.33f, 493.88f, 440f, 392f};
+        var totalSamples = 0;
         for (int noteDurationMs : noteDurationsMs) {
             totalSamples += Math.max(1, sampleRateHz * noteDurationMs / 1000);
         }
 
-        short[] samples = new short[totalSamples];
-        int sampleOffset = 0;
+        var samples = new short[totalSamples];
+        var sampleOffset = 0;
         for (int noteIndex = 0; noteIndex < noteDurationsMs.length; noteIndex++) {
-            int noteSampleCount = Math.max(1, sampleRateHz * noteDurationsMs[noteIndex] / 1000);
-            float frequencyHz = noteFrequenciesHz[noteIndex];
+            var noteSampleCount = Math.max(1, sampleRateHz * noteDurationsMs[noteIndex] / 1000);
+            var frequencyHz = noteFrequenciesHz[noteIndex];
             for (int i = 0; i < noteSampleCount; i++) {
-                float progress = (float) i / (float) noteSampleCount;
-                float attack = Math.min(1f, progress * 12f);
-                float release = Math.min(1f, (1f - progress) * 12f);
-                float envelope = Math.min(attack, release);
-                double phase = 2d * Math.PI * frequencyHz * i / sampleRateHz;
-                float value = (float) Math.sin(phase) * envelope * MENU_MUSIC_VOLUME;
+                var progress = (float) i / (float) noteSampleCount;
+                var attack = Math.min(1f, progress * 12f);
+                var release = Math.min(1f, (1f - progress) * 12f);
+                var envelope = Math.min(attack, release);
+                var phase = 2d * Math.PI * frequencyHz * i / sampleRateHz;
+                var value = (float) Math.sin(phase) * envelope * MENU_MUSIC_VOLUME;
                 samples[sampleOffset + i] = (short) (value * Short.MAX_VALUE);
             }
             sampleOffset += noteSampleCount;
@@ -258,8 +258,8 @@ public class MainMenuScreen extends ScreenAdapter {
     }
 
     static byte[] menuMusicWavBytes(int sampleRateHz) {
-        short[] samples = menuMusicSamples(sampleRateHz);
-        int dataSize = samples.length * Short.BYTES;
+        var samples = menuMusicSamples(sampleRateHz);
+        var dataSize = samples.length * Short.BYTES;
 
         try (var outputStream = new ByteArrayOutputStream(44 + dataSize)) {
             writeAscii(outputStream, "RIFF");

@@ -14,16 +14,16 @@ class BattlefieldScreenRuntimeAdapterIntegrationTest {
 
     @BeforeAll
     static void initGdx() {
-        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
+        var config = new HeadlessApplicationConfiguration();
         config.updatesPerSecond = -1;
         new HeadlessApplication(new ApplicationAdapter() {}, config);
     }
 
     @Test
     void runtimeAdapter_statusBarFormat_matchesSpec() {
-        GameRuntime runtime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
-        String scenarioId = "desert-rats-bootstrap";
-        String statusText = String.format("Scenariusz: %s | Tura: %d | Strona aktywna: %s",
+        var runtime = new GameRuntime(ScenarioLoader.loadBootstrapScenario());
+        var scenarioId = "desert-rats-bootstrap";
+        var statusText = String.format("Scenariusz: %s | Tura: %d | Strona aktywna: %s",
             scenarioId,
             runtime.getTurnNumber(),
             runtime.getActiveSideCode());

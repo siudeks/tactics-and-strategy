@@ -11,7 +11,7 @@ class MapPanelEnterIssuingOrdersTest {
 
     @Test
     void enterIssuingOrdersOutcome_returnsNoProgress_whenCurrentCommandSideIsIncomplete() {
-        MapPanel.EnterIssuingOrdersOutcome outcome = MapPanel.enterIssuingOrdersOutcome(
+        var outcome = MapPanel.enterIssuingOrdersOutcome(
             false,
             Side.ALLIES,
             Side.ALLIES
@@ -22,7 +22,7 @@ class MapPanelEnterIssuingOrdersTest {
 
     @Test
     void enterIssuingOrdersOutcome_switchesCommandSide_whenCurrentSideIsCompleteAndMatchesInitialActiveSide() {
-        MapPanel.EnterIssuingOrdersOutcome outcome = MapPanel.enterIssuingOrdersOutcome(
+        var outcome = MapPanel.enterIssuingOrdersOutcome(
             true,
             Side.ALLIES,
             Side.ALLIES
@@ -33,7 +33,7 @@ class MapPanelEnterIssuingOrdersTest {
 
     @Test
     void enterIssuingOrdersOutcome_endsTurn_whenCurrentSideIsCompleteAndIsSecondCommandSide() {
-        MapPanel.EnterIssuingOrdersOutcome outcome = MapPanel.enterIssuingOrdersOutcome(
+        var outcome = MapPanel.enterIssuingOrdersOutcome(
             true,
             Side.AXIS,
             Side.ALLIES
@@ -44,8 +44,8 @@ class MapPanelEnterIssuingOrdersTest {
 
     @Test
     void applyEnterIssuingOrdersOutcome_doesNotInvokeCallbacks_whenOutcomeIsNoProgress() {
-        AtomicInteger sideSwitchCalls = new AtomicInteger();
-        AtomicInteger endTurnCalls = new AtomicInteger();
+        var sideSwitchCalls = new AtomicInteger();
+        var endTurnCalls = new AtomicInteger();
 
         MapPanel.applyEnterIssuingOrdersOutcome(
             MapPanel.EnterIssuingOrdersOutcome.NO_PROGRESS,
@@ -59,8 +59,8 @@ class MapPanelEnterIssuingOrdersTest {
 
     @Test
     void applyEnterIssuingOrdersOutcome_invokesOnlySideSwitch_whenOutcomeIsSwitchCommandSide() {
-        AtomicInteger sideSwitchCalls = new AtomicInteger();
-        AtomicInteger endTurnCalls = new AtomicInteger();
+        var sideSwitchCalls = new AtomicInteger();
+        var endTurnCalls = new AtomicInteger();
 
         MapPanel.applyEnterIssuingOrdersOutcome(
             MapPanel.EnterIssuingOrdersOutcome.SWITCH_COMMAND_SIDE,
@@ -74,8 +74,8 @@ class MapPanelEnterIssuingOrdersTest {
 
     @Test
     void applyEnterIssuingOrdersOutcome_invokesOnlyEndTurn_whenOutcomeIsEndTurn() {
-        AtomicInteger sideSwitchCalls = new AtomicInteger();
-        AtomicInteger endTurnCalls = new AtomicInteger();
+        var sideSwitchCalls = new AtomicInteger();
+        var endTurnCalls = new AtomicInteger();
 
         MapPanel.applyEnterIssuingOrdersOutcome(
             MapPanel.EnterIssuingOrdersOutcome.END_TURN,

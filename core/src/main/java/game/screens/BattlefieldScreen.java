@@ -118,16 +118,16 @@ public class BattlefieldScreen extends ScreenAdapter {
         var icons = Objects.requireNonNull(unitIconTextures, "unitIconTextures must be initialized");
         var unidentifiedIcon = Objects.requireNonNull(unidentifiedIconTexture, "unidentifiedIconTexture must be initialized");
 
-        TextureRegionDrawable base = new TextureRegionDrawable(new TextureRegion(whiteTexture));
-        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        var base = new TextureRegionDrawable(new TextureRegion(whiteTexture));
+        var labelStyle = new Label.LabelStyle(font, Color.WHITE);
+        var buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = base.tint(Color.valueOf("3D4450"));
         buttonStyle.down = base.tint(Color.valueOf("2C323B"));
         buttonStyle.over = base.tint(Color.valueOf("4A5362"));
         buttonStyle.font = font;
         buttonStyle.fontColor = Color.WHITE;
 
-        Table root = new Table();
+        var root = new Table();
         root.setFillParent(true);
 
         mapPanel = new MapPanel(
@@ -149,14 +149,14 @@ public class BattlefieldScreen extends ScreenAdapter {
             unidentifiedIcon
         );
 
-        Table topArea = new Table();
+        var topArea = new Table();
         topArea.add(mapPanel).grow().pad(8f);
         timeLabel = new Label(gameRuntime.formattedInGameTime(), labelStyle);
         topArea.add(createCommandPanel(labelStyle, buttonStyle, base.tint(PANEL_BG), mapPanel)).width(300f).growY().pad(8f, 0f, 8f, 8f);
 
         statusLabel = new Label(runtimeStatusSummary(), labelStyle);
         statusLabel.setAlignment(1);
-        Table statusBar = new Table();
+        var statusBar = new Table();
         statusBar.setBackground(base.tint(STATUS_BG));
         statusBar.add(statusLabel).left().padLeft(12f);
 
@@ -173,7 +173,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                                      TextButton.TextButtonStyle buttonStyle,
                                      Drawable background,
                                      MapPanel mapPanel) {
-        Table panel = new Table();
+        var panel = new Table();
         panel.setBackground(background);
         panel.defaults().growX().pad(8f);
 
@@ -198,7 +198,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         });
         panel.add(moveButton).row();
 
-        TextButton holdButton = new TextButton("Hold", buttonStyle);
+        var holdButton = new TextButton("Hold", buttonStyle);
         holdButton.setDisabled(true);
         holdButton.setTouchable(Touchable.disabled);
         panel.add(holdButton).row();
@@ -227,7 +227,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     private void endTurn() {
-        GameRuntime runtime = Objects.requireNonNull(gameRuntime, "gameRuntime must be initialized before endTurn");
+        var runtime = Objects.requireNonNull(gameRuntime, "gameRuntime must be initialized before endTurn");
         if (!phasePlaybackController.shouldAcceptEndTurn()) {
             return;
         }
@@ -239,7 +239,7 @@ public class BattlefieldScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        GameRuntime runtime = Objects.requireNonNull(gameRuntime, "gameRuntime must be initialized before render");
+        var runtime = Objects.requireNonNull(gameRuntime, "gameRuntime must be initialized before render");
         ScreenUtils.clear(BG);
         runtime.advanceClock(delta);
         runtime.advanceMovements(delta);
@@ -247,13 +247,13 @@ public class BattlefieldScreen extends ScreenAdapter {
         if (phasePlaybackController.consumeTurnCompletedThisFrame()) {
             mapPanel.resetSelection();
         }
-        InteractionLockState interactionLockState = phasePlaybackController.interactionLockState();
+        var interactionLockState = phasePlaybackController.interactionLockState();
         mapPanel.setInteractionLockState(interactionLockState);
         stage.act(delta);
         syncHudActionState(phasePlaybackController.hudActionsEnabled());
         syncMoveButtonState();
         if (timeLabel != null) {
-            String timeText = runtime.formattedInGameTime();
+            var timeText = runtime.formattedInGameTime();
             if (runtime.isPaused()) {
                 timeText += "  [PAUSED]";
             }
@@ -325,10 +325,10 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     private Texture createWhiteTexture() {
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        var pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
-        Texture texture = new Texture(pixmap);
+        var texture = new Texture(pixmap);
         pixmap.dispose();
         return texture;
     }
@@ -351,17 +351,17 @@ public class BattlefieldScreen extends ScreenAdapter {
         Objects.requireNonNull(campaignState, "campaignState must not be null");
         Objects.requireNonNull(rtsPositions, "rtsPositions must not be null");
 
-        float scaledTileSize = MapPanel.DRAW_TILE_SIZE * zoomLevel;
-        float unitDrawSize = scaledTileSize * MapPanel.UNIT_SIZE_IN_TILES;
-        List<UnitRenderPlacement> placements = new ArrayList<>();
+        var scaledTileSize = MapPanel.DRAW_TILE_SIZE * zoomLevel;
+        var unitDrawSize = scaledTileSize * MapPanel.UNIT_SIZE_IN_TILES;
+        var placements = new ArrayList<UnitRenderPlacement>();
         for (Unit unit : campaignState.units()) {
             float @Nullable [] rtsPos = rtsPositions.get(unit.id());
-            UnitRenderPositionResolver.RenderTilePosition renderTilePosition =
+            var renderTilePosition =
                 UnitRenderPositionResolver.resolveTilePosition(unit, rtsPos, movementPlaybackRenderState);
-            float iconWorldX = renderTilePosition.tileX() * MapPanel.DRAW_TILE_SIZE;
-            float iconWorldY = (scenarioMapHeightTiles - renderTilePosition.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
-            float iconScreenX = panelX + (iconWorldX - cameraX) * zoomLevel;
-            float iconScreenY = panelY + (iconWorldY - cameraY) * zoomLevel;
+            var iconWorldX = renderTilePosition.tileX() * MapPanel.DRAW_TILE_SIZE;
+            var iconWorldY = (scenarioMapHeightTiles - renderTilePosition.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
+            var iconScreenX = panelX + (iconWorldX - cameraX) * zoomLevel;
+            var iconScreenY = panelY + (iconWorldY - cameraY) * zoomLevel;
 
             if (isUnitOutsideViewport(iconScreenX, iconScreenY, unitDrawSize, panelX, panelY, panelWidth, panelHeight)) {
                 continue;
@@ -428,13 +428,13 @@ public class BattlefieldScreen extends ScreenAdapter {
                                                  float panelY,
                                                  float panelWidth,
                                                  float panelHeight) {
-        float visibleLeft = panelX;
-        float visibleRight = panelX + panelWidth;
-        float visibleBottom = panelY;
-        float visibleTop = panelY + panelHeight;
+        var visibleLeft = panelX;
+        var visibleRight = panelX + panelWidth;
+        var visibleBottom = panelY;
+        var visibleTop = panelY + panelHeight;
 
-        float iconRight = iconScreenX + unitDrawSize;
-        float iconTop = iconScreenY + unitDrawSize;
+        var iconRight = iconScreenX + unitDrawSize;
+        var iconTop = iconScreenY + unitDrawSize;
 
         return iconRight <= visibleLeft
             || iconScreenX >= visibleRight
@@ -468,7 +468,7 @@ public class BattlefieldScreen extends ScreenAdapter {
 
     static @Nullable String nextSelectedUnitId(List<Unit> activeUnits, @Nullable String currentId) {
         if (activeUnits.isEmpty()) return null;
-        int idx = -1;
+        var idx = -1;
         for (int i = 0; i < activeUnits.size(); i++) {
             if (activeUnits.get(i).id().equals(currentId)) {
                 idx = i;
@@ -486,7 +486,7 @@ public class BattlefieldScreen extends ScreenAdapter {
             return null;
         }
 
-        int currentIndex = -1;
+        var currentIndex = -1;
         for (int i = 0; i < activeUnits.size(); i++) {
             if (activeUnits.get(i).id().equals(currentId)) {
                 currentIndex = i;
@@ -495,8 +495,8 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
 
         for (int offset = 1; offset <= activeUnits.size(); offset++) {
-            int index = (currentIndex + offset + activeUnits.size()) % activeUnits.size();
-            String candidateId = activeUnits.get(index).id();
+            var index = (currentIndex + offset + activeUnits.size()) % activeUnits.size();
+            var candidateId = activeUnits.get(index).id();
             if (!moveTargetsByUnit.containsKey(candidateId)) {
                 return candidateId;
             }
@@ -517,7 +517,7 @@ public class BattlefieldScreen extends ScreenAdapter {
                                  float pointerPositionInPanel,
                                  float oldZoomLevel,
                                  float newZoomLevel) {
-        float worldAtPointer = cameraPosition + pointerPositionInPanel / oldZoomLevel;
+        var worldAtPointer = cameraPosition + pointerPositionInPanel / oldZoomLevel;
         return worldAtPointer - pointerPositionInPanel / newZoomLevel;
     }
 
@@ -534,17 +534,17 @@ public class BattlefieldScreen extends ScreenAdapter {
                                                 float zoomLevel) {
         Objects.requireNonNull(unit, "unit must not be null");
 
-        float visibleLeft = cameraX;
-        float visibleBottom = cameraY;
-        float visibleRight = cameraX + panelWidth / zoomLevel;
-        float visibleTop = cameraY + panelHeight / zoomLevel;
+        var visibleLeft = cameraX;
+        var visibleBottom = cameraY;
+        var visibleRight = cameraX + panelWidth / zoomLevel;
+        var visibleTop = cameraY + panelHeight / zoomLevel;
 
-        float unitWorldX = unit.tileX() * MapPanel.DRAW_TILE_SIZE;
-        float unitWorldY = (scenarioMapHeightTiles - unit.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
-        float unitWorldSize = MapPanel.DRAW_TILE_SIZE * MapPanel.UNIT_SIZE_IN_TILES;
+        var unitWorldX = unit.tileX() * MapPanel.DRAW_TILE_SIZE;
+        var unitWorldY = (scenarioMapHeightTiles - unit.tileY() - MapPanel.UNIT_SIZE_IN_TILES) * MapPanel.DRAW_TILE_SIZE;
+        var unitWorldSize = MapPanel.DRAW_TILE_SIZE * MapPanel.UNIT_SIZE_IN_TILES;
 
-        float unitRight = unitWorldX + unitWorldSize;
-        float unitTop = unitWorldY + unitWorldSize;
+        var unitRight = unitWorldX + unitWorldSize;
+        var unitTop = unitWorldY + unitWorldSize;
 
         return unitWorldX >= visibleLeft
             && unitRight <= visibleRight
@@ -556,9 +556,9 @@ public class BattlefieldScreen extends ScreenAdapter {
                                         float panelSize,
                                         float zoomLevel,
                                         float mapWorldSize) {
-        float visibleWorldSize = panelSize / zoomLevel;
-        float unclamped = unitCenter - visibleWorldSize / 2f;
-        float maxCamera = Math.max(0f, mapWorldSize - visibleWorldSize);
+        var visibleWorldSize = panelSize / zoomLevel;
+        var unclamped = unitCenter - visibleWorldSize / 2f;
+        var maxCamera = Math.max(0f, mapWorldSize - visibleWorldSize);
         return MathUtils.clamp(unclamped, 0f, maxCamera);
     }
 
@@ -569,11 +569,11 @@ public class BattlefieldScreen extends ScreenAdapter {
                                                    float zoomLevel,
                                                    int mapWidthTiles,
                                                    int mapHeightTiles) {
-        float worldX = cameraX + panelPointerX / zoomLevel;
-        float worldY = cameraY + panelPointerY / zoomLevel;
-        int tileX = (int) Math.floor(worldX / MapPanel.DRAW_TILE_SIZE);
-        int rowFromBottom = (int) Math.floor(worldY / MapPanel.DRAW_TILE_SIZE);
-        int tileY = mapHeightTiles - rowFromBottom - 1;
+        var worldX = cameraX + panelPointerX / zoomLevel;
+        var worldY = cameraY + panelPointerY / zoomLevel;
+        var tileX = (int) Math.floor(worldX / MapPanel.DRAW_TILE_SIZE);
+        var rowFromBottom = (int) Math.floor(worldY / MapPanel.DRAW_TILE_SIZE);
+        var tileY = mapHeightTiles - rowFromBottom - 1;
         if (tileX < 0 || tileY < 0 || tileX >= mapWidthTiles || tileY >= mapHeightTiles) {
             return null;
         }
@@ -603,13 +603,13 @@ public class BattlefieldScreen extends ScreenAdapter {
     private static short[] moveConfirmSoundSamples(int sampleRateHz,
                                                    int durationMs,
                                                    float frequencyHz) {
-        int sampleCount = Math.max(1, sampleRateHz * durationMs / 1000);
-        short[] samples = new short[sampleCount];
+        var sampleCount = Math.max(1, sampleRateHz * durationMs / 1000);
+        var samples = new short[sampleCount];
         for (int i = 0; i < sampleCount; i++) {
-            float progress = (float) i / (float) sampleCount;
-            float envelope = 1f - progress;
-            double phase = 2d * Math.PI * frequencyHz * i / sampleRateHz;
-            float value = (float) Math.sin(phase) * envelope;
+            var progress = (float) i / (float) sampleCount;
+            var envelope = 1f - progress;
+            var phase = 2d * Math.PI * frequencyHz * i / sampleRateHz;
+            var value = (float) Math.sin(phase) * envelope;
             samples[i] = (short) (value * Short.MAX_VALUE);
         }
         return samples;
@@ -623,7 +623,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         try {
             moveConfirmSoundFile = Files.createTempFile("tactics-and-strategy-move-confirm-sound", ".wav");
             Files.write(moveConfirmSoundFile, MOVE_CONFIRM_SOUND_WAV_BYTES);
-            FileHandle fileHandle = Gdx.files.absolute(moveConfirmSoundFile.toString());
+            var fileHandle = Gdx.files.absolute(moveConfirmSoundFile.toString());
             moveConfirmSound = createMoveConfirmationSound(() -> Objects.requireNonNull(Gdx.audio,
                 "audio service must be available").newSound(fileHandle));
         } catch (IOException | RuntimeException exception) {
@@ -633,7 +633,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     private void playMoveConfirmationSound() {
-        Sound sound = moveConfirmSound;
+        var sound = moveConfirmSound;
         if (sound == null) {
             return;
         }
@@ -684,8 +684,8 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     static byte[] moveConfirmSoundWavBytes(int sampleRateHz) {
-        short[] samples = MOVE_CONFIRM_SOUND_SAMPLES;
-        int dataSize = samples.length * Short.BYTES;
+        var samples = MOVE_CONFIRM_SOUND_SAMPLES;
+        var dataSize = samples.length * Short.BYTES;
 
         try (var outputStream = new ByteArrayOutputStream(44 + dataSize)) {
             writeAscii(outputStream, "RIFF");
@@ -761,9 +761,9 @@ public class BattlefieldScreen extends ScreenAdapter {
         if (moveButton == null || mapPanel == null) {
             return;
         }
-        boolean hasSelection = mapPanel.getSelectedUnitId() != null;
-        boolean blocked = phasePlaybackController.interactionLockState().blocksHudActions();
-        boolean enabled = hasSelection && !blocked;
+        var hasSelection = mapPanel.getSelectedUnitId() != null;
+        var blocked = phasePlaybackController.interactionLockState().blocksHudActions();
+        var enabled = hasSelection && !blocked;
         moveButton.setDisabled(!enabled);
         moveButton.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
         moveButton.setText(mapPanel.isMoveModeActive() ? "Move (On)" : "Move");
@@ -783,20 +783,20 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     private void drawPhaseOverlay() {
-        PhaseOverlayRenderContract renderContract = phasePlaybackController.phaseOverlayRenderContract().orElse(null);
+        var renderContract = phasePlaybackController.phaseOverlayRenderContract().orElse(null);
         if (renderContract == null) {
             return;
         }
-        float viewportWidth = stage.getViewport().getWorldWidth();
-        float viewportHeight = stage.getViewport().getWorldHeight();
+        var viewportWidth = stage.getViewport().getWorldWidth();
+        var viewportHeight = stage.getViewport().getWorldHeight();
 
-        Batch batch = stage.getBatch();
-        Color previousColor = batch.getColor().cpy();
+        var batch = stage.getBatch();
+        var previousColor = batch.getColor().cpy();
         batch.begin();
         batch.setColor(renderContract.dimColor());
         batch.draw(whiteTexture, 0f, 0f, viewportWidth, viewportHeight);
         batch.setColor(Color.WHITE);
-        GlyphLayout layout = new GlyphLayout(font, renderContract.label());
+        var layout = new GlyphLayout(font, renderContract.label());
         font.draw(
             batch,
             renderContract.label(),

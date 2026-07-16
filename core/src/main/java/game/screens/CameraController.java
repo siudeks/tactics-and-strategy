@@ -35,8 +35,8 @@ final class CameraController {
     }
 
     void dragTo(float x, float y, float viewportWidth, float viewportHeight) {
-        float dx = x - lastDragX;
-        float dy = y - lastDragY;
+        var dx = x - lastDragX;
+        var dy = y - lastDragY;
         cameraX -= dx;
         cameraY -= dy;
         clampToViewport(viewportWidth, viewportHeight);
@@ -46,9 +46,9 @@ final class CameraController {
     }
 
     boolean zoomAt(float pointerX, float pointerY, float amountY, float viewportWidth, float viewportHeight) {
-        float oldZoomLevel = zoomLevel;
-        float factor = BattlefieldScreen.zoomStepFactor(amountY, zoomStepPercent);
-        float newZoomLevel = BattlefieldScreen.clampZoomLevel(oldZoomLevel * factor, minZoomLevel, maxZoomLevel);
+        var oldZoomLevel = zoomLevel;
+        var factor = BattlefieldScreen.zoomStepFactor(amountY, zoomStepPercent);
+        var newZoomLevel = BattlefieldScreen.clampZoomLevel(oldZoomLevel * factor, minZoomLevel, maxZoomLevel);
         if (newZoomLevel == oldZoomLevel) {
             return true;
         }
@@ -67,10 +67,10 @@ final class CameraController {
     }
 
     void clampToViewport(float viewportWidth, float viewportHeight) {
-        float visibleWorldWidth = viewportWidth / zoomLevel;
-        float visibleWorldHeight = viewportHeight / zoomLevel;
-        float maxCameraX = Math.max(0f, mapWorldWidth - visibleWorldWidth);
-        float maxCameraY = Math.max(0f, mapWorldHeight - visibleWorldHeight);
+        var visibleWorldWidth = viewportWidth / zoomLevel;
+        var visibleWorldHeight = viewportHeight / zoomLevel;
+        var maxCameraX = Math.max(0f, mapWorldWidth - visibleWorldWidth);
+        var maxCameraY = Math.max(0f, mapWorldHeight - visibleWorldHeight);
         cameraX = MathUtils.clamp(cameraX, 0f, maxCameraX);
         cameraY = MathUtils.clamp(cameraY, 0f, maxCameraY);
     }

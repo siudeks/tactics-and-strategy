@@ -59,7 +59,7 @@ final class BattlefieldPhasePlaybackController {
     void advance(GameRuntime runtime, float deltaSeconds) {
         Objects.requireNonNull(runtime, "runtime must not be null");
         turnCompletedThisFrame = false;
-        float remainingSeconds = Math.max(0f, deltaSeconds);
+        var remainingSeconds = Math.max(0f, deltaSeconds);
 
         while (true) {
             switch (playbackState) {
@@ -74,13 +74,13 @@ final class BattlefieldPhasePlaybackController {
                     if (remainingSeconds <= 0f) {
                         return;
                     }
-                    float nextElapsed = notificationState.elapsedSeconds() + remainingSeconds;
+                    var nextElapsed = notificationState.elapsedSeconds() + remainingSeconds;
                     if (nextElapsed < phaseNotificationSeconds) {
                         playbackState = new PhaseNotificationState(notificationState.phase(), nextElapsed);
                         return;
                     }
                     remainingSeconds = nextElapsed - phaseNotificationSeconds;
-                    PhaseStepResult stepResult = runtime.advanceTurnExecution();
+                    var stepResult = runtime.advanceTurnExecution();
                     playbackState = postStepState(stepResult);
                     continue;
                 }
@@ -88,7 +88,7 @@ final class BattlefieldPhasePlaybackController {
                     if (remainingSeconds <= 0f) {
                         return;
                     }
-                    float nextElapsed = movementState.elapsedSeconds() + remainingSeconds;
+                    var nextElapsed = movementState.elapsedSeconds() + remainingSeconds;
                     if (nextElapsed < movementPlaybackSeconds) {
                         playbackState = new MovementPlaybackState(
                             movementState.playback(),
@@ -109,7 +109,7 @@ final class BattlefieldPhasePlaybackController {
                     if (remainingSeconds <= 0f) {
                         return;
                     }
-                    float nextElapsed = transitionState.elapsedSeconds() + remainingSeconds;
+                    var nextElapsed = transitionState.elapsedSeconds() + remainingSeconds;
                     if (nextElapsed < phaseTransitionSeconds) {
                         playbackState = new PhaseTransitionState(transitionState.completedStep(), nextElapsed);
                         return;
@@ -138,7 +138,7 @@ final class BattlefieldPhasePlaybackController {
     }
 
     Optional<BattlefieldScreen.PhaseOverlayRenderContract> phaseOverlayRenderContract() {
-        TurnPhase overlayPhase = playbackState.overlayPhase();
+        var overlayPhase = playbackState.overlayPhase();
         if (overlayPhase == null) {
             return Optional.empty();
         }
@@ -159,7 +159,7 @@ final class BattlefieldPhasePlaybackController {
     }
 
     boolean consumeTurnCompletedThisFrame() {
-        boolean completed = turnCompletedThisFrame;
+        var completed = turnCompletedThisFrame;
         turnCompletedThisFrame = false;
         return completed;
     }

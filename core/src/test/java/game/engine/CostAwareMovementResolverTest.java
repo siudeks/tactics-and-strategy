@@ -34,10 +34,10 @@ class CostAwareMovementResolverTest {
 
     @Test
     void resolve_withSameDistanceOverDifferentTerrain_assignsDifferentTotalCost() {
-        Order move = Order.of("o1", UNIT.id(), Side.ALLIES, OrderType.MOVE, new TileCoordinate(0, 2));
+        var move = Order.of("o1", UNIT.id(), Side.ALLIES, OrderType.MOVE, new TileCoordinate(0, 2));
 
-        CostAwareMovementResolver sandResolver = new CostAwareMovementResolver(scenario("sand", TerrainType.SAND));
-        CostAwareMovementResolver mountainResolver = new CostAwareMovementResolver(scenario("mountain", TerrainType.MOUNTAIN));
+        var sandResolver = new CostAwareMovementResolver(scenario("sand", TerrainType.SAND));
+        var mountainResolver = new CostAwareMovementResolver(scenario("mountain", TerrainType.MOUNTAIN));
 
         var sandResult = sandResolver.resolve(UNIT, move).orElseThrow();
         var mountainResult = mountainResolver.resolve(UNIT, move).orElseThrow();
@@ -48,7 +48,7 @@ class CostAwareMovementResolverTest {
 
     @Test
     void resolve_equalCostRoute_usesDeterministicTieBreak() {
-        CostAwareMovementResolver resolver = new CostAwareMovementResolver(scenario("tie", TerrainType.SAND));
+        var resolver = new CostAwareMovementResolver(scenario("tie", TerrainType.SAND));
 
         var route = resolver.resolve(new TileCoordinate(0, 0), new TileCoordinate(1, 1))
             .orElseThrow()
@@ -63,7 +63,7 @@ class CostAwareMovementResolverTest {
 
     @Test
     void resolve_repeatedRunsReturnIdenticalRouteAndCost() {
-        CostAwareMovementResolver resolver = new CostAwareMovementResolver(scenario("det", TerrainType.SAND));
+        var resolver = new CostAwareMovementResolver(scenario("det", TerrainType.SAND));
         var expected = resolver.resolve(new TileCoordinate(0, 0), new TileCoordinate(3, 2)).orElseThrow();
 
         for (int i = 0; i < 20; i++) {
@@ -75,7 +75,7 @@ class CostAwareMovementResolverTest {
 
     @Test
     void resolve_impassableDefaultTerrain_returnsEmptyResult() {
-        CostAwareMovementResolver resolver = new CostAwareMovementResolver(scenario("void", TerrainType.VOID));
+        var resolver = new CostAwareMovementResolver(scenario("void", TerrainType.VOID));
 
         var maybeResult = resolver.resolve(new TileCoordinate(1, 1), new TileCoordinate(1, 2));
 

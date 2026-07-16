@@ -22,7 +22,7 @@ public record OrderBook(List<Order> orders) {
      * If input contains duplicates for one unit, the last order wins.
      */
     public Map<String, Order> activeMoveOrdersByUnit() {
-        Map<String, Order> moveOrders = new LinkedHashMap<>();
+        var moveOrders = new LinkedHashMap<String, Order>();
         for (Order order : orders) {
             if (order.type() == OrderType.MOVE) {
                 moveOrders.put(order.unitId(), order);
@@ -42,8 +42,8 @@ public record OrderBook(List<Order> orders) {
      * Replaces current MOVE order for a unit (if present) using deterministic last-write-wins.
      */
     public MoveUpsertResult upsertMove(String unitId, Side side, TileCoordinate target) {
-        boolean replacedExisting = false;
-        List<Order> next = new ArrayList<>(orders.size() + 1);
+        var replacedExisting = false;
+        var next = new ArrayList<Order>(orders.size() + 1);
         for (Order existing : orders) {
             if (existing.type() == OrderType.MOVE && existing.unitId().equals(unitId)) {
                 replacedExisting = true;

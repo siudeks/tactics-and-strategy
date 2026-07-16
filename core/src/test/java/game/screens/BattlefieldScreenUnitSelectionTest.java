@@ -23,27 +23,27 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void nextSelectedUnitId_returnsFirstUnit_whenCurrentIdIsNull() {
-        List<Unit> units = List.of(unit("A"), unit("B"), unit("C"));
+        var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        String result = BattlefieldScreen.nextSelectedUnitId(units, null);
+        var result = BattlefieldScreen.nextSelectedUnitId(units, null);
 
         assertEquals("A", result);
     }
 
     @Test
     void nextSelectedUnitId_advancesToNextUnit() {
-        List<Unit> units = List.of(unit("A"), unit("B"), unit("C"));
+        var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        String result = BattlefieldScreen.nextSelectedUnitId(units, "A");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, "A");
 
         assertEquals("B", result);
     }
 
     @Test
     void nextSelectedUnitId_wrapsToFirstAfterLast() {
-        List<Unit> units = List.of(unit("A"), unit("B"), unit("C"));
+        var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        String result = BattlefieldScreen.nextSelectedUnitId(units, "C");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, "C");
 
         assertEquals("A", result);
     }
@@ -52,34 +52,34 @@ class BattlefieldScreenUnitSelectionTest {
     void nextSelectedUnitId_returnsNull_whenListIsEmpty() {
         List<Unit> units = List.of();
 
-        String result = BattlefieldScreen.nextSelectedUnitId(units, null);
+        var result = BattlefieldScreen.nextSelectedUnitId(units, null);
 
         assertNull(result);
     }
 
     @Test
     void nextSelectedUnitId_returnsFirstUnit_whenCurrentIdNotFound() {
-        List<Unit> units = List.of(unit("A"), unit("B"));
+        var units = List.of(unit("A"), unit("B"));
 
-        String result = BattlefieldScreen.nextSelectedUnitId(units, "X");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, "X");
 
         assertEquals("A", result);
     }
 
     @Test
     void nextSelectedUnitId_returnsSelf_whenSingleUnit() {
-        List<Unit> units = List.of(unit("A"));
+        var units = List.of(unit("A"));
 
-        String result = BattlefieldScreen.nextSelectedUnitId(units, "A");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, "A");
 
         assertEquals("A", result);
     }
 
     @Test
     void nextUnassignedUnitId_returnsNextUnitWithoutTarget() {
-        List<Unit> units = List.of(unit("A"), unit("B"), unit("C"));
+        var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        String result = BattlefieldScreen.nextUnassignedUnitId(
+        var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
             "A",
             Map.of("A", new BattlefieldScreen.TileCoord(1, 1), "B", new BattlefieldScreen.TileCoord(2, 2))
@@ -90,9 +90,9 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void nextUnassignedUnitId_wrapsAroundAndSkipsAssignedUnits() {
-        List<Unit> units = List.of(unit("A"), unit("B"), unit("C"));
+        var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        String result = BattlefieldScreen.nextUnassignedUnitId(
+        var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
             "C",
             Map.of("C", new BattlefieldScreen.TileCoord(3, 3))
@@ -103,9 +103,9 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void nextUnassignedUnitId_returnsNull_whenAllUnitsAlreadyAssigned() {
-        List<Unit> units = List.of(unit("A"), unit("B"));
+        var units = List.of(unit("A"), unit("B"));
 
-        String result = BattlefieldScreen.nextUnassignedUnitId(
+        var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
             "A",
             Map.of("A", new BattlefieldScreen.TileCoord(1, 1), "B", new BattlefieldScreen.TileCoord(2, 2))
@@ -116,9 +116,9 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void nextUnassignedUnitId_returnsFirstUnassigned_whenCurrentIdIsNull() {
-        List<Unit> units = List.of(unit("A"), unit("B"));
+        var units = List.of(unit("A"), unit("B"));
 
-        String result = BattlefieldScreen.nextUnassignedUnitId(
+        var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
             null,
             Map.of("A", new BattlefieldScreen.TileCoord(1, 1))
@@ -130,27 +130,27 @@ class BattlefieldScreenUnitSelectionTest {
     @Test
     void unitIdAtScreenPoint_returnsId_whenPointInsideBoundsAndSideMatches() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
-        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
+        var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
         assertEquals("A", result);
     }
 
     @Test
     void unitIdAtScreenPoint_returnsNull_whenPointInsideBoundsButWrongSide() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.AXIS), 10f, 10f, 20f);
-        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
+        var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
         assertNull(result);
     }
 
     @Test
     void unitIdAtScreenPoint_returnsNull_whenPointOutsideBounds() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
-        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 31f, 15f, Side.ALLIES);
+        var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 31f, 15f, Side.ALLIES);
         assertNull(result);
     }
 
     @Test
     void unitIdAtScreenPoint_returnsNull_whenPlacementsEmpty() {
-        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(), 15f, 15f, Side.ALLIES);
+        var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(), 15f, 15f, Side.ALLIES);
         assertNull(result);
     }
 
@@ -158,38 +158,38 @@ class BattlefieldScreenUnitSelectionTest {
     void unitIdAtScreenPoint_returnsFirstMatch_whenMultipleOverlap() {
         var p1 = new BattlefieldScreen.UnitRenderPlacement(unit("FIRST", Side.ALLIES), 10f, 10f, 20f);
         var p2 = new BattlefieldScreen.UnitRenderPlacement(unit("SECOND", Side.ALLIES), 10f, 10f, 20f);
-        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p1, p2), 15f, 15f, Side.ALLIES);
+        var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p1, p2), 15f, 15f, Side.ALLIES);
         assertEquals("FIRST", result);
     }
 
     @Test
     void unitIdAtScreenPoint_returnsNull_whenPointOnExclusiveUpperBound() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
-        String result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 30f, 15f, Side.ALLIES);
+        var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 30f, 15f, Side.ALLIES);
         assertNull(result);
     }
 
     @Test
     void visibleUnitType_returnsActualType_forOwnUnit() {
-        Unit unit = new Unit("A", Side.ALLIES, UnitType.ARTILLERY, UnitSize.BATTALION, 0, 0);
+        var unit = new Unit("A", Side.ALLIES, UnitType.ARTILLERY, UnitSize.BATTALION, 0, 0);
 
-        UnitType result = BattlefieldScreen.visibleUnitType(unit, Side.ALLIES);
+        var result = BattlefieldScreen.visibleUnitType(unit, Side.ALLIES);
 
         assertEquals(UnitType.ARTILLERY, result);
     }
 
     @Test
     void visibleUnitType_returnsNull_forEnemyUnit() {
-        Unit unit = new Unit("A", Side.AXIS, UnitType.HQ, UnitSize.BATTALION, 0, 0);
+        var unit = new Unit("A", Side.AXIS, UnitType.HQ, UnitSize.BATTALION, 0, 0);
 
-        UnitType result = BattlefieldScreen.visibleUnitType(unit, Side.ALLIES);
+        var result = BattlefieldScreen.visibleUnitType(unit, Side.ALLIES);
 
         assertNull(result);
     }
 
     @Test
     void mapTileAtPanelPoint_returnsTileCoordinates_forClickInsideMap() {
-        BattlefieldScreen.TileCoord tile = BattlefieldScreen.mapTileAtPanelPoint(
+        var tile = BattlefieldScreen.mapTileAtPanelPoint(
             32f,
             16f,
             0f,
@@ -204,7 +204,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void mapTileAtPanelPoint_returnsNull_forClickOutsideMap() {
-        BattlefieldScreen.TileCoord tile = BattlefieldScreen.mapTileAtPanelPoint(
+        var tile = BattlefieldScreen.mapTileAtPanelPoint(
             -1f,
             16f,
             0f,
@@ -219,7 +219,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void moveTargetAssignmentForClick_returnsAssignment_whenMoveModeAndSelectionArePresent() {
-        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+        var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
             "A",
             new BattlefieldScreen.TileCoord(3, 4),
@@ -232,7 +232,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void moveTargetAssignmentForClick_returnsNull_whenMoveModeIsDisabled() {
-        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+        var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             false,
             "A",
             new BattlefieldScreen.TileCoord(3, 4),
@@ -245,7 +245,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void moveTargetAssignmentForClick_returnsNull_whenSelectionMissing() {
-        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+        var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
             null,
             new BattlefieldScreen.TileCoord(3, 4),
@@ -258,7 +258,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void moveTargetAssignmentForClick_returnsNull_whenClickedTileIsImpassable() {
-        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+        var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
             "A",
             new BattlefieldScreen.TileCoord(3, 4),
@@ -271,7 +271,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void moveTargetAssignmentForClick_returnsNull_whenPreviewIsMissing() {
-        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+        var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
             "A",
             null,
@@ -284,7 +284,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void moveTargetAssignmentForClick_returnsNull_whenClickedTileDoesNotMatchPreview() {
-        BattlefieldScreen.MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+        var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
             "A",
             new BattlefieldScreen.TileCoord(3, 4),
@@ -297,7 +297,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void shouldPlayMoveConfirmationSound_returnsTrue_whenAssignmentExists() {
-        boolean result = BattlefieldScreen.shouldPlayMoveConfirmationSound(
+        var result = BattlefieldScreen.shouldPlayMoveConfirmationSound(
             new BattlefieldScreen.MoveTargetAssignment("A", new BattlefieldScreen.TileCoord(3, 4))
         );
 
@@ -306,14 +306,14 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void shouldPlayMoveConfirmationSound_returnsFalse_whenAssignmentMissing() {
-        boolean result = BattlefieldScreen.shouldPlayMoveConfirmationSound(null);
+        var result = BattlefieldScreen.shouldPlayMoveConfirmationSound(null);
 
         assertFalse(result);
     }
 
     @Test
     void createMoveConfirmationSound_returnsFactorySound_whenFactorySucceeds() {
-        RecordingSound sound = new RecordingSound();
+        var sound = new RecordingSound();
 
         Sound result = BattlefieldScreen.createMoveConfirmationSound(() -> sound);
 
@@ -322,7 +322,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void createMoveConfirmationSound_returnsNull_whenFactoryThrows() {
-        Sound result = BattlefieldScreen.createMoveConfirmationSound(
+        var result = BattlefieldScreen.createMoveConfirmationSound(
             () -> {
                 throw new IllegalStateException("boom");
             }
@@ -333,7 +333,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void playMoveConfirmationSound_playsSoundWithConfiguredVolume() {
-        RecordingSound sound = new RecordingSound();
+        var sound = new RecordingSound();
 
         BattlefieldScreen.playMoveConfirmationSound(sound);
 
@@ -349,7 +349,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void moveConfirmSoundWavBytes_containsWaveHeader() {
-        byte[] wavBytes = BattlefieldScreen.moveConfirmSoundWavBytes(22050);
+        var wavBytes = BattlefieldScreen.moveConfirmSoundWavBytes(22050);
 
         assertNotNull(wavBytes);
         assertTrue(wavBytes.length > 44);
@@ -365,7 +365,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void movePreviewTile_returnsHoveredTile_whenMoveModeSelectionAndTerrainAreValid() {
-        BattlefieldScreen.TileCoord previewTile = BattlefieldScreen.movePreviewTile(
+        var previewTile = BattlefieldScreen.movePreviewTile(
             true,
             "A",
             new BattlefieldScreen.TileCoord(7, 8),
@@ -377,7 +377,7 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void movePreviewTile_returnsNull_whenHoveredTileIsImpassable() {
-        BattlefieldScreen.TileCoord previewTile = BattlefieldScreen.movePreviewTile(
+        var previewTile = BattlefieldScreen.movePreviewTile(
             true,
             "A",
             new BattlefieldScreen.TileCoord(7, 8),
@@ -401,14 +401,14 @@ class BattlefieldScreenUnitSelectionTest {
 
     @Test
     void shouldConsumeClickInMoveMode_returnsTrue_whenMoveModeIsActive() {
-        boolean consume = BattlefieldScreen.shouldConsumeClickInMoveMode(true);
+        var consume = BattlefieldScreen.shouldConsumeClickInMoveMode(true);
 
         assertTrue(consume);
     }
 
     @Test
     void shouldConsumeClickInMoveMode_returnsFalse_whenMoveModeIsDisabled() {
-        boolean consume = BattlefieldScreen.shouldConsumeClickInMoveMode(false);
+        var consume = BattlefieldScreen.shouldConsumeClickInMoveMode(false);
 
         assertFalse(consume);
     }

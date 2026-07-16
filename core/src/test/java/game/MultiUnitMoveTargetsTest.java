@@ -56,15 +56,17 @@ class MultiUnitMoveTargetsTest {
         var bravoStart = new UnitStart("bravo", 8, 8);
         var runtime = runtimeWith(List.of(alphaStart, bravoStart));
 
-        int alphaTargetX = 3, alphaTargetY = 2;
-        int bravoTargetX = 6, bravoTargetY = 7;
+        int alphaTargetX = 3;
+        int alphaTargetY = 2;
+        int bravoTargetX = 6;
+        int bravoTargetY = 7;
 
         runtime.assignMoveTarget("alpha", alphaTargetX, alphaTargetY);
         runtime.assignMoveTarget("bravo", bravoTargetX, bravoTargetY);
         runtime.simulateOneTurn();
 
-        Unit alpha = unitFrom(runtime, "alpha");
-        Unit bravo = unitFrom(runtime, "bravo");
+        var alpha = unitFrom(runtime, "alpha");
+        var bravo = unitFrom(runtime, "bravo");
 
         // Each unit advanced from its own start position.
         assertNotEquals(alphaStart.x(), alpha.tileX(), "alpha must have advanced from start X");
@@ -85,15 +87,17 @@ class MultiUnitMoveTargetsTest {
 
         // Alpha heads toward bottom-right; bravo heads toward top-left — proves
         // targets are not swapped or shared between units.
-        int alphaTargetX = 7, alphaTargetY = 6;
-        int bravoTargetX = 2, bravoTargetY = 3;
+        int alphaTargetX = 7;
+        int alphaTargetY = 6;
+        int bravoTargetX = 2;
+        int bravoTargetY = 3;
 
         runtime.assignMoveTarget("alpha", alphaTargetX, alphaTargetY);
         runtime.assignMoveTarget("bravo", bravoTargetX, bravoTargetY);
         runtime.simulateOneTurn();
 
-        Unit alpha = unitFrom(runtime, "alpha");
-        Unit bravo = unitFrom(runtime, "bravo");
+        var alpha = unitFrom(runtime, "alpha");
+        var bravo = unitFrom(runtime, "bravo");
 
         assertEquals(alphaTargetX, alpha.tileX());
         assertEquals(alphaTargetY, alpha.tileY());
@@ -112,9 +116,9 @@ class MultiUnitMoveTargetsTest {
         runtime.assignMoveTarget("bravo", 2, 1);
         runtime.simulateOneTurn();
 
-        Map<String, Unit> unitsById = unitsById(runtime);
-        Unit alpha = unitsById.get("alpha");
-        Unit bravo = unitsById.get("bravo");
+        var unitsById = unitsById(runtime);
+        var alpha = unitsById.get("alpha");
+        var bravo = unitsById.get("bravo");
         assertNotNull(alpha);
         assertNotNull(bravo);
 
@@ -137,10 +141,10 @@ class MultiUnitMoveTargetsTest {
         runtime.assignMoveTarget("charlie", 2, 2);
         runtime.simulateOneTurn();
 
-        Map<String, Unit> unitsById = unitsById(runtime);
-        Unit alpha = unitsById.get("alpha");
-        Unit bravo = unitsById.get("bravo");
-        Unit charlie = unitsById.get("charlie");
+        var unitsById = unitsById(runtime);
+        var alpha = unitsById.get("alpha");
+        var bravo = unitsById.get("bravo");
+        var charlie = unitsById.get("charlie");
         assertNotNull(alpha);
         assertNotNull(bravo);
         assertNotNull(charlie);

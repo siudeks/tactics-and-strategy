@@ -153,13 +153,13 @@ final class MapPanel extends Actor {
                 if (shouldBlockInputPath(interactionLockState, InputPath.CLICK)) {
                     return;
                 }
-                float dx = x - cameraController.lastDragX();
-                float dy = y - cameraController.lastDragY();
+                var dx = x - cameraController.lastDragX();
+                var dy = y - cameraController.lastDragY();
                 if (dx * dx + dy * dy >= 100f) return; // drag, not a click
 
-                TileCoord clickedTile = scenarioTileAtPanelPoint(x, y);
-                boolean clickedTilePassable = isTilePassable(clickedTile);
-                MoveTargetAssignment assignment = BattlefieldScreen.moveTargetAssignmentForClick(
+                var clickedTile = scenarioTileAtPanelPoint(x, y);
+                var clickedTilePassable = isTilePassable(clickedTile);
+                var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
                     selectionState.isMoveModeActive(),
                     selectionState.selectedUnitId(),
                     movePreviewTile,
@@ -172,10 +172,10 @@ final class MapPanel extends Actor {
                     if (BattlefieldScreen.shouldPlayMoveConfirmationSound(assignment)) {
                         onMoveTargetConfirmed.run();
                     }
-                    String selectedUnitId = selectionState.selectedUnitId();
+                    var selectedUnitId = selectionState.selectedUnitId();
                     selectionState.deactivateMoveMode();
                     clearMovePreview();
-                    CampaignState state = campaignStateSupplier.get();
+                    var state = campaignStateSupplier.get();
                     selectUnit(BattlefieldScreen.nextUnassignedUnitId(unitsForCommandSide(state), selectedUnitId, moveTargetsByUnit));
                     return;
                 }
@@ -183,10 +183,10 @@ final class MapPanel extends Actor {
                     return;
                 }
 
-                float sx = x + getX();
-                float sy = y + getY();
-                CampaignState state = campaignStateSupplier.get();
-                List<UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
+                var sx = x + getX();
+                var sy = y + getY();
+                var state = campaignStateSupplier.get();
+                var placements = BattlefieldScreen.computeVisibleUnitPlacements(
                     state,
                     rtsPositionsSource.get(),
                     movementPlaybackStateSource.get(),
@@ -216,7 +216,7 @@ final class MapPanel extends Actor {
                 if (shouldBlockInputPath(interactionLockState, InputPath.ZOOM)) {
                     return true;
                 }
-                boolean ctrlPressed = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)
+                var ctrlPressed = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)
                     || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT);
                 if (!ctrlPressed || amountY == 0f) {
                     return false;
@@ -288,10 +288,10 @@ final class MapPanel extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        float x = getX();
-        float y = getY();
-        float w = getWidth();
-        float h = getHeight();
+        var x = getX();
+        var y = getY();
+        var w = getWidth();
+        var h = getHeight();
 
         cameraController.clampToViewport(w, h);
 
@@ -314,49 +314,49 @@ final class MapPanel extends Actor {
     }
 
     private void drawTerrain(Batch batch, float panelX, float panelY, float panelW, float panelH) {
-        float zoomLevel = cameraController.zoomLevel();
-        float cameraX = cameraController.cameraX();
-        float cameraY = cameraController.cameraY();
-        float scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
-        float visibleWorldWidth = panelW / zoomLevel;
-        int startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
-        int endCol = MathUtils.clamp((int) Math.ceil((cameraX + visibleWorldWidth) / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
+        var zoomLevel = cameraController.zoomLevel();
+        var cameraX = cameraController.cameraX();
+        var cameraY = cameraController.cameraY();
+        var scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
+        var visibleWorldWidth = panelW / zoomLevel;
+        var startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
+        var endCol = MathUtils.clamp((int) Math.ceil((cameraX + visibleWorldWidth) / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
 
         batch.setColor(Color.WHITE);
         for (int rowTop = 0; rowTop < mapHeightTiles; rowTop++) {
-            float worldY = (mapHeightTiles - rowTop - 1) * DRAW_TILE_SIZE;
-            float screenY = panelY + (worldY - cameraY) * zoomLevel;
+            var worldY = (mapHeightTiles - rowTop - 1) * DRAW_TILE_SIZE;
+            var screenY = panelY + (worldY - cameraY) * zoomLevel;
             if (screenY + scaledTileSize < panelY || screenY > panelY + panelH) {
                 continue;
             }
 
             for (int col = startCol; col <= endCol; col++) {
-                float worldX = col * DRAW_TILE_SIZE;
-                float screenX = panelX + (worldX - cameraX) * zoomLevel;
+                var worldX = col * DRAW_TILE_SIZE;
+                var screenX = panelX + (worldX - cameraX) * zoomLevel;
 
-                int tileId = mapDefinition.getMapTileId(col, rowTop);
+                var tileId = mapDefinition.getMapTileId(col, rowTop);
                 batch.draw(tileAtlas.getRegion(tileId), screenX, screenY, scaledTileSize, scaledTileSize);
             }
         }
     }
 
     private void drawDebugGrid(Batch batch, float panelX, float panelY, float panelW, float panelH) {
-        float zoomLevel = cameraController.zoomLevel();
-        float cameraX = cameraController.cameraX();
-        float cameraY = cameraController.cameraY();
+        var zoomLevel = cameraController.zoomLevel();
+        var cameraX = cameraController.cameraX();
+        var cameraY = cameraController.cameraY();
         batch.setColor(BattlefieldScreen.GRID);
 
-        float visibleWorldWidth = panelW / zoomLevel;
-        int startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
-        int endCol = MathUtils.clamp((int) Math.ceil((cameraX + visibleWorldWidth) / DRAW_TILE_SIZE), 0, mapWidthTiles);
+        var visibleWorldWidth = panelW / zoomLevel;
+        var startCol = MathUtils.clamp((int) Math.floor(cameraX / DRAW_TILE_SIZE), 0, mapWidthTiles - 1);
+        var endCol = MathUtils.clamp((int) Math.ceil((cameraX + visibleWorldWidth) / DRAW_TILE_SIZE), 0, mapWidthTiles);
         for (int col = startCol; col <= endCol; col++) {
-            float lineX = panelX + (col * DRAW_TILE_SIZE - cameraX) * zoomLevel;
+            var lineX = panelX + (col * DRAW_TILE_SIZE - cameraX) * zoomLevel;
             batch.draw(pixel, lineX, panelY, 1f, panelH);
         }
 
         for (int rowTop = 0; rowTop <= mapHeightTiles; rowTop++) {
-            float worldY = (mapHeightTiles - rowTop) * DRAW_TILE_SIZE;
-            float lineY = panelY + (worldY - cameraY) * zoomLevel;
+            var worldY = (mapHeightTiles - rowTop) * DRAW_TILE_SIZE;
+            var lineY = panelY + (worldY - cameraY) * zoomLevel;
             if (lineY < panelY || lineY > panelY + panelH) {
                 continue;
             }
@@ -369,17 +369,17 @@ final class MapPanel extends Actor {
             return;
         }
 
-        float zoomLevel = cameraController.zoomLevel();
-        float cameraX = cameraController.cameraX();
-        float cameraY = cameraController.cameraY();
-        float scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
-        float previewDrawSize = scaledTileSize * UNIT_SIZE_IN_TILES;
-        float screenX = panelX + (movePreviewTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
-        float worldY = (scenarioMapHeightTiles - movePreviewTile.tileY() - UNIT_SIZE_IN_TILES) * DRAW_TILE_SIZE;
-        float screenY = panelY + (worldY - cameraY) * zoomLevel;
-        float border = previewDrawSize / 16f;
-        float borderX = screenX - border;
-        float borderY = screenY - border;
+        var zoomLevel = cameraController.zoomLevel();
+        var cameraX = cameraController.cameraX();
+        var cameraY = cameraController.cameraY();
+        var scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
+        var previewDrawSize = scaledTileSize * UNIT_SIZE_IN_TILES;
+        var screenX = panelX + (movePreviewTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
+        var worldY = (scenarioMapHeightTiles - movePreviewTile.tileY() - UNIT_SIZE_IN_TILES) * DRAW_TILE_SIZE;
+        var screenY = panelY + (worldY - cameraY) * zoomLevel;
+        var border = previewDrawSize / 16f;
+        var borderX = screenX - border;
+        var borderY = screenY - border;
 
         batch.setColor(movePreviewVisible ? Color.WHITE : Color.BLACK);
         drawBlock(batch, borderX, borderY, previewDrawSize + border * 2f, border);
@@ -393,24 +393,24 @@ final class MapPanel extends Actor {
             return;
         }
 
-        float zoomLevel = cameraController.zoomLevel();
-        float cameraX = cameraController.cameraX();
-        float cameraY = cameraController.cameraY();
-        float scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
-        float poleWidth = Math.max(1f, scaledTileSize / 10f);
-        float poleHeight = scaledTileSize * 0.75f;
-        float flagWidth = scaledTileSize * 0.45f;
-        float flagHeight = scaledTileSize * 0.3f;
+        var zoomLevel = cameraController.zoomLevel();
+        var cameraX = cameraController.cameraX();
+        var cameraY = cameraController.cameraY();
+        var scaledTileSize = DRAW_TILE_SIZE * zoomLevel;
+        var poleWidth = Math.max(1f, scaledTileSize / 10f);
+        var poleHeight = scaledTileSize * 0.75f;
+        var flagWidth = scaledTileSize * 0.45f;
+        var flagHeight = scaledTileSize * 0.3f;
 
         for (TileCoord targetTile : moveTargetsByUnit.values()) {
-            float tileScreenX = panelX + (targetTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
-            float worldY = (scenarioMapHeightTiles - targetTile.tileY() - 1f) * DRAW_TILE_SIZE;
-            float tileScreenY = panelY + (worldY - cameraY) * zoomLevel;
+            var tileScreenX = panelX + (targetTile.tileX() * DRAW_TILE_SIZE - cameraX) * zoomLevel;
+            var worldY = (scenarioMapHeightTiles - targetTile.tileY() - 1f) * DRAW_TILE_SIZE;
+            var tileScreenY = panelY + (worldY - cameraY) * zoomLevel;
 
-            float poleX = tileScreenX + scaledTileSize * 0.15f;
-            float poleY = tileScreenY + scaledTileSize * 0.1f;
-            float flagX = poleX + poleWidth;
-            float flagY = poleY + poleHeight - flagHeight;
+            var poleX = tileScreenX + scaledTileSize * 0.15f;
+            var poleY = tileScreenY + scaledTileSize * 0.1f;
+            var flagX = poleX + poleWidth;
+            var flagY = poleY + poleHeight - flagHeight;
 
             batch.setColor(Color.WHITE);
             drawBlock(batch, poleX, poleY, poleWidth, poleHeight);
@@ -420,12 +420,12 @@ final class MapPanel extends Actor {
     }
 
     private void drawUnits(Batch batch, float panelX, float panelY, float panelWidth, float panelHeight) {
-        CampaignState campaignState = campaignStateSupplier.get();
-        String selectedUnitId = selectionState.selectedUnitId();
-        float cameraX = cameraController.cameraX();
-        float cameraY = cameraController.cameraY();
-        float zoomLevel = cameraController.zoomLevel();
-        List<UnitRenderPlacement> placements = BattlefieldScreen.computeVisibleUnitPlacements(
+        var campaignState = campaignStateSupplier.get();
+        var selectedUnitId = selectionState.selectedUnitId();
+        var cameraX = cameraController.cameraX();
+        var cameraY = cameraController.cameraY();
+        var zoomLevel = cameraController.zoomLevel();
+        var placements = BattlefieldScreen.computeVisibleUnitPlacements(
             campaignState,
             rtsPositionsSource.get(),
             movementPlaybackStateSource.get(),
@@ -452,12 +452,12 @@ final class MapPanel extends Actor {
     }
 
     private void drawUnitPlacement(Batch batch, UnitRenderPlacement placement, Side activeSide) {
-        String selectedUnitId = selectionState.selectedUnitId();
-        float border = placement.drawSize() / 16f;
-        float borderX = placement.screenX() - border;
-        float borderY = placement.screenY() - border;
-        UnitIconPalette palette = BattlefieldScreen.paletteFor(placement.unit().side());
-        UnitType visibleType = BattlefieldScreen.visibleUnitType(placement.unit(), activeSide);
+        var selectedUnitId = selectionState.selectedUnitId();
+        var border = placement.drawSize() / 16f;
+        var borderX = placement.screenX() - border;
+        var borderY = placement.screenY() - border;
+        var palette = BattlefieldScreen.paletteFor(placement.unit().side());
+        var visibleType = BattlefieldScreen.visibleUnitType(placement.unit(), activeSide);
         drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline(), visibleType);
         if (placement.unit().id().equals(selectedUnitId) && selectorVisible) {
             batch.setColor(Color.WHITE);
@@ -473,7 +473,7 @@ final class MapPanel extends Actor {
     }
 
     private void selectUnit(@Nullable String unitId) {
-        String previousUnitId = selectionState.selectedUnitId();
+        var previousUnitId = selectionState.selectedUnitId();
         if (!Objects.equals(previousUnitId, unitId)) {
             selectionState.selectAndEnterMoveMode(unitId);
             clearMovePreview();
@@ -502,7 +502,7 @@ final class MapPanel extends Actor {
     }
 
     private void centerCameraOnSelectedUnitIfNeeded() {
-        String selectedUnitId = selectionState.selectedUnitId();
+        var selectedUnitId = selectionState.selectedUnitId();
         if (selectedUnitId == null) {
             pendingSelectionCameraCenter = false;
             return;
@@ -511,8 +511,8 @@ final class MapPanel extends Actor {
             pendingSelectionCameraCenter = true;
             return;
         }
-        CampaignState state = campaignStateSupplier.get();
-        Unit selectedUnit = state.units().stream()
+        var state = campaignStateSupplier.get();
+        var selectedUnit = state.units().stream()
             .filter(unit -> unit.id().equals(selectedUnitId))
             .findFirst()
             .orElse(null);
@@ -533,8 +533,8 @@ final class MapPanel extends Actor {
             return;
         }
 
-        float unitWorldCenterX = selectedUnit.tileX() * DRAW_TILE_SIZE + (UNIT_SIZE_IN_TILES * DRAW_TILE_SIZE) / 2f;
-        float unitWorldCenterY = (scenarioMapHeightTiles - selectedUnit.tileY() - UNIT_SIZE_IN_TILES / 2f) * DRAW_TILE_SIZE;
+        var unitWorldCenterX = selectedUnit.tileX() * DRAW_TILE_SIZE + (UNIT_SIZE_IN_TILES * DRAW_TILE_SIZE) / 2f;
+        var unitWorldCenterY = (scenarioMapHeightTiles - selectedUnit.tileY() - UNIT_SIZE_IN_TILES / 2f) * DRAW_TILE_SIZE;
 
         cameraController.centerOn(unitWorldCenterX, unitWorldCenterY, getWidth(), getHeight());
         pendingSelectionCameraCenter = false;
@@ -542,22 +542,22 @@ final class MapPanel extends Actor {
 
     void resetSelection() {
         clearMovePreview();
-        CampaignState state = campaignStateSupplier.get();
+        var state = campaignStateSupplier.get();
         moveTargetsByUnit.clear();
         commandSide = state.activeSide();
-        List<Unit> active = unitsForCommandSide(state);
+        var active = unitsForCommandSide(state);
         selectUnit(active.isEmpty() ? null : active.getFirst().id());
     }
 
     private void cycleSelectedUnit() {
-        CampaignState state = campaignStateSupplier.get();
-        List<Unit> active = unitsForCommandSide(state);
+        var state = campaignStateSupplier.get();
+        var active = unitsForCommandSide(state);
         selectUnit(BattlefieldScreen.nextSelectedUnitId(active, selectionState.selectedUnitId()));
     }
 
     private void handleEnterKey() {
-        CampaignState state = campaignStateSupplier.get();
-        EnterIssuingOrdersOutcome outcome = enterIssuingOrdersOutcome(
+        var state = campaignStateSupplier.get();
+        var outcome = enterIssuingOrdersOutcome(
             areAllMoveOrdersAssignedForCommandSide(state),
             commandSide,
             state.activeSide()
@@ -666,7 +666,7 @@ final class MapPanel extends Actor {
                   Color fillColor,
                   Color outlineColor,
                   @Nullable UnitType visibleType) {
-        float pixel = size / 16f;
+        var pixel = size / 16f;
         batch.setColor(outlineColor);
         drawBlock(batch, x - pixel, y - pixel, size + pixel * 2f, pixel);
         drawBlock(batch, x - pixel, y + size, size + pixel * 2f, pixel);
@@ -698,18 +698,18 @@ final class MapPanel extends Actor {
         // Convert scenario tile coordinates to terrain tile coordinates for passability lookup.
         // Scenario tileY 0 corresponds to terrain row (mapHeightTiles - scenarioMapHeightTiles + 0),
         // increasing linearly: terrainTileY = mapHeightTiles - scenarioMapHeightTiles + scenarioTileY.
-        int terrainTileX = tile.tileX();
-        int terrainTileY = mapHeightTiles - scenarioMapHeightTiles + tile.tileY();
+        var terrainTileX = tile.tileX();
+        var terrainTileY = mapHeightTiles - scenarioMapHeightTiles + tile.tileY();
         if (terrainTileX < 0 || terrainTileX >= mapWidthTiles
             || terrainTileY < 0 || terrainTileY >= mapHeightTiles) {
             return false;
         }
-        int mapIndex = terrainTileY * mapWidthTiles + terrainTileX;
+        var mapIndex = terrainTileY * mapWidthTiles + terrainTileX;
         return BattlefieldScreen.isPassableTerrainCode(mapDefinition.getTerrainCode(mapIndex));
     }
 
     private @Nullable TileCoord scenarioTileAtPanelPoint(float panelPointerX, float panelPointerY) {
-        TileCoord terrainTile = BattlefieldScreen.mapTileAtPanelPoint(
+        var terrainTile = BattlefieldScreen.mapTileAtPanelPoint(
             panelPointerX,
             panelPointerY,
             cameraController.cameraX(),
@@ -728,8 +728,8 @@ final class MapPanel extends Actor {
         if (terrainTile == null) {
             return null;
         }
-        int scenarioTileX = terrainTile.tileX();
-        int scenarioTileY = terrainTile.tileY() - (mapHeightTiles - scenarioMapHeightTiles);
+        var scenarioTileX = terrainTile.tileX();
+        var scenarioTileY = terrainTile.tileY() - (mapHeightTiles - scenarioMapHeightTiles);
         // Keep full horizontal terrain coverage clickable; Y may be outside the original scenario band.
         if (scenarioTileX < 0 || scenarioTileX >= mapWidthTiles) {
             return null;
@@ -738,7 +738,7 @@ final class MapPanel extends Actor {
     }
 
     private void refreshMovePreviewAtPointer(float panelPointerX, float panelPointerY) {
-        TileCoord hoveredTile = scenarioTileAtPanelPoint(panelPointerX, panelPointerY);
+        var hoveredTile = scenarioTileAtPanelPoint(panelPointerX, panelPointerY);
         movePreviewTile = BattlefieldScreen.movePreviewTile(
             selectionState.isMoveModeActive(),
             selectionState.selectedUnitId(),

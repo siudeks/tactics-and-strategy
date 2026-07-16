@@ -10,9 +10,9 @@ class TerrainMapDefinitionTest {
 
     @Test
     void constructor_usesImprovedPaletteForSandColor() {
-        TerrainMapDefinition definition = new TerrainMapDefinition();
+        var definition = new TerrainMapDefinition();
 
-        RgbaColor sand = definition.getTerrainColor(GeneratedTerrainData.TERRAIN_SAND);
+        var sand = definition.getTerrainColor(GeneratedTerrainData.TERRAIN_SAND);
 
         assertEquals(194f / 255f, sand.r(), 0.0001f);
         assertEquals(171f / 255f, sand.g(), 0.0001f);

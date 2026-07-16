@@ -6,7 +6,7 @@ import game.platform.TacticsGame;
 
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
-        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+        var config = new Lwjgl3ApplicationConfiguration();
         config.setTitle("Tactics & Strategy - Hello World");
         config.setWindowedMode(1280, 720);
         config.useVsync(true);

@@ -7,7 +7,7 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 
 public class HeadlessLauncher {
     public static void main(String[] args) {
-        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
+        var config = new HeadlessApplicationConfiguration();
         new HeadlessApplication(new ApplicationAdapter() {
             @Override
             public void create() {

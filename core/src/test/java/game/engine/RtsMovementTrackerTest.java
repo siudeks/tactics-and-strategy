@@ -15,12 +15,12 @@ class RtsMovementTrackerTest {
 
     @Test
     void startMovement_createsActiveEntry_visibleInCurrentPositions() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
 
         tracker.startMovement("u1", 0f, 0f, 4, 0);
 
-        Map<String, float[]> positions = tracker.currentPositions();
-        float[] pos = positions.get("u1");
+        var positions = tracker.currentPositions();
+        var pos = positions.get("u1");
         assertNotNull(pos);
         assertEquals(0f, pos[0], 0.0001f, "Should be at start X");
         assertEquals(0f, pos[1], 0.0001f, "Should be at start Y");
@@ -28,13 +28,13 @@ class RtsMovementTrackerTest {
 
     @Test
     void advance_movesUnitAlongPath() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
         // 4-tile horizontal journey → totalSeconds = 4.0
         tracker.startMovement("u1", 0f, 0f, 4, 0);
 
         tracker.advance(1f); // 1 second → 25% progress
 
-        float[] pos = tracker.currentPositions().get("u1");
+        var pos = tracker.currentPositions().get("u1");
         assertNotNull(pos);
         assertEquals(1f, pos[0], 0.0001f, "Should be 1/4 of the way");
         assertEquals(0f, pos[1], 0.0001f);
@@ -42,10 +42,10 @@ class RtsMovementTrackerTest {
 
     @Test
     void advance_returnsArrivedUnits_andRemovesThemFromTracker() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
         tracker.startMovement("u1", 0f, 0f, 3, 0); // totalSeconds = 3.0
 
-        Map<String, int[]> arrived = tracker.advance(3f); // exactly at target
+        var arrived = tracker.advance(3f); // exactly at target
 
         assertAll(
             () -> assertTrue(arrived.containsKey("u1")),
@@ -57,10 +57,10 @@ class RtsMovementTrackerTest {
 
     @Test
     void advance_withExcessTime_stillArrivesAtTarget() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
         tracker.startMovement("u1", 0f, 0f, 2, 0); // totalSeconds = 2.0
 
-        Map<String, int[]> arrived = tracker.advance(5f); // way more than needed
+        var arrived = tracker.advance(5f); // way more than needed
 
         assertTrue(arrived.containsKey("u1"));
         assertArrayEquals(new int[]{2, 0}, arrived.get("u1"));
@@ -68,19 +68,19 @@ class RtsMovementTrackerTest {
 
     @Test
     void currentPosition_returnsNull_whenUnitNotMoving() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
 
         assertNull(tracker.currentPosition("no-such-unit"));
     }
 
     @Test
     void currentPosition_returnsInterpolatedFloat_duringMovement() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
         tracker.startMovement("u1", 0f, 0f, 4, 3); // diagonal: sqrt(16+9)=5.0
 
         tracker.advance(2.5f); // 50% progress
 
-        float[] pos = tracker.currentPosition("u1");
+        var pos = tracker.currentPosition("u1");
         assertNotNull(pos);
         assertEquals(2f, pos[0], 0.0001f);
         assertEquals(1.5f, pos[1], 0.0001f);
@@ -88,14 +88,14 @@ class RtsMovementTrackerTest {
 
     @Test
     void startMovement_replacesExistingMovement() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
         tracker.startMovement("u1", 0f, 0f, 10, 0);
         tracker.advance(1f); // advance partway
 
         // Re-assign to a different target
         tracker.startMovement("u1", 1f, 0f, 5, 0);
 
-        float[] pos = tracker.currentPosition("u1");
+        var pos = tracker.currentPosition("u1");
         assertNotNull(pos);
         // Progress resets to 0 from new fromX=1
         assertEquals(1f, pos[0], 0.0001f, "Should start from new fromX");
@@ -103,7 +103,7 @@ class RtsMovementTrackerTest {
 
     @Test
     void clear_removesAllMovements() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
         tracker.startMovement("u1", 0f, 0f, 5, 0);
         tracker.startMovement("u2", 0f, 0f, 3, 3);
 
@@ -115,20 +115,20 @@ class RtsMovementTrackerTest {
 
     @Test
     void advance_emptyTracker_returnsEmptyMap() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
 
-        Map<String, int[]> arrived = tracker.advance(1f);
+        var arrived = tracker.advance(1f);
 
         assertTrue(arrived.isEmpty());
     }
 
     @Test
     void startMovement_sameStartAndTarget_arrivesImmediately() {
-        RtsMovementTracker tracker = new RtsMovementTracker();
+        var tracker = new RtsMovementTracker();
         // totalSeconds = 0 (start == target)
         tracker.startMovement("u1", 3f, 3f, 3, 3);
 
-        Map<String, int[]> arrived = tracker.advance(0f);
+        var arrived = tracker.advance(0f);
 
         assertAll(
             () -> assertTrue(arrived.containsKey("u1"), "Should arrive immediately when already at target"),

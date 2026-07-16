@@ -12,7 +12,7 @@ final class EndTurnPhaseExecutor implements TurnPhaseExecutor {
 
     @Override
     public PhaseExecution execute(CampaignState state) {
-        CampaignState nextState = new CampaignState(
+        var nextState = new CampaignState(
             state.campaignId(),
             state.scenarioId(),
             state.turnNumber() + 1,

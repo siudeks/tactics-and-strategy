@@ -18,7 +18,7 @@ class CampaignInitializationTest {
 
     @BeforeEach
     void setUp() {
-        LoadedScenario loaded = ScenarioLoader.loadBootstrapScenario();
+        var loaded = ScenarioLoader.loadBootstrapScenario();
         campaignState = loaded.campaignState();
     }
 
@@ -39,7 +39,7 @@ class CampaignInitializationTest {
 
     @Test
     void initialCampaignState_alliesUnitsPresent() {
-        List<Unit> alliesUnits = campaignState.units().stream()
+        var alliesUnits = campaignState.units().stream()
             .filter(u -> u.side() == Side.ALLIES)
             .toList();
         assertEquals(2, alliesUnits.size());
@@ -47,7 +47,7 @@ class CampaignInitializationTest {
 
     @Test
     void initialCampaignState_axisUnitsPresent() {
-        List<Unit> axisUnits = campaignState.units().stream()
+        var axisUnits = campaignState.units().stream()
             .filter(u -> u.side() == Side.AXIS)
             .toList();
         assertEquals(2, axisUnits.size());

@@ -29,9 +29,9 @@ class MapPanelInputLockIntegrationTest {
 
     @Test
     void movementPlaybackPointerDrag_initializesDragStateAndPansCamera() {
-        CameraController controller = new CameraController(320f, 320f, 0.5f, 3f, 0.1f);
+        var controller = new CameraController(320f, 320f, 0.5f, 3f, 0.1f);
 
-        boolean dragInitialized = MapPanel.initializePointerDrag(
+        var dragInitialized = MapPanel.initializePointerDrag(
             InteractionLockState.MOVEMENT_PLAYBACK,
             controller,
             60f,

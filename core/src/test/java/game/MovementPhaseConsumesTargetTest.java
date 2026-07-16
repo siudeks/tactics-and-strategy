@@ -54,14 +54,14 @@ class MovementPhaseConsumesTargetTest {
     @Test
     void simulateOneTurn_withAssignedMoveTarget_movesUnitToTarget() {
         var runtime = runtimeFor(TerrainType.SAND);
-        int targetX = 2;
-        int targetY = 1;
+        var targetX = 2;
+        var targetY = 1;
 
         var assignment = runtime.assignMoveTarget(UNIT_ID, targetX, targetY);
         assertEquals(MoveCommandOutcome.ACCEPTED, assignment.outcome());
         runtime.simulateOneTurn();
 
-        Unit moved = unitFrom(runtime);
+        var moved = unitFrom(runtime);
         assertEquals(targetX, moved.tileX());
         assertEquals(targetY, moved.tileY());
     }
@@ -76,7 +76,7 @@ class MovementPhaseConsumesTargetTest {
             runtime.simulateOneTurn();
         });
 
-        Unit unit = unitFrom(runtime);
+        var unit = unitFrom(runtime);
         assertEquals(START_X, unit.tileX());
         assertEquals(START_Y, unit.tileY());
     }
@@ -91,7 +91,7 @@ class MovementPhaseConsumesTargetTest {
             runtime.simulateOneTurn();
         });
 
-        Unit unit = unitFrom(runtime);
+        var unit = unitFrom(runtime);
         assertEquals(START_X, unit.tileX());
         assertEquals(START_Y, unit.tileY());
     }
@@ -106,8 +106,8 @@ class MovementPhaseConsumesTargetTest {
         assertEquals(MoveCommandOutcome.ACCEPTED, assignment.outcome());
         runtime.simulateOneTurn();
 
-        Unit blockedMover = unitFrom(runtime, UNIT_ID);
-        Unit stationaryIncumbent = unitFrom(runtime, "u2");
+        var blockedMover = unitFrom(runtime, UNIT_ID);
+        var stationaryIncumbent = unitFrom(runtime, "u2");
         assertEquals(START_X, blockedMover.tileX());
         assertEquals(START_Y, blockedMover.tileY());
         assertEquals(2, stationaryIncumbent.tileX());

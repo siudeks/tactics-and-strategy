@@ -25,8 +25,8 @@ public final class TurnEngine {
     }
 
     public TurnResult runOneTurn(CampaignState state) {
-        TurnExecutionSession session = beginExecution(state);
-        PhaseStepResult stepResult = session.advance();
+        var session = beginExecution(state);
+        var stepResult = session.advance();
         while (!session.isComplete()) {
             stepResult = session.advance();
         }
@@ -38,7 +38,7 @@ public final class TurnEngine {
     }
 
     PhaseExecution executePhase(TurnPhase phase, CampaignState state) {
-        TurnPhaseExecutor executor = phaseExecutors.get(Objects.requireNonNull(phase));
+        var executor = phaseExecutors.get(Objects.requireNonNull(phase));
         if (executor == null) {
             throw new IllegalArgumentException("No executor registered for phase " + phase);
         }
@@ -46,8 +46,8 @@ public final class TurnEngine {
     }
 
     TurnResult buildTurnResult(CampaignState state, List<TurnPhase> phaseTrace, long startTime) {
-        long elapsed = System.currentTimeMillis() - startTime;
-        String snapshot = buildCanonicalSnapshot(state);
+        var elapsed = System.currentTimeMillis() - startTime;
+        var snapshot = buildCanonicalSnapshot(state);
         return new TurnResult(state, phaseTrace, context.seed(), elapsed, snapshot);
     }
 
@@ -65,7 +65,7 @@ public final class TurnEngine {
         if (x < 0 || y < 0 || x >= scenarioDefinition.mapWidth() || y >= scenarioDefinition.mapHeight()) {
             return false;
         }
-        TerrainType terrain = scenarioDefinition.defaultTerrain();
+        var terrain = scenarioDefinition.defaultTerrain();
         return terrain != TerrainType.VOID && terrain != TerrainType.WATER;
     }
 
@@ -78,7 +78,7 @@ public final class TurnEngine {
     }
 
     static String buildCanonicalSnapshot(CampaignState state) {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         sb.append("turn=").append(state.turnNumber());
         sb.append(",side=").append(state.activeSide());
         sb.append(",units=[");

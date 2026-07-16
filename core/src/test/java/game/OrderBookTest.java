@@ -18,12 +18,12 @@ class OrderBookTest {
 
     @Test
     void upsertMove_addsOrderWhenNoMoveForUnitExists() {
-        OrderBook book = new OrderBook(List.of());
+        var book = new OrderBook(List.of());
 
-        OrderBook.MoveUpsertResult result = book.upsertMove("u1", Side.ALLIES, 2, 3);
+        var result = book.upsertMove("u1", Side.ALLIES, 2, 3);
 
         assertFalse(result.replacedExisting());
-        List<Order> orders = result.orderBook().asPendingOrders();
+        var orders = result.orderBook().asPendingOrders();
         assertEquals(1, orders.size());
         assertEquals("u1", orders.get(0).unitId());
         assertEquals(OrderType.MOVE, orders.get(0).type());
@@ -33,22 +33,22 @@ class OrderBookTest {
 
     @Test
     void upsertMove_replacesOnlyExistingMoveForSameUnit_withDeterministicLastWriteWins() {
-        OrderBook book = new OrderBook(List.of(
+        var book = new OrderBook(List.of(
             Order.of("hold-u1", "u1", Side.ALLIES, OrderType.HOLD, new TileCoordinate(0, 0)),
             Order.of("move-u1", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(1, 1)),
             Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, new TileCoordinate(5, 5))
         ));
 
-        OrderBook.MoveUpsertResult result = book.upsertMove("u1", Side.ALLIES, 7, 8);
+        var result = book.upsertMove("u1", Side.ALLIES, 7, 8);
 
         assertTrue(result.replacedExisting());
-        List<Order> orders = result.orderBook().asPendingOrders();
+        var orders = result.orderBook().asPendingOrders();
         assertEquals(3, orders.size());
-        long u1MoveCount = orders.stream()
+        var u1MoveCount = orders.stream()
             .filter(o -> o.type() == OrderType.MOVE && o.unitId().equals("u1"))
             .count();
         assertEquals(1, u1MoveCount);
-        Order last = orders.get(orders.size() - 1);
+        var last = orders.get(orders.size() - 1);
         assertEquals("u1", last.unitId());
         assertEquals(OrderType.MOVE, last.type());
         assertEquals(7, last.target().x());
@@ -57,7 +57,7 @@ class OrderBookTest {
 
     @Test
     void activeMoveOrdersByUnit_prefersLastMoveForDuplicateUnitIds() {
-        OrderBook book = new OrderBook(List.of(
+        var book = new OrderBook(List.of(
             Order.of("move-u1-a", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(1, 1)),
             Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
             Order.of("move-u1-b", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(4, 5))
@@ -66,11 +66,11 @@ class OrderBookTest {
         var activeMoves = book.activeMoveOrdersByUnit();
 
         assertEquals(2, activeMoves.size());
-        Order u1Move = activeMoves.get("u1");
+        var u1Move = activeMoves.get("u1");
         assertNotNull(u1Move);
         assertEquals(4, u1Move.target().x());
         assertEquals(5, u1Move.target().y());
-        Order u2Move = activeMoves.get("u2");
+        var u2Move = activeMoves.get("u2");
         assertNotNull(u2Move);
         assertEquals(2, u2Move.target().x());
         assertEquals(2, u2Move.target().y());

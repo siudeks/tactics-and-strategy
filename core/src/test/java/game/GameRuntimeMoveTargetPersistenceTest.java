@@ -31,14 +31,14 @@ class GameRuntimeMoveTargetPersistenceTest {
 
     @Test
     void assignMoveTarget_persistsMoveOrderInPendingOrders() {
-        Unit unit = findUnit("allies-armor-1");
+        var unit = findUnit("allies-armor-1");
 
         var outcome = runtime.assignMoveTarget("allies-armor-1", 5, 4);
 
-        List<Order> orders = runtime.getCurrentCampaignState().pendingOrders();
+        var orders = runtime.getCurrentCampaignState().pendingOrders();
         assertEquals(MoveCommandOutcome.ACCEPTED, outcome.outcome());
         assertEquals(1, orders.size());
-        Order o = orders.get(0);
+        var o = orders.get(0);
         assertEquals("move-allies-armor-1", o.id());
         assertEquals("allies-armor-1", o.unitId());
         assertEquals(OrderType.MOVE, o.type());
@@ -52,11 +52,11 @@ class GameRuntimeMoveTargetPersistenceTest {
         var firstOutcome = runtime.assignMoveTarget("allies-armor-1", 3, 3);
         var secondOutcome = runtime.assignMoveTarget("allies-armor-1", 7, 2);
 
-        List<Order> orders = runtime.getCurrentCampaignState().pendingOrders();
+        var orders = runtime.getCurrentCampaignState().pendingOrders();
         assertEquals(MoveCommandOutcome.ACCEPTED, firstOutcome.outcome());
         assertEquals(MoveCommandOutcome.REPLACED_EXISTING, secondOutcome.outcome());
         assertEquals(1, orders.size());
-        Order o = orders.get(0);
+        var o = orders.get(0);
         assertEquals("allies-armor-1", o.unitId());
         assertEquals(7, o.target().x());
         assertEquals(2, o.target().y());
@@ -68,7 +68,7 @@ class GameRuntimeMoveTargetPersistenceTest {
         runtime.assignMoveTarget("allies-armor-1", 3, 3);
         runtime.assignMoveTarget("allies-inf-1", 4, 1);
 
-        List<Order> orders = runtime.getCurrentCampaignState().pendingOrders();
+        var orders = runtime.getCurrentCampaignState().pendingOrders();
         assertEquals(2, orders.size());
 
         Order armor = orders.stream().filter(o -> o.unitId().equals("allies-armor-1")).findFirst().orElseThrow();
@@ -85,12 +85,12 @@ class GameRuntimeMoveTargetPersistenceTest {
 
     @Test
     void assignMoveTarget_unknownUnitId_isSilentNoOp() {
-        CampaignState before = runtime.getCurrentCampaignState();
+        var before = runtime.getCurrentCampaignState();
         assertTrue(before.pendingOrders().isEmpty());
 
         var outcome = assertDoesNotThrow(() -> runtime.assignMoveTarget("does-not-exist", 1, 1));
 
-        CampaignState after = runtime.getCurrentCampaignState();
+        var after = runtime.getCurrentCampaignState();
         assertEquals(MoveCommandOutcome.UNKNOWN_UNIT, outcome.outcome());
         assertTrue(after.pendingOrders().isEmpty());
         assertIterableEquals(before.units(), after.units());
@@ -102,17 +102,17 @@ class GameRuntimeMoveTargetPersistenceTest {
     void assignMoveTarget_outOfBoundsTarget_isPersistedForMovementPhaseValidation() {
         var outcome = runtime.assignMoveTarget("allies-armor-1", -1, 1);
 
-        CampaignState after = runtime.getCurrentCampaignState();
+        var after = runtime.getCurrentCampaignState();
         assertEquals(MoveCommandOutcome.ACCEPTED, outcome.outcome());
         assertEquals(1, after.pendingOrders().size());
-        Order order = after.pendingOrders().get(0);
+        var order = after.pendingOrders().get(0);
         assertEquals(-1, order.target().x());
         assertEquals(1, order.target().y());
     }
 
     @Test
     void assignMoveTarget_nullUnitId_throwsNullPointerException() {
-        String nullId = nullString();
+        var nullId = nullString();
         assertThrows(NullPointerException.class, () -> runtime.assignMoveTarget(nullId, 1, 1));
     }
 
@@ -123,11 +123,11 @@ class GameRuntimeMoveTargetPersistenceTest {
 
     @Test
     void assignMoveTarget_doesNotMutateUnits_orTurnNumber_orActiveSide() {
-        CampaignState before = runtime.getCurrentCampaignState();
+        var before = runtime.getCurrentCampaignState();
 
         runtime.assignMoveTarget("axis-inf-1", 0, 0);
 
-        CampaignState after = runtime.getCurrentCampaignState();
+        var after = runtime.getCurrentCampaignState();
         assertEquals(before.campaignId(), after.campaignId());
         assertEquals(before.scenarioId(), after.scenarioId());
         assertEquals(before.turnNumber(), after.turnNumber());
@@ -140,7 +140,7 @@ class GameRuntimeMoveTargetPersistenceTest {
         // active side is ALLIES; assigning to an AXIS unit must record AXIS as the order's side
         runtime.assignMoveTarget("axis-armor-1", 6, 6);
 
-        List<Order> orders = runtime.getCurrentCampaignState().pendingOrders();
+        var orders = runtime.getCurrentCampaignState().pendingOrders();
         assertEquals(1, orders.size());
         assertEquals(Side.AXIS, orders.get(0).side());
     }

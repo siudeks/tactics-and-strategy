@@ -37,9 +37,9 @@ class OneTurnSimulationTest {
     @Test
     void oneTurn_phaseTraceContainsAllFivePhases() {
         var loaded = ScenarioLoader.loadBootstrapScenario();
-        TurnResult result = engine().runOneTurn(loaded.campaignState());
+        var result = engine().runOneTurn(loaded.campaignState());
 
-        List<TurnPhase> expected = List.of(
+        var expected = List.of(
             TurnPhase.ISSUE_ORDERS,
             TurnPhase.SIMULTANEOUS_MOVE,
             TurnPhase.COMBAT,
@@ -52,7 +52,7 @@ class OneTurnSimulationTest {
     @Test
     void oneTurn_canonicalSnapshotIsNotEmpty() {
         var loaded = ScenarioLoader.loadBootstrapScenario();
-        TurnResult result = engine().runOneTurn(loaded.campaignState());
+        var result = engine().runOneTurn(loaded.campaignState());
 
         assertNotNull(result.canonicalSnapshot());
         assertFalse(result.canonicalSnapshot().isEmpty());
@@ -61,8 +61,8 @@ class OneTurnSimulationTest {
     @Test
     void oneTurn_resultStateHasSameUnitCount() {
         var loaded = ScenarioLoader.loadBootstrapScenario();
-        int initialUnitCount = loaded.campaignState().units().size();
-        TurnResult result = engine().runOneTurn(loaded.campaignState());
+        var initialUnitCount = loaded.campaignState().units().size();
+        var result = engine().runOneTurn(loaded.campaignState());
 
         assertEquals(initialUnitCount, result.state().units().size());
     }
@@ -73,10 +73,10 @@ class OneTurnSimulationTest {
         var startState = loaded.campaignState();
         var engine = engine();
 
-        TurnExecutionSession session = engine.beginExecution(startState);
+        var session = engine.beginExecution(startState);
         TurnResult stepwiseResult = null;
         while (!session.isComplete()) {
-            PhaseStepResult stepResult = session.advance();
+            var stepResult = session.advance();
             assertEquals(stepResult.phase(), RuntimePhase.fromTurnPhase(stepResult.phase().turnPhase()));
             if (stepResult.phase() == RuntimePhase.SIMULTANEOUS_MOVE) {
                 assertEquals(startState.units().size(), stepResult.movementPlayback().size());
@@ -86,7 +86,7 @@ class OneTurnSimulationTest {
             }
         }
 
-        TurnResult monolithicResult = engine.runOneTurn(startState);
+        var monolithicResult = engine.runOneTurn(startState);
         assertNotNull(stepwiseResult);
         assertTrue(TurnEngine.areSemanticallyEquivalent(stepwiseResult, monolithicResult));
     }
@@ -114,9 +114,9 @@ class OneTurnSimulationTest {
         var startState = new CampaignState("c1", "stack-det", 1, Side.ALLIES, units, orders);
         var engine = TurnEngine.fixedContext(DeterministicContext.withSeed(42L), scenarioDefinition);
 
-        TurnResult baseline = engine.runOneTurn(startState);
+        var baseline = engine.runOneTurn(startState);
         for (int i = 0; i < 20; i++) {
-            TurnResult next = engine.runOneTurn(startState);
+            var next = engine.runOneTurn(startState);
             assertTrue(TurnEngine.areSemanticallyEquivalent(baseline, next));
         }
     }
