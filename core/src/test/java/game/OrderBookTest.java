@@ -4,6 +4,7 @@ import game.domain.Order;
 import game.domain.OrderBook;
 import game.domain.OrderType;
 import game.domain.Side;
+import game.domain.TileCoordinate;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -33,9 +34,9 @@ class OrderBookTest {
     @Test
     void upsertMove_replacesOnlyExistingMoveForSameUnit_withDeterministicLastWriteWins() {
         OrderBook book = new OrderBook(List.of(
-            Order.of("hold-u1", "u1", Side.ALLIES, OrderType.HOLD, 0, 0),
-            Order.of("move-u1", "u1", Side.ALLIES, OrderType.MOVE, 1, 1),
-            Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, 5, 5)
+            Order.of("hold-u1", "u1", Side.ALLIES, OrderType.HOLD, new TileCoordinate(0, 0)),
+            Order.of("move-u1", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(1, 1)),
+            Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, new TileCoordinate(5, 5))
         ));
 
         OrderBook.MoveUpsertResult result = book.upsertMove("u1", Side.ALLIES, 7, 8);
@@ -57,9 +58,9 @@ class OrderBookTest {
     @Test
     void activeMoveOrdersByUnit_prefersLastMoveForDuplicateUnitIds() {
         OrderBook book = new OrderBook(List.of(
-            Order.of("move-u1-a", "u1", Side.ALLIES, OrderType.MOVE, 1, 1),
-            Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, 2, 2),
-            Order.of("move-u1-b", "u1", Side.ALLIES, OrderType.MOVE, 4, 5)
+            Order.of("move-u1-a", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(1, 1)),
+            Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
+            Order.of("move-u1-b", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(4, 5))
         ));
 
         var activeMoves = book.activeMoveOrdersByUnit();

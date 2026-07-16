@@ -6,6 +6,7 @@ import game.domain.OrderType;
 import game.domain.ScenarioDefinition;
 import game.domain.Side;
 import game.domain.TerrainType;
+import game.domain.TileCoordinate;
 import game.domain.Unit;
 import game.domain.UnitSize;
 import game.domain.UnitType;
@@ -169,7 +170,7 @@ class BattlefieldScreenSyncTest {
             1,
             Side.ALLIES,
             List.of(unit),
-            List.of(Order.of("move-1", unitId, Side.ALLIES, OrderType.MOVE, targetTileX, targetTileY))
+            List.of(Order.of("move-1", unitId, Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }

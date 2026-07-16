@@ -35,7 +35,7 @@ public record OrderBook(List<Order> orders) {
      * Replaces current MOVE order for a unit (if present) using deterministic last-write-wins.
      */
     public MoveUpsertResult upsertMove(String unitId, Side side, int targetX, int targetY) {
-        return upsertMove(unitId, side, new TileCoordinate(targetX, targetY));
+        return upsertMove(unitId, side, TileCoordinate.of(targetX, targetY));
     }
 
     /**

@@ -7,6 +7,7 @@ import game.domain.OrderType;
 import game.domain.ScenarioDefinition;
 import game.domain.Side;
 import game.domain.TerrainType;
+import game.domain.TileCoordinate;
 import game.domain.Unit;
 import game.domain.UnitSize;
 import game.domain.UnitType;
@@ -106,9 +107,9 @@ class OneTurnSimulationTest {
             new Unit("charlie", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 3)
         );
         var orders = List.of(
-            Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 2),
-            Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 2),
-            Order.of("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, 2, 2)
+            Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
+            Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
+            Order.of("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2))
         );
         var startState = new CampaignState("c1", "stack-det", 1, Side.ALLIES, units, orders);
         var engine = TurnEngine.fixedContext(DeterministicContext.withSeed(42L), scenarioDefinition);

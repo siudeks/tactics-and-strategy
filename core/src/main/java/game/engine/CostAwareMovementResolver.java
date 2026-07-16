@@ -51,7 +51,7 @@ final class CostAwareMovementResolver {
         if (order.type() != OrderType.MOVE) {
             return Optional.empty();
         }
-        TileCoordinate start = new TileCoordinate(unit.tileX(), unit.tileY());
+        TileCoordinate start = TileCoordinate.of(unit.tileX(), unit.tileY());
         return resolve(start, order.target());
     }
 
@@ -82,7 +82,7 @@ final class CostAwareMovementResolver {
             }
 
             for (int[] step : ORTHOGONAL_STEPS) {
-                TileCoordinate neighbour = new TileCoordinate(
+                TileCoordinate neighbour = TileCoordinate.of(
                     currentEntry.tile().x() + step[0],
                     currentEntry.tile().y() + step[1]
                 );

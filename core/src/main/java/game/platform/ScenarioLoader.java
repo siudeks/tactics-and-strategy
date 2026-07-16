@@ -126,7 +126,7 @@ public final class ScenarioLoader {
         OrderType type = OrderType.valueOf(orderJson.getString("type").toUpperCase(Locale.ROOT));
         int targetX = orderJson.getInt("targetX");
         int targetY = orderJson.getInt("targetY");
-        return Order.of(id, unitId, side, type, new TileCoordinate(targetX, targetY));
+        return Order.of(id, unitId, side, type, TileCoordinate.of(targetX, targetY));
     }
 
     private static void validateUnitCoordinates(String scenarioId, int mapWidth, int mapHeight, List<Unit> units) {

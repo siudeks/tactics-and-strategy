@@ -54,7 +54,7 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
                 continue;
             }
 
-            TileCoordinate from = new TileCoordinate(unit.tileX(), unit.tileY());
+            TileCoordinate from = TileCoordinate.of(unit.tileX(), unit.tileY());
             CostAwareMovementResolver.ResolvedMove move = resolvedMove.orElseThrow();
             contendersByDestination.computeIfAbsent(move.destination(), key -> new ArrayList<>())
                 .add(new MoveCandidate(unit, from, move));
@@ -72,7 +72,7 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
                 updatedUnits.add(new Unit(unit.id(), unit.side(), unit.type(), unit.size(), destination.x(), destination.y()));
                 movementPlayback.add(new MovementPlayback(
                     unit.id(),
-                    new TileCoordinate(unit.tileX(), unit.tileY()),
+                    TileCoordinate.of(unit.tileX(), unit.tileY()),
                     destination,
                     MovementPlaybackOutcome.MOVED
                 ));
@@ -80,8 +80,8 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
                 updatedUnits.add(unit);
                 movementPlayback.add(new MovementPlayback(
                     unit.id(),
-                    new TileCoordinate(unit.tileX(), unit.tileY()),
-                    new TileCoordinate(unit.tileX(), unit.tileY()),
+                    TileCoordinate.of(unit.tileX(), unit.tileY()),
+                    TileCoordinate.of(unit.tileX(), unit.tileY()),
                     MovementPlaybackOutcome.SKIPPED
                 ));
             }
@@ -101,7 +101,7 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
     private static Map<TileCoordinate, List<Unit>> occupantsByTile(List<Unit> units) {
         Map<TileCoordinate, List<Unit>> occupants = new HashMap<>();
         for (Unit unit : units) {
-            TileCoordinate tile = new TileCoordinate(unit.tileX(), unit.tileY());
+            TileCoordinate tile = TileCoordinate.of(unit.tileX(), unit.tileY());
             occupants.computeIfAbsent(tile, key -> new ArrayList<>()).add(unit);
         }
         return occupants;
