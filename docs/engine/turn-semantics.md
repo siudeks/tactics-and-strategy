@@ -57,10 +57,13 @@ Every phase step returns a `PhaseExecution` whose state becomes the next in-sess
 ### 4.2 SIMULTANEOUS_MOVE
 - Input orders are read from the current in-session `pendingOrders` through `OrderBook.activeMoveOrdersByUnit()`.
 - `OrderBook` guarantees a deterministic single active `MOVE` per unit (`last-write-wins` if duplicates exist).
-- For each unit in the in-session `units` list:
-  - If a valid MOVE target exists for that `unit.id`, the engine resolves an orthogonal route using terrain-cost-aware shortest-path search.
-  - If a route is found, output unit coordinates become the route destination `(x, y)` from the resolved MOVE order.
-  - Otherwise, output unit coordinates remain unchanged.
+- The engine resolves valid MOVE candidates first, then applies deterministic destination arbitration and occupancy checks.
+- Stacking policy (`REQ-STACK-001`) in movement phase:
+  - maximum `1` unit per tile after movement resolution,
+  - each destination tile accepts at most one MOVE winner,
+  - contenders for the same destination are ordered by collision tie-break and only the highest-priority candidate is considered.
+- A chosen MOVE candidate succeeds only if every incumbent currently on its destination tile also vacates successfully in the same phase; otherwise it is skipped.
+- Units without a valid route, units that lose destination arbitration, and units blocked by incumbents remain on their current tile.
 - `PhaseStepResult.movementPlayback()` MUST describe the per-unit move/skip outcome for this phase.
 
 #### 4.2.1 Deterministic Tie-Break
@@ -87,6 +90,17 @@ Movement cost per orthogonal tile step is derived from scenario default terrain:
 - `D.defaultTerrain != WATER`
 
 If false, move MUST be ignored without exception.
+
+#### 4.2.4 Destination Collision Tie-Break (REQ-STACK-001)
+When two or more units contend for the same destination tile, winner selection MUST be deterministic and independent of collection iteration order.
+
+For a single destination tile, contenders are ordered by:
+- lower resolved route total cost,
+- then lower source tile `y`,
+- then lower source tile `x`,
+- then lexicographically lower `unit.id`.
+
+With v1 stack limit `1`, only the first contender in this order can win the tile.
 
 ### 4.3 COMBAT
 - Current behavior: no-op.
@@ -127,6 +141,9 @@ Only after this step completes may `GameRuntime` replace its durable stored camp
 ## 7. Evidence
 - `OneTurnSimulationTest.oneTurn_phaseTraceContainsAllFivePhases`
 - `OneTurnSimulationTest.oneTurn_stepwiseSessionMatchesMonolithicRun`
+- `OneTurnSimulationTest.oneTurn_contestedDestination_isDeterministicAcrossRepeatedRuns`
+- `TurnEngineOrderTest.moveOrders_twoUnitsContendForSameDestination_onlyDeterministicWinnerMoves`
+- `TurnEngineOrderTest.moveOrders_threeUnitsContendForSameDestination_lowestCostWinnerMoves`
 - `GameRuntimeTurnSessionTest.beginTurnExecution_advancesStepwise_andCommitsOnlyAfterEndTurn`
 - `BattlefieldPhasePlaybackControllerTest.advance_sequencesNotificationsMovementPlaybackAndTurnCompletion`
 

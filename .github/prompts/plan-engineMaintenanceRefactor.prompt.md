@@ -10,7 +10,7 @@ Celem jest podniesienie utrzymywalności i przewidywalności silnika bez przepis
 5. Faza 2 [ZREALIZOWANE]: Ujednolicić semantykę UI state machine dla selekcji i trybu ruchu tak, aby nazwy operacji odpowiadały faktycznym przejściom stanów. Krok może iść równolegle z krokiem 4 po zakończeniu kroku 3.
 6. Faza 3 [ZREALIZOWANE]: Wyodrębnić resolvery faz (Movement, Combat, Retreat) z jednolitym kontraktem wejście/wyjście i zachować pełną deterministyczność orkiestracji tury. Krok zależy od kroku 4.
 7. Faza 3 [ZREALIZOWANE]: Zaimplementować ruch kosztowy z deterministycznym tie-break (REQ-MOVE-002) jako pierwszy pełny mechanizm gameplay ponad baseline. Krok zależy od kroku 6.
-8. Faza 3: Dodać politykę stackingu i ograniczeń współlokacji (REQ-STACK-001) wraz z testami kolizji wielojednostkowych. Krok zależy od kroku 7.
+8. Faza 3 [ZREALIZOWANE]: Dodać politykę stackingu i ograniczeń współlokacji (REQ-STACK-001) wraz z testami kolizji wielojednostkowych. Krok zależy od kroku 7.
 9. Faza 3: Domknąć minimalnie użyteczny resolver walki kontekstowej (REQ-CBT-001) oparty o pozycję, teren i stan jednostki, bez rozszerzeń poza wymagany baseline. Krok zależy od kroku 8.
 10. Faza 4: Uzupełnić testy regresji, testy własności deterministycznych, ArchUnit oraz dokumentację traceability po każdym ukończonym mechanizmie. Krok zależy od kroku 9.
 

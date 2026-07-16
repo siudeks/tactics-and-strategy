@@ -12,9 +12,12 @@ import game.engine.GameRuntime;
 import game.scenario.LoadedScenario;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 // REQ-ORD-MOVE-003: Multiple units on the same side may receive distinct MOVE targets
 // in a single command phase, and each unit advances toward its own target independently.
@@ -40,6 +43,11 @@ class MultiUnitMoveTargetsTest {
             .filter(u -> u.id().equals(unitId))
             .findFirst()
             .orElseThrow();
+    }
+
+    private static Map<String, Unit> unitsById(GameRuntime runtime) {
+        return runtime.getCurrentCampaignState().units().stream()
+            .collect(Collectors.toMap(Unit::id, unit -> unit));
     }
 
     @Test
@@ -91,5 +99,57 @@ class MultiUnitMoveTargetsTest {
         assertEquals(alphaTargetY, alpha.tileY());
         assertEquals(bravoTargetX, bravo.tileX());
         assertEquals(bravoTargetY, bravo.tileY());
+    }
+
+    @Test
+    void simulateOneTurn_twoUnitsContendForSameTile_onlyOneUnitOccupiesDestination() {
+        var runtime = runtimeWith(List.of(
+            new UnitStart("alpha", 1, 1),
+            new UnitStart("bravo", 3, 1)
+        ));
+
+        runtime.assignMoveTarget("alpha", 2, 1);
+        runtime.assignMoveTarget("bravo", 2, 1);
+        runtime.simulateOneTurn();
+
+        Map<String, Unit> unitsById = unitsById(runtime);
+        Unit alpha = unitsById.get("alpha");
+        Unit bravo = unitsById.get("bravo");
+        assertNotNull(alpha);
+        assertNotNull(bravo);
+
+        assertEquals(2, alpha.tileX());
+        assertEquals(1, alpha.tileY());
+        assertEquals(3, bravo.tileX());
+        assertEquals(1, bravo.tileY());
+    }
+
+    @Test
+    void simulateOneTurn_threeUnitsContendForSameTile_lowestCostCandidateWins() {
+        var runtime = runtimeWith(List.of(
+            new UnitStart("alpha", 1, 1),
+            new UnitStart("bravo", 3, 1),
+            new UnitStart("charlie", 2, 3)
+        ));
+
+        runtime.assignMoveTarget("alpha", 2, 2);
+        runtime.assignMoveTarget("bravo", 2, 2);
+        runtime.assignMoveTarget("charlie", 2, 2);
+        runtime.simulateOneTurn();
+
+        Map<String, Unit> unitsById = unitsById(runtime);
+        Unit alpha = unitsById.get("alpha");
+        Unit bravo = unitsById.get("bravo");
+        Unit charlie = unitsById.get("charlie");
+        assertNotNull(alpha);
+        assertNotNull(bravo);
+        assertNotNull(charlie);
+
+        assertEquals(1, alpha.tileX());
+        assertEquals(1, alpha.tileY());
+        assertEquals(3, bravo.tileX());
+        assertEquals(1, bravo.tileY());
+        assertEquals(2, charlie.tileX());
+        assertEquals(2, charlie.tileY());
     }
 }

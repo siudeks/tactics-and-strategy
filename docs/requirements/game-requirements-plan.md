@@ -14,6 +14,7 @@ they are already implemented and covered by executable evidence in the traceabil
 - REQ-ORD-MOVE-001, REQ-ORD-MOVE-002, REQ-ORD-MOVE-003 (MOVE target persistence and consumption)
 - REQ-RTS-001, REQ-RTS-002, REQ-RTS-003 (real-time clock and always-available movement commands)
 - REQ-MOVE-002 (terrain-cost-aware movement route resolution with deterministic tie-break)
+- REQ-STACK-001 (tile-level stacking constraints and deterministic contested-destination policy)
 
 ## Planned Requirement Candidates
 
@@ -56,7 +57,7 @@ Key decisions required:
 
 ### Supply and Stacking (Not Implemented)
 - REQ-SUP-001: Supply continuity must be tracked and penalties applied when disrupted.
-- REQ-STACK-001: Tile-level stacking constraints must cap co-located units.
+
 
 ### Combat Resolution (Partial/Not Implemented)
 - REQ-CBT-001: Combat phase must resolve contextual outcomes using terrain, position, and unit state.
@@ -82,7 +83,6 @@ Covered by current implemented behavior (not pending):
 High priority:
 - Final combat resolution model and balancing levers.
 - Movement allowance finalization.
-- Collision policy for conflicting movement orders.
 - Supply disruption penalties and recovery rules.
 
 Medium priority:

@@ -8,11 +8,25 @@ import game.domain.TileCoordinate;
 import game.domain.Unit;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
+    private static final int MAX_UNITS_PER_TILE = 1;
+    private static final Comparator<MoveCandidate> COLLISION_TIE_BREAK = Comparator
+        .comparingInt((MoveCandidate candidate) -> candidate.move().totalCost())
+        .thenComparingInt(candidate -> candidate.from().y())
+        .thenComparingInt(candidate -> candidate.from().x())
+        .thenComparing(candidate -> candidate.unit().id());
+
+    private record MoveCandidate(Unit unit, TileCoordinate from, CostAwareMovementResolver.ResolvedMove move) {
+    }
+
     private final CostAwareMovementResolver movementResolver;
 
     SimultaneousMovePhaseExecutor(ScenarioDefinition scenarioDefinition) {
@@ -27,16 +41,34 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
     @Override
     public PhaseExecution execute(CampaignState state) {
         Map<String, Order> moveTargets = new OrderBook(state.pendingOrders()).activeMoveOrdersByUnit();
+        Map<TileCoordinate, List<Unit>> occupantsByTile = occupantsByTile(state.units());
+
+        Map<TileCoordinate, List<MoveCandidate>> contendersByDestination = new HashMap<>();
+        for (Unit unit : state.units()) {
+            Order target = moveTargets.get(unit.id());
+            if (target == null) {
+                continue;
+            }
+            Optional<CostAwareMovementResolver.ResolvedMove> resolvedMove = movementResolver.resolve(unit, target);
+            if (resolvedMove.isEmpty()) {
+                continue;
+            }
+
+            TileCoordinate from = new TileCoordinate(unit.tileX(), unit.tileY());
+            CostAwareMovementResolver.ResolvedMove move = resolvedMove.orElseThrow();
+            contendersByDestination.computeIfAbsent(move.destination(), key -> new ArrayList<>())
+                .add(new MoveCandidate(unit, from, move));
+        }
+
+        Map<String, MoveCandidate> winningMovesByUnitId = chooseWinnersPerDestination(contendersByDestination);
+        Set<String> successfulMoves = resolveSuccessfulMoves(winningMovesByUnitId, occupantsByTile);
 
         List<Unit> updatedUnits = new ArrayList<>(state.units().size());
         List<MovementPlayback> movementPlayback = new ArrayList<>(state.units().size());
         for (Unit unit : state.units()) {
-            Order target = moveTargets.get(unit.id());
-            Optional<CostAwareMovementResolver.ResolvedMove> resolvedMove = target == null
-                ? Optional.empty()
-                : movementResolver.resolve(unit, target);
-            if (resolvedMove.isPresent()) {
-                TileCoordinate destination = resolvedMove.orElseThrow().destination();
+            MoveCandidate winningMove = winningMovesByUnitId.get(unit.id());
+            if (winningMove != null && successfulMoves.contains(unit.id())) {
+                TileCoordinate destination = winningMove.move().destination();
                 updatedUnits.add(new Unit(unit.id(), unit.side(), unit.type(), unit.size(), destination.x(), destination.y()));
                 movementPlayback.add(new MovementPlayback(
                     unit.id(),
@@ -64,5 +96,70 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
             state.pendingOrders()
         );
         return new PhaseExecution(nextState, movementPlayback);
+    }
+
+    private static Map<TileCoordinate, List<Unit>> occupantsByTile(List<Unit> units) {
+        Map<TileCoordinate, List<Unit>> occupants = new HashMap<>();
+        for (Unit unit : units) {
+            TileCoordinate tile = new TileCoordinate(unit.tileX(), unit.tileY());
+            occupants.computeIfAbsent(tile, key -> new ArrayList<>()).add(unit);
+        }
+        return occupants;
+    }
+
+    private static Map<String, MoveCandidate> chooseWinnersPerDestination(
+        Map<TileCoordinate, List<MoveCandidate>> contendersByDestination
+    ) {
+        Map<String, MoveCandidate> winners = new HashMap<>();
+        contendersByDestination.entrySet().stream()
+            .sorted(Comparator
+                .comparingInt((Map.Entry<TileCoordinate, List<MoveCandidate>> entry) -> entry.getKey().y())
+                .thenComparingInt(entry -> entry.getKey().x()))
+            .forEach(entry -> {
+                List<MoveCandidate> contenders = entry.getValue().stream()
+                    .sorted(COLLISION_TIE_BREAK)
+                    .toList();
+                int accepted = 0;
+                for (MoveCandidate contender : contenders) {
+                    if (accepted >= MAX_UNITS_PER_TILE) {
+                        break;
+                    }
+                    winners.put(contender.unit().id(), contender);
+                    accepted++;
+                }
+            });
+        return winners;
+    }
+
+    private static Set<String> resolveSuccessfulMoves(
+        Map<String, MoveCandidate> winningMovesByUnitId,
+        Map<TileCoordinate, List<Unit>> occupantsByTile
+    ) {
+        Set<String> successfulMoves = new HashSet<>(winningMovesByUnitId.keySet());
+        boolean changed;
+        do {
+            changed = false;
+            List<String> moveIds = List.copyOf(successfulMoves);
+            for (String moveId : moveIds) {
+                MoveCandidate winningMove = winningMovesByUnitId.get(moveId);
+                if (winningMove == null) {
+                    continue;
+                }
+
+                List<Unit> incumbents = occupantsByTile.get(winningMove.move().destination());
+                if (incumbents == null) {
+                    continue;
+                }
+
+                boolean blockedByIncumbent = incumbents.stream()
+                    .filter(incumbent -> !incumbent.id().equals(moveId))
+                    .anyMatch(incumbent -> !successfulMoves.contains(incumbent.id()));
+                if (blockedByIncumbent && successfulMoves.remove(moveId)) {
+                    changed = true;
+                }
+            }
+        } while (changed);
+
+        return successfulMoves;
     }
 }

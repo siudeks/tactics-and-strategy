@@ -1,6 +1,15 @@
 package game;
 
 import org.junit.jupiter.api.Test;
+import game.domain.CampaignState;
+import game.domain.Order;
+import game.domain.OrderType;
+import game.domain.ScenarioDefinition;
+import game.domain.Side;
+import game.domain.TerrainType;
+import game.domain.Unit;
+import game.domain.UnitSize;
+import game.domain.UnitType;
 import game.engine.DeterministicContext;
 import game.engine.PhaseStepResult;
 import game.engine.RuntimePhase;
@@ -79,5 +88,35 @@ class OneTurnSimulationTest {
         TurnResult monolithicResult = engine.runOneTurn(startState);
         assertNotNull(stepwiseResult);
         assertTrue(TurnEngine.areSemanticallyEquivalent(stepwiseResult, monolithicResult));
+    }
+
+    @Test
+    void oneTurn_contestedDestination_isDeterministicAcrossRepeatedRuns() {
+        var scenarioDefinition = new ScenarioDefinition(
+            "stack-det",
+            "Stack Determinism",
+            10,
+            10,
+            TerrainType.SAND,
+            List.of()
+        );
+        var units = List.of(
+            new Unit("alpha", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1),
+            new Unit("bravo", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 3, 1),
+            new Unit("charlie", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 3)
+        );
+        var orders = List.of(
+            new Order("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 2),
+            new Order("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 2),
+            new Order("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, 2, 2)
+        );
+        var startState = new CampaignState("c1", "stack-det", 1, Side.ALLIES, units, orders);
+        var engine = TurnEngine.fixedContext(DeterministicContext.withSeed(42L), scenarioDefinition);
+
+        TurnResult baseline = engine.runOneTurn(startState);
+        for (int i = 0; i < 20; i++) {
+            TurnResult next = engine.runOneTurn(startState);
+            assertTrue(TurnEngine.areSemanticallyEquivalent(baseline, next));
+        }
     }
 }

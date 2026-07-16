@@ -27,18 +27,26 @@ class MovementPhaseConsumesTargetTest {
 
     private static GameRuntime runtimeFor(TerrainType defaultTerrain) {
         var unit = new Unit(UNIT_ID, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, START_X, START_Y);
+        return runtimeForUnits(defaultTerrain, List.of(unit));
+    }
+
+    private static GameRuntime runtimeForUnits(TerrainType defaultTerrain, List<Unit> units) {
         var scenarioDefinition = new ScenarioDefinition(
             "test-move-002", "Test Move 002", 10, 10, defaultTerrain, List.of()
         );
         var state = new CampaignState(
-            "c1", "test-move-002", 1, Side.ALLIES, List.of(unit), List.of()
+            "c1", "test-move-002", 1, Side.ALLIES, units, List.of()
         );
         return new GameRuntime(new LoadedScenario(scenarioDefinition, state));
     }
 
     private static Unit unitFrom(GameRuntime runtime) {
+        return unitFrom(runtime, UNIT_ID);
+    }
+
+    private static Unit unitFrom(GameRuntime runtime, String unitId) {
         return runtime.getCurrentCampaignState().units().stream()
-            .filter(u -> u.id().equals(UNIT_ID))
+            .filter(u -> u.id().equals(unitId))
             .findFirst()
             .orElseThrow();
     }
@@ -86,5 +94,23 @@ class MovementPhaseConsumesTargetTest {
         Unit unit = unitFrom(runtime);
         assertEquals(START_X, unit.tileX());
         assertEquals(START_Y, unit.tileY());
+    }
+
+    @Test
+    void simulateOneTurn_withOccupiedDestinationAndStationaryIncumbent_blocksIncomingMove() {
+        var mover = new Unit(UNIT_ID, Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, START_X, START_Y);
+        var incumbent = new Unit("u2", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 1);
+        var runtime = runtimeForUnits(TerrainType.SAND, List.of(mover, incumbent));
+
+        var assignment = runtime.assignMoveTarget(UNIT_ID, 2, 1);
+        assertEquals(MoveCommandOutcome.ACCEPTED, assignment.outcome());
+        runtime.simulateOneTurn();
+
+        Unit blockedMover = unitFrom(runtime, UNIT_ID);
+        Unit stationaryIncumbent = unitFrom(runtime, "u2");
+        assertEquals(START_X, blockedMover.tileX());
+        assertEquals(START_Y, blockedMover.tileY());
+        assertEquals(2, stationaryIncumbent.tileX());
+        assertEquals(1, stationaryIncumbent.tileY());
     }
 }
