@@ -35,6 +35,13 @@ public record OrderBook(List<Order> orders) {
      * Replaces current MOVE order for a unit (if present) using deterministic last-write-wins.
      */
     public MoveUpsertResult upsertMove(String unitId, Side side, int targetX, int targetY) {
+        return upsertMove(unitId, side, new TileCoordinate(targetX, targetY));
+    }
+
+    /**
+     * Replaces current MOVE order for a unit (if present) using deterministic last-write-wins.
+     */
+    public MoveUpsertResult upsertMove(String unitId, Side side, TileCoordinate target) {
         boolean replacedExisting = false;
         List<Order> next = new ArrayList<>(orders.size() + 1);
         for (Order existing : orders) {
@@ -44,7 +51,7 @@ public record OrderBook(List<Order> orders) {
             }
             next.add(existing);
         }
-        next.add(new Order("move-" + unitId, unitId, side, OrderType.MOVE, targetX, targetY));
+        next.add(Order.of("move-" + unitId, unitId, side, OrderType.MOVE, target));
         return new MoveUpsertResult(new OrderBook(next), replacedExisting);
     }
 

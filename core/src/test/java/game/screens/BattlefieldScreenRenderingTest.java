@@ -275,7 +275,7 @@ class BattlefieldScreenRenderingTest {
             1,
             Side.ALLIES,
             List.of(unit),
-            List.of(new Order("move-1", unitId, Side.ALLIES, OrderType.MOVE, targetTileX, targetTileY))
+            List.of(Order.of("move-1", unitId, Side.ALLIES, OrderType.MOVE, targetTileX, targetTileY))
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }

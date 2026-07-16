@@ -33,7 +33,8 @@ When invoked:
 - Use sealed classes when a hierarchy is intentionally closed.
 - Use pattern matching for switch and instanceof when it improves readability.
 - Use text blocks for multi-line literals when clearer than concatenation.
-- Use var for local variables when type is obvious from context.
+- Use `var` for local variables when type is obvious from context
+  - Example: `var unitById = new HashMap<String, Unit>();`
 - Keep concurrency explicit and bounded; prefer simple models first.
 
 ## Design Pattern Guidance

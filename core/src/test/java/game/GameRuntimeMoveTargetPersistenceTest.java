@@ -42,8 +42,8 @@ class GameRuntimeMoveTargetPersistenceTest {
         assertEquals("move-allies-armor-1", o.id());
         assertEquals("allies-armor-1", o.unitId());
         assertEquals(OrderType.MOVE, o.type());
-        assertEquals(5, o.targetX());
-        assertEquals(4, o.targetY());
+        assertEquals(5, o.target().x());
+        assertEquals(4, o.target().y());
         assertEquals(unit.side(), o.side());
     }
 
@@ -58,8 +58,8 @@ class GameRuntimeMoveTargetPersistenceTest {
         assertEquals(1, orders.size());
         Order o = orders.get(0);
         assertEquals("allies-armor-1", o.unitId());
-        assertEquals(7, o.targetX());
-        assertEquals(2, o.targetY());
+        assertEquals(7, o.target().x());
+        assertEquals(2, o.target().y());
         assertEquals("move-allies-armor-1", o.id());
     }
 
@@ -75,12 +75,12 @@ class GameRuntimeMoveTargetPersistenceTest {
         Order inf = orders.stream().filter(o -> o.unitId().equals("allies-inf-1")).findFirst().orElseThrow();
 
         assertEquals("move-allies-armor-1", armor.id());
-        assertEquals(3, armor.targetX());
-        assertEquals(3, armor.targetY());
+        assertEquals(3, armor.target().x());
+        assertEquals(3, armor.target().y());
 
         assertEquals("move-allies-inf-1", inf.id());
-        assertEquals(4, inf.targetX());
-        assertEquals(1, inf.targetY());
+        assertEquals(4, inf.target().x());
+        assertEquals(1, inf.target().y());
     }
 
     @Test
@@ -106,8 +106,8 @@ class GameRuntimeMoveTargetPersistenceTest {
         assertEquals(MoveCommandOutcome.ACCEPTED, outcome.outcome());
         assertEquals(1, after.pendingOrders().size());
         Order order = after.pendingOrders().get(0);
-        assertEquals(-1, order.targetX());
-        assertEquals(1, order.targetY());
+        assertEquals(-1, order.target().x());
+        assertEquals(1, order.target().y());
     }
 
     @Test

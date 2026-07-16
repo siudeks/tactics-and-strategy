@@ -2,6 +2,7 @@ package game.engine;
 
 import game.domain.CampaignState;
 import game.domain.OrderBook;
+import game.domain.TileCoordinate;
 import game.domain.Unit;
 import game.scenario.LoadedScenario;
 
@@ -147,8 +148,9 @@ public final class GameRuntime {
         if (unit == null) {
             return new MoveCommandResult(MoveCommandOutcome.UNKNOWN_UNIT);
         }
+        TileCoordinate target = new TileCoordinate(tileX, tileY);
         OrderBook.MoveUpsertResult upsert = new OrderBook(state.pendingOrders())
-            .upsertMove(unitId, unit.side(), tileX, tileY);
+            .upsertMove(unitId, unit.side(), target);
         CampaignState updated = new CampaignState(
             state.campaignId(),
             state.scenarioId(),

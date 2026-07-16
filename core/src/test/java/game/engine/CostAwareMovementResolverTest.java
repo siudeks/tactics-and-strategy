@@ -34,7 +34,7 @@ class CostAwareMovementResolverTest {
 
     @Test
     void resolve_withSameDistanceOverDifferentTerrain_assignsDifferentTotalCost() {
-        Order move = new Order("o1", UNIT.id(), Side.ALLIES, OrderType.MOVE, 0, 2);
+        Order move = Order.of("o1", UNIT.id(), Side.ALLIES, OrderType.MOVE, 0, 2);
 
         CostAwareMovementResolver sandResolver = new CostAwareMovementResolver(scenario("sand", TerrainType.SAND));
         CostAwareMovementResolver mountainResolver = new CostAwareMovementResolver(scenario("mountain", TerrainType.MOUNTAIN));

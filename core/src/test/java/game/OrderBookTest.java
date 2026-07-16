@@ -26,16 +26,16 @@ class OrderBookTest {
         assertEquals(1, orders.size());
         assertEquals("u1", orders.get(0).unitId());
         assertEquals(OrderType.MOVE, orders.get(0).type());
-        assertEquals(2, orders.get(0).targetX());
-        assertEquals(3, orders.get(0).targetY());
+        assertEquals(2, orders.get(0).target().x());
+        assertEquals(3, orders.get(0).target().y());
     }
 
     @Test
     void upsertMove_replacesOnlyExistingMoveForSameUnit_withDeterministicLastWriteWins() {
         OrderBook book = new OrderBook(List.of(
-            new Order("hold-u1", "u1", Side.ALLIES, OrderType.HOLD, 0, 0),
-            new Order("move-u1", "u1", Side.ALLIES, OrderType.MOVE, 1, 1),
-            new Order("move-u2", "u2", Side.ALLIES, OrderType.MOVE, 5, 5)
+            Order.of("hold-u1", "u1", Side.ALLIES, OrderType.HOLD, 0, 0),
+            Order.of("move-u1", "u1", Side.ALLIES, OrderType.MOVE, 1, 1),
+            Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, 5, 5)
         ));
 
         OrderBook.MoveUpsertResult result = book.upsertMove("u1", Side.ALLIES, 7, 8);
@@ -50,16 +50,16 @@ class OrderBookTest {
         Order last = orders.get(orders.size() - 1);
         assertEquals("u1", last.unitId());
         assertEquals(OrderType.MOVE, last.type());
-        assertEquals(7, last.targetX());
-        assertEquals(8, last.targetY());
+        assertEquals(7, last.target().x());
+        assertEquals(8, last.target().y());
     }
 
     @Test
     void activeMoveOrdersByUnit_prefersLastMoveForDuplicateUnitIds() {
         OrderBook book = new OrderBook(List.of(
-            new Order("move-u1-a", "u1", Side.ALLIES, OrderType.MOVE, 1, 1),
-            new Order("move-u2", "u2", Side.ALLIES, OrderType.MOVE, 2, 2),
-            new Order("move-u1-b", "u1", Side.ALLIES, OrderType.MOVE, 4, 5)
+            Order.of("move-u1-a", "u1", Side.ALLIES, OrderType.MOVE, 1, 1),
+            Order.of("move-u2", "u2", Side.ALLIES, OrderType.MOVE, 2, 2),
+            Order.of("move-u1-b", "u1", Side.ALLIES, OrderType.MOVE, 4, 5)
         ));
 
         var activeMoves = book.activeMoveOrdersByUnit();
@@ -67,11 +67,11 @@ class OrderBookTest {
         assertEquals(2, activeMoves.size());
         Order u1Move = activeMoves.get("u1");
         assertNotNull(u1Move);
-        assertEquals(4, u1Move.targetX());
-        assertEquals(5, u1Move.targetY());
+        assertEquals(4, u1Move.target().x());
+        assertEquals(5, u1Move.target().y());
         Order u2Move = activeMoves.get("u2");
         assertNotNull(u2Move);
-        assertEquals(2, u2Move.targetX());
-        assertEquals(2, u2Move.targetY());
+        assertEquals(2, u2Move.target().x());
+        assertEquals(2, u2Move.target().y());
     }
 }

@@ -52,8 +52,7 @@ final class CostAwareMovementResolver {
             return Optional.empty();
         }
         TileCoordinate start = new TileCoordinate(unit.tileX(), unit.tileY());
-        TileCoordinate target = new TileCoordinate(order.targetX(), order.targetY());
-        return resolve(start, target);
+        return resolve(start, order.target());
     }
 
     Optional<ResolvedMove> resolve(TileCoordinate start, TileCoordinate target) {

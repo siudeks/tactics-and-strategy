@@ -30,7 +30,7 @@ The following are not currently implemented and are therefore not normative in t
 ### 3.1 Domain State
 - `CampaignState(campaignId, scenarioId, turnNumber, activeSide, units, pendingOrders)`
 - `Unit(id, side, type, size, tileX, tileY)`
-- `Order(id, unitId, side, type, targetX, targetY)`
+- `Order(id, unitId, side, type, target: TileCoordinate)`
 - `ScenarioDefinition(id, name, mapWidth, mapHeight, defaultTerrain, units)`
 
 ### 3.2 Engine Runtime

@@ -33,7 +33,7 @@ class TurnEngineOrderTest {
     @Test
     void moveOrder_movesUnitToTarget() {
         Unit unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
-        Order order = new Order("o1", "u1", Side.ALLIES, OrderType.MOVE, 3, 4);
+        Order order = Order.of("o1", "u1", Side.ALLIES, OrderType.MOVE, 3, 4);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -51,7 +51,7 @@ class TurnEngineOrderTest {
     @Test
     void moveOrder_outOfBounds_unitStaysInPlace() {
         Unit unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
-        Order order = new Order("o1", "u1", Side.ALLIES, OrderType.MOVE, -1, 0);
+        Order order = Order.of("o1", "u1", Side.ALLIES, OrderType.MOVE, -1, 0);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -69,7 +69,7 @@ class TurnEngineOrderTest {
     @Test
     void moveOrder_toVoidTile_unitStaysInPlace() {
         Unit unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
-        Order order = new Order("o1", "u1", Side.ALLIES, OrderType.MOVE, 3, 3);
+        Order order = Order.of("o1", "u1", Side.ALLIES, OrderType.MOVE, 3, 3);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -88,7 +88,7 @@ class TurnEngineOrderTest {
     @Test
     void holdOrder_unitDoesNotMove() {
         Unit unit = new Unit("u1", Side.ALLIES, UnitType.FOOT_INFANTRY, UnitSize.BRIGADE, 5, 5);
-        Order order = new Order("o1", "u1", Side.ALLIES, OrderType.HOLD, 0, 0);
+        Order order = Order.of("o1", "u1", Side.ALLIES, OrderType.HOLD, 0, 0);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -107,8 +107,8 @@ class TurnEngineOrderTest {
     void moveOrders_twoUnitsContendForSameDestination_onlyDeterministicWinnerMoves() {
         Unit alpha = new Unit("alpha", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         Unit bravo = new Unit("bravo", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 3, 1);
-        Order alphaOrder = new Order("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 1);
-        Order bravoOrder = new Order("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 1);
+        Order alphaOrder = Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 1);
+        Order bravoOrder = Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 1);
         CampaignState state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(alpha, bravo), List.of(alphaOrder, bravoOrder)
         );
@@ -131,9 +131,9 @@ class TurnEngineOrderTest {
         Unit alpha = new Unit("alpha", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         Unit bravo = new Unit("bravo", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 3, 1);
         Unit charlie = new Unit("charlie", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 3);
-        Order alphaOrder = new Order("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 2);
-        Order bravoOrder = new Order("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 2);
-        Order charlieOrder = new Order("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, 2, 2);
+        Order alphaOrder = Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 2);
+        Order bravoOrder = Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 2);
+        Order charlieOrder = Order.of("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, 2, 2);
         CampaignState state = new CampaignState(
             "c1",
             "s1",
@@ -165,9 +165,9 @@ class TurnEngineOrderTest {
         Unit alpha = new Unit("alpha", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         Unit bravo = new Unit("bravo", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 3, 1);
         Unit charlie = new Unit("charlie", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 3);
-        Order alphaOrder = new Order("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 2);
-        Order bravoOrder = new Order("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 2);
-        Order charlieOrder = new Order("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, 2, 2);
+        Order alphaOrder = Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, 2, 2);
+        Order bravoOrder = Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, 2, 2);
+        Order charlieOrder = Order.of("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, 2, 2);
 
         CampaignState orderedState = new CampaignState(
             "c1",
