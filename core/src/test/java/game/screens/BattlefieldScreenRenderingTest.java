@@ -9,6 +9,7 @@ import game.domain.Side;
 import game.domain.TerrainType;
 import game.domain.TileCoordinate;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
@@ -276,7 +277,7 @@ class BattlefieldScreenRenderingTest {
             1,
             Side.ALLIES,
             List.of(unit),
-            List.of(Order.of("move-1", unitId, Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
+            List.of(Order.of("move-1", UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }

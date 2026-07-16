@@ -1,11 +1,12 @@
 package game.engine;
 
 import game.domain.TileCoordinate;
+import game.domain.UnitId;
 
 import java.util.Objects;
 
 public record MovementPlayback(
-    String unitId,
+    UnitId unitId,
     TileCoordinate from,
     TileCoordinate to,
     MovementPlaybackOutcome outcome

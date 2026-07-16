@@ -33,7 +33,7 @@ class TurnEngineOrderTest {
     @Test
     void moveOrder_movesUnitToTarget() {
         var unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
-        var order = Order.of("o1", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(3, 4));
+        var order = Order.of("o1", UnitId.of("u1"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(3, 4));
         var state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -51,7 +51,7 @@ class TurnEngineOrderTest {
     @Test
     void moveOrder_outOfBounds_unitStaysInPlace() {
         var unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
-        var order = Order.of("o1", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(-1, 0));
+        var order = Order.of("o1", UnitId.of("u1"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(-1, 0));
         var state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -69,7 +69,7 @@ class TurnEngineOrderTest {
     @Test
     void moveOrder_toVoidTile_unitStaysInPlace() {
         var unit = new Unit("u1", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
-        var order = Order.of("o1", "u1", Side.ALLIES, OrderType.MOVE, new TileCoordinate(3, 3));
+        var order = Order.of("o1", UnitId.of("u1"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(3, 3));
         var state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -88,7 +88,7 @@ class TurnEngineOrderTest {
     @Test
     void holdOrder_unitDoesNotMove() {
         var unit = new Unit("u1", Side.ALLIES, UnitType.FOOT_INFANTRY, UnitSize.BRIGADE, 5, 5);
-        var order = Order.of("o1", "u1", Side.ALLIES, OrderType.HOLD, new TileCoordinate(0, 0));
+        var order = Order.of("o1", UnitId.of("u1"), Side.ALLIES, OrderType.HOLD, new TileCoordinate(0, 0));
         var state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(unit), List.of(order)
         );
@@ -107,8 +107,8 @@ class TurnEngineOrderTest {
     void moveOrders_twoUnitsContendForSameDestination_onlyDeterministicWinnerMoves() {
         var alpha = new Unit("alpha", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         var bravo = new Unit("bravo", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 3, 1);
-        var alphaOrder = Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 1));
-        var bravoOrder = Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 1));
+        var alphaOrder = Order.of("o-alpha", UnitId.of("alpha"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 1));
+        var bravoOrder = Order.of("o-bravo", UnitId.of("bravo"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 1));
         var state = new CampaignState(
             "c1", "s1", 1, Side.ALLIES, List.of(alpha, bravo), List.of(alphaOrder, bravoOrder)
         );
@@ -131,9 +131,9 @@ class TurnEngineOrderTest {
         var alpha = new Unit("alpha", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         var bravo = new Unit("bravo", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 3, 1);
         var charlie = new Unit("charlie", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 3);
-        var alphaOrder = Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
-        var bravoOrder = Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
-        var charlieOrder = Order.of("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
+        var alphaOrder = Order.of("o-alpha", UnitId.of("alpha"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
+        var bravoOrder = Order.of("o-bravo", UnitId.of("bravo"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
+        var charlieOrder = Order.of("o-charlie", UnitId.of("charlie"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
         var state = new CampaignState(
             "c1",
             "s1",
@@ -165,9 +165,9 @@ class TurnEngineOrderTest {
         var alpha = new Unit("alpha", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 1, 1);
         var bravo = new Unit("bravo", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 3, 1);
         var charlie = new Unit("charlie", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 3);
-        var alphaOrder = Order.of("o-alpha", "alpha", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
-        var bravoOrder = Order.of("o-bravo", "bravo", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
-        var charlieOrder = Order.of("o-charlie", "charlie", Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
+        var alphaOrder = Order.of("o-alpha", UnitId.of("alpha"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
+        var bravoOrder = Order.of("o-bravo", UnitId.of("bravo"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
+        var charlieOrder = Order.of("o-charlie", UnitId.of("charlie"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2));
 
         var orderedState = new CampaignState(
             "c1",

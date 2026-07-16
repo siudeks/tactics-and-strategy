@@ -6,6 +6,7 @@ import game.domain.OrderBook;
 import game.domain.ScenarioDefinition;
 import game.domain.TileCoordinate;
 import game.domain.Unit;
+import game.domain.UnitId;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -45,7 +46,7 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
 
         Map<TileCoordinate, List<MoveCandidate>> contendersByDestination = new HashMap<>();
         for (Unit unit : state.units()) {
-            var target = moveTargets.get(unit.id());
+            var target = moveTargets.get(UnitId.of(unit.id()));
             if (target == null) {
                 continue;
             }
@@ -71,7 +72,7 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
                 var destination = winningMove.move().destination();
                 updatedUnits.add(new Unit(unit.id(), unit.side(), unit.type(), unit.size(), destination.x(), destination.y()));
                 movementPlayback.add(new MovementPlayback(
-                    unit.id(),
+                    UnitId.of(unit.id()),
                     TileCoordinate.of(unit.tileX(), unit.tileY()),
                     destination,
                     MovementPlaybackOutcome.MOVED
@@ -79,7 +80,7 @@ final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {
             } else {
                 updatedUnits.add(unit);
                 movementPlayback.add(new MovementPlayback(
-                    unit.id(),
+                    UnitId.of(unit.id()),
                     TileCoordinate.of(unit.tileX(), unit.tileY()),
                     TileCoordinate.of(unit.tileX(), unit.tileY()),
                     MovementPlaybackOutcome.SKIPPED

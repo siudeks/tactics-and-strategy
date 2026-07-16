@@ -121,7 +121,7 @@ public final class ScenarioLoader {
 
     private static Order parseOrder(JsonValue orderJson) {
         var id = orderJson.getString("id");
-        var unitId = orderJson.getString("unitId");
+        var unitId = UnitId.of(orderJson.getString("unitId"));
         var side = Side.valueOf(orderJson.getString("side").toUpperCase(Locale.ROOT));
         var type = OrderType.valueOf(orderJson.getString("type").toUpperCase(Locale.ROOT));
         var targetX = orderJson.getInt("targetX");

@@ -2,12 +2,13 @@ package game.screens;
 
 import game.domain.CampaignState;
 import game.domain.Side;
+import game.domain.TileCoordinate;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.MovementPlayback;
 import game.engine.MovementPlaybackOutcome;
-import game.domain.TileCoordinate;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -34,8 +35,8 @@ class UnitRenderPositionResolverTest {
         );
         var movementState = new MovementPlaybackRenderState(
             List.of(
-                new MovementPlayback("moving", new TileCoordinate(1, 1), new TileCoordinate(3, 4), MovementPlaybackOutcome.MOVED),
-                new MovementPlayback("static", new TileCoordinate(5, 5), new TileCoordinate(5, 5), MovementPlaybackOutcome.SKIPPED)
+                new MovementPlayback(UnitId.of("moving"), new TileCoordinate(1, 1), new TileCoordinate(3, 4), MovementPlaybackOutcome.MOVED),
+                new MovementPlayback(UnitId.of("static"), new TileCoordinate(5, 5), new TileCoordinate(5, 5), MovementPlaybackOutcome.SKIPPED)
             ),
             0.5f
         );
@@ -77,7 +78,7 @@ class UnitRenderPositionResolverTest {
         var unit = new Unit("unit", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 4, 6);
         float[] rtsPos = {2.5f, 3.7f};
         var playback = new MovementPlaybackRenderState(
-            List.of(new MovementPlayback("unit", new TileCoordinate(0, 0), new TileCoordinate(8, 8), MovementPlaybackOutcome.MOVED)),
+            List.of(new MovementPlayback(UnitId.of("unit"), new TileCoordinate(0, 0), new TileCoordinate(8, 8), MovementPlaybackOutcome.MOVED)),
             0.5f
         );
 

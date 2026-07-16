@@ -1,6 +1,7 @@
 package game.screens;
 
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.engine.MovementPlayback;
 import org.jspecify.annotations.Nullable;
 
@@ -33,7 +34,7 @@ final class UnitRenderPositionResolver {
             return new RenderTilePosition(unit.tileX(), unit.tileY());
         }
         for (MovementPlayback playback : movementState.playback()) {
-            if (!playback.unitId().equals(unit.id()) || !playback.moved()) {
+            if (!playback.unitId().equals(UnitId.of(unit.id())) || !playback.moved()) {
                 continue;
             }
             var progress = movementState.progress();

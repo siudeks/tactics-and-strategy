@@ -8,6 +8,7 @@ import game.domain.Side;
 import game.domain.TerrainType;
 import game.domain.TileCoordinate;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
@@ -44,7 +45,7 @@ class BattlefieldPhasePlaybackControllerTest {
         assertEquals(InteractionLockState.MOVEMENT_PLAYBACK, controller.interactionLockState());
         var movementState = controller.movementPlaybackRenderState();
         assertNotNull(movementState);
-        assertTrue(movementState.playback().stream().anyMatch(playback -> playback.unitId().equals("moving-unit") && playback.moved()));
+        assertTrue(movementState.playback().stream().anyMatch(playback -> playback.unitId().equals(UnitId.of("moving-unit")) && playback.moved()));
         assertEquals(0f, movementState.progress());
 
         controller.advance(runtime, 0.25f);
@@ -101,7 +102,7 @@ class BattlefieldPhasePlaybackControllerTest {
             1,
             Side.ALLIES,
             List.of(unit),
-            List.of(Order.of("move-1", unitId, Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
+            List.of(Order.of("move-1", UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }

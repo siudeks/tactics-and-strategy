@@ -4,6 +4,7 @@ import game.domain.CampaignState;
 import game.domain.OrderBook;
 import game.domain.TileCoordinate;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.scenario.LoadedScenario;
 
 import java.util.ArrayList;
@@ -150,7 +151,7 @@ public final class GameRuntime {
         }
         var target = TileCoordinate.of(tileX, tileY);
         var upsert = new OrderBook(state.pendingOrders())
-            .upsertMove(unitId, unit.side(), target);
+            .upsertMove(UnitId.of(unitId), unit.side(), target);
         var updated = new CampaignState(
             state.campaignId(),
             state.scenarioId(),

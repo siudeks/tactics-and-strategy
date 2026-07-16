@@ -5,6 +5,7 @@ import game.domain.Order;
 import game.domain.OrderType;
 import game.domain.Side;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.engine.GameRuntime;
 import game.engine.MoveCommandOutcome;
 import game.platform.ScenarioLoader;
@@ -40,7 +41,7 @@ class GameRuntimeMoveTargetPersistenceTest {
         assertEquals(1, orders.size());
         var o = orders.get(0);
         assertEquals("move-allies-armor-1", o.id());
-        assertEquals("allies-armor-1", o.unitId());
+        assertEquals(UnitId.of("allies-armor-1"), o.unitId());
         assertEquals(OrderType.MOVE, o.type());
         assertEquals(5, o.target().x());
         assertEquals(4, o.target().y());
@@ -57,7 +58,7 @@ class GameRuntimeMoveTargetPersistenceTest {
         assertEquals(MoveCommandOutcome.REPLACED_EXISTING, secondOutcome.outcome());
         assertEquals(1, orders.size());
         var o = orders.get(0);
-        assertEquals("allies-armor-1", o.unitId());
+        assertEquals(UnitId.of("allies-armor-1"), o.unitId());
         assertEquals(7, o.target().x());
         assertEquals(2, o.target().y());
         assertEquals("move-allies-armor-1", o.id());
@@ -71,8 +72,8 @@ class GameRuntimeMoveTargetPersistenceTest {
         var orders = runtime.getCurrentCampaignState().pendingOrders();
         assertEquals(2, orders.size());
 
-        Order armor = orders.stream().filter(o -> o.unitId().equals("allies-armor-1")).findFirst().orElseThrow();
-        Order inf = orders.stream().filter(o -> o.unitId().equals("allies-inf-1")).findFirst().orElseThrow();
+        Order armor = orders.stream().filter(o -> o.unitId().equals(UnitId.of("allies-armor-1"))).findFirst().orElseThrow();
+        Order inf = orders.stream().filter(o -> o.unitId().equals(UnitId.of("allies-inf-1"))).findFirst().orElseThrow();
 
         assertEquals("move-allies-armor-1", armor.id());
         assertEquals(3, armor.target().x());

@@ -3,6 +3,7 @@ package game;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import game.domain.CampaignState;
+import game.domain.UnitId;
 import game.engine.GameRuntime;
 import game.platform.ScenarioLoader;
 
@@ -67,7 +68,7 @@ class GameRuntimeTurnIntegrationTest {
         runtime.advanceClock(0.5f);
 
         var orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
-            .anyMatch(o -> o.unitId().equals(unitId) && o.type() == game.domain.OrderType.MOVE);
+            .anyMatch(o -> o.unitId().equals(UnitId.of(unitId)) && o.type() == game.domain.OrderType.MOVE);
         assertTrue(orderPresent, "MOVE order should persist after clock advances");
     }
 
@@ -79,7 +80,7 @@ class GameRuntimeTurnIntegrationTest {
         var outcome = runtime.assignMoveTargetOrder(unitId, unit.tileX() + 2, unit.tileY());
 
         var orderPresent = runtime.getCurrentCampaignState().pendingOrders().stream()
-            .anyMatch(o -> o.unitId().equals(unitId) && o.type() == game.domain.OrderType.MOVE);
+            .anyMatch(o -> o.unitId().equals(UnitId.of(unitId)) && o.type() == game.domain.OrderType.MOVE);
         assertAll(
             () -> assertEquals(game.engine.MoveCommandOutcome.ACCEPTED, outcome.outcome()),
             () -> assertTrue(orderPresent, "MOVE order should be persisted in pendingOrders"),

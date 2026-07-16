@@ -21,8 +21,8 @@ public record OrderBook(List<Order> orders) {
      * Returns a deterministic materialized view of active MOVE orders keyed by unit id.
      * If input contains duplicates for one unit, the last order wins.
      */
-    public Map<String, Order> activeMoveOrdersByUnit() {
-        var moveOrders = new LinkedHashMap<String, Order>();
+    public Map<UnitId, Order> activeMoveOrdersByUnit() {
+        var moveOrders = new LinkedHashMap<UnitId, Order>();
         for (Order order : orders) {
             if (order.type() == OrderType.MOVE) {
                 moveOrders.put(order.unitId(), order);
@@ -35,13 +35,17 @@ public record OrderBook(List<Order> orders) {
      * Replaces current MOVE order for a unit (if present) using deterministic last-write-wins.
      */
     public MoveUpsertResult upsertMove(String unitId, Side side, int targetX, int targetY) {
+        return upsertMove(UnitId.of(unitId), side, targetX, targetY);
+    }
+
+    public MoveUpsertResult upsertMove(UnitId unitId, Side side, int targetX, int targetY) {
         return upsertMove(unitId, side, TileCoordinate.of(targetX, targetY));
     }
 
     /**
      * Replaces current MOVE order for a unit (if present) using deterministic last-write-wins.
      */
-    public MoveUpsertResult upsertMove(String unitId, Side side, TileCoordinate target) {
+    public MoveUpsertResult upsertMove(UnitId unitId, Side side, TileCoordinate target) {
         var replacedExisting = false;
         var next = new ArrayList<Order>(orders.size() + 1);
         for (Order existing : orders) {
