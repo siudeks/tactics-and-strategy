@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import game.domain.RgbaColor;
 import game.terrain.GeneratedTerrainData;
 import game.terrain.TerrainMapDefinition;
 

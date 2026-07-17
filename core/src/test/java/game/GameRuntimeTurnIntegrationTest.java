@@ -2,7 +2,6 @@ package game;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import game.domain.CampaignState;
 import game.domain.UnitId;
 import game.engine.GameRuntime;
 import game.platform.ScenarioLoader;

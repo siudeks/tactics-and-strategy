@@ -4,13 +4,11 @@ import org.junit.jupiter.api.Test;
 import game.domain.Side;
 import game.domain.TerrainType;
 import game.domain.UnitType;
-import game.scenario.ScenarioEntry;
-import game.scenario.LoadedScenario;
 import game.platform.ScenarioLoader;
+import game.scenario.ScenarioEntry;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

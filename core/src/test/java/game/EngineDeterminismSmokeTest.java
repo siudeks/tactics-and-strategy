@@ -1,11 +1,8 @@
 package game;
 
 import org.junit.jupiter.api.Test;
-import game.domain.CampaignState;
 import game.engine.DeterministicContext;
 import game.engine.TurnEngine;
-import game.engine.TurnResult;
-import game.scenario.LoadedScenario;
 import game.platform.ScenarioLoader;
 
 import static org.junit.jupiter.api.Assertions.*;

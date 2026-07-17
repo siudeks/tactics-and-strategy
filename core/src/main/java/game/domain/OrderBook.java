@@ -55,7 +55,7 @@ public record OrderBook(List<Order> orders) {
             }
             next.add(existing);
         }
-        next.add(Order.of("move-" + unitId, unitId, side, OrderType.MOVE, target));
+        next.add(Order.of(unitId, side, OrderType.MOVE, target));
         return new MoveUpsertResult(new OrderBook(next), replacedExisting);
     }
 

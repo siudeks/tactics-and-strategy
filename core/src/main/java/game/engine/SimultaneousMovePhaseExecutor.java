@@ -1,7 +1,6 @@
 package game.engine;
 
 import game.domain.CampaignState;
-import game.domain.Order;
 import game.domain.OrderBook;
 import game.domain.ScenarioDefinition;
 import game.domain.TileCoordinate;
@@ -14,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 final class SimultaneousMovePhaseExecutor implements TurnPhaseExecutor {

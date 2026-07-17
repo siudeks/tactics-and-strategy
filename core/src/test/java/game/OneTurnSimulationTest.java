@@ -13,15 +13,14 @@ import game.domain.Unit;
 import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.engine.DeterministicContext;
-import game.engine.PhaseStepResult;
 import game.engine.RuntimePhase;
-import game.engine.TurnExecutionSession;
 import game.engine.TurnEngine;
 import game.engine.TurnPhase;
 import game.engine.TurnResult;
 import game.platform.ScenarioLoader;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -108,9 +107,9 @@ class OneTurnSimulationTest {
             new Unit("charlie", Side.ALLIES, UnitType.MEDIUM_TANK, UnitSize.BATTALION, 2, 3)
         );
         var orders = List.of(
-            Order.of("o-alpha", UnitId.of("alpha"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
-            Order.of("o-bravo", UnitId.of("bravo"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
-            Order.of("o-charlie", UnitId.of("charlie"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2))
+            Order.of(UUID.fromString("00000000-0000-0000-0000-0000000000a1"), UnitId.of("alpha"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
+            Order.of(UUID.fromString("00000000-0000-0000-0000-0000000000b1"), UnitId.of("bravo"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2)),
+            Order.of(UUID.fromString("00000000-0000-0000-0000-0000000000c1"), UnitId.of("charlie"), Side.ALLIES, OrderType.MOVE, new TileCoordinate(2, 2))
         );
         var startState = new CampaignState("c1", "stack-det", 1, Side.ALLIES, units, orders);
         var engine = TurnEngine.fixedContext(DeterministicContext.withSeed(42L), scenarioDefinition);

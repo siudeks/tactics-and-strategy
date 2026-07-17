@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.Objects;
 
 public final class ScenarioLoader {
@@ -126,7 +127,7 @@ public final class ScenarioLoader {
         var type = OrderType.valueOf(orderJson.getString("type").toUpperCase(Locale.ROOT));
         var targetX = orderJson.getInt("targetX");
         var targetY = orderJson.getInt("targetY");
-        return Order.of(id, unitId, side, type, TileCoordinate.of(targetX, targetY));
+        return Order.of(UUID.fromString(id), unitId, side, type, TileCoordinate.of(targetX, targetY));
     }
 
     private static void validateUnitCoordinates(String scenarioId, int mapWidth, int mapHeight, List<Unit> units) {

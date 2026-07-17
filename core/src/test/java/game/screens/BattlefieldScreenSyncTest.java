@@ -16,9 +16,8 @@ import game.scenario.LoadedScenario;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -171,7 +170,7 @@ class BattlefieldScreenSyncTest {
             1,
             Side.ALLIES,
             List.of(unit),
-            List.of(Order.of("move-1", UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
+            List.of(Order.of(UUID.fromString("00000000-0000-0000-0000-0000000000f3"), UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }

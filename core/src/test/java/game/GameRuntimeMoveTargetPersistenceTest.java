@@ -1,6 +1,5 @@
 package game;
 
-import game.domain.CampaignState;
 import game.domain.Order;
 import game.domain.OrderType;
 import game.domain.Side;
@@ -12,10 +11,11 @@ import game.platform.ScenarioLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,7 +40,7 @@ class GameRuntimeMoveTargetPersistenceTest {
         assertEquals(MoveCommandOutcome.ACCEPTED, outcome.outcome());
         assertEquals(1, orders.size());
         var o = orders.get(0);
-        assertEquals("move-allies-armor-1", o.id());
+        assertInstanceOf(UUID.class, o.id());
         assertEquals(UnitId.of("allies-armor-1"), o.unitId());
         assertEquals(OrderType.MOVE, o.type());
         assertEquals(5, o.target().x());
@@ -61,7 +61,7 @@ class GameRuntimeMoveTargetPersistenceTest {
         assertEquals(UnitId.of("allies-armor-1"), o.unitId());
         assertEquals(7, o.target().x());
         assertEquals(2, o.target().y());
-        assertEquals("move-allies-armor-1", o.id());
+        assertInstanceOf(UUID.class, o.id());
     }
 
     @Test
@@ -75,11 +75,11 @@ class GameRuntimeMoveTargetPersistenceTest {
         Order armor = orders.stream().filter(o -> o.unitId().equals(UnitId.of("allies-armor-1"))).findFirst().orElseThrow();
         Order inf = orders.stream().filter(o -> o.unitId().equals(UnitId.of("allies-inf-1"))).findFirst().orElseThrow();
 
-        assertEquals("move-allies-armor-1", armor.id());
+        assertInstanceOf(UUID.class, armor.id());
         assertEquals(3, armor.target().x());
         assertEquals(3, armor.target().y());
 
-        assertEquals("move-allies-inf-1", inf.id());
+        assertInstanceOf(UUID.class, inf.id());
         assertEquals(4, inf.target().x());
         assertEquals(1, inf.target().y());
     }

@@ -4,14 +4,12 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import game.platform.ScenarioLoader;
 import game.scenario.LoadedScenario;
 import game.scenario.ScenarioEntry;
-import game.platform.ScenarioLoader;
 
-import java.util.List;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;

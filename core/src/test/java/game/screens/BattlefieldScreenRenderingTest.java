@@ -17,6 +17,7 @@ import game.scenario.LoadedScenario;
 import game.platform.ScenarioLoader;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -277,7 +278,7 @@ class BattlefieldScreenRenderingTest {
             1,
             Side.ALLIES,
             List.of(unit),
-            List.of(Order.of("move-1", UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
+            List.of(Order.of(UUID.fromString("00000000-0000-0000-0000-0000000000f2"), UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }

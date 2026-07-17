@@ -103,8 +103,9 @@ For a single destination tile, contenders are ordered by:
 With v1 stack limit `1`, only the first contender in this order can win the tile.
 
 ### 4.3 COMBAT
-- Current behavior: no-op.
-- Session effect: the in-session state remains unchanged.
+- Current behavior: adjacent opposing units engage deterministically.
+- Resolution rule: for each orthogonally adjacent enemy pair, the unit with the stronger combat rank survives; if ranks tie, the lexicographically earlier `unit.id` survives.
+- Session effect: the in-session state removes defeated units from the resulting `CampaignState`.
 
 ### 4.4 RETREAT
 - Current behavior: no-op.

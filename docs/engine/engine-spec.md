@@ -84,7 +84,7 @@ At `END_TURN`, engine output state MUST satisfy all conditions below:
 2. If side flip receives `NEUTRAL`, engine MUST fail with `IllegalStateException`.
 
 ### 4.6 Placeholders with Explicit Current Behavior
-1. `COMBAT` phase MUST be represented in `phaseTrace` and currently performs no unit-state mutation.
+1. `COMBAT` phase MUST be represented in `phaseTrace` and MUST resolve adjacent opposing units deterministically using unit-type ranking, removing the weaker unit from the resulting state.
 2. `RETREAT` phase MUST be represented in `phaseTrace` and currently performs no unit-state mutation.
 
 ## 5. State Invariants

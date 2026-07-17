@@ -16,6 +16,7 @@ import game.scenario.LoadedScenario;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -102,7 +103,7 @@ class BattlefieldPhasePlaybackControllerTest {
             1,
             Side.ALLIES,
             List.of(unit),
-            List.of(Order.of("move-1", UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
+            List.of(Order.of(UUID.fromString("00000000-0000-0000-0000-0000000000f1"), UnitId.of(unitId), Side.ALLIES, OrderType.MOVE, new TileCoordinate(targetTileX, targetTileY)))
         );
         return new LoadedScenario(scenarioDefinition, campaignState);
     }

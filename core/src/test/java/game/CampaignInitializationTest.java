@@ -4,11 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import game.domain.CampaignState;
 import game.domain.Side;
-import game.domain.Unit;
-import game.scenario.LoadedScenario;
 import game.platform.ScenarioLoader;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

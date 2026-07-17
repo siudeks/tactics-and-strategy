@@ -8,7 +8,6 @@ import game.domain.UnitId;
 import game.scenario.LoadedScenario;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.jspecify.annotations.Nullable;

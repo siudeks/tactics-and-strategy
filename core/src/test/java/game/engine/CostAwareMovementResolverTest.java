@@ -12,6 +12,7 @@ import game.domain.UnitType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,7 +35,7 @@ class CostAwareMovementResolverTest {
 
     @Test
     void resolve_withSameDistanceOverDifferentTerrain_assignsDifferentTotalCost() {
-        var move = Order.of("o1", UNIT.id(), Side.ALLIES, OrderType.MOVE, new TileCoordinate(0, 2));
+        var move = Order.of(UUID.fromString("00000000-0000-0000-0000-0000000000a1"), UNIT.id(), Side.ALLIES, OrderType.MOVE, new TileCoordinate(0, 2));
 
         var sandResolver = new CostAwareMovementResolver(scenario("sand", TerrainType.SAND));
         var mountainResolver = new CostAwareMovementResolver(scenario("mountain", TerrainType.MOUNTAIN));
