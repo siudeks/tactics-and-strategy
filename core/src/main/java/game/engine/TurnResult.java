@@ -2,7 +2,6 @@ package game.engine;
 
 import game.domain.CampaignState;
 import java.util.List;
-import java.util.Objects;
 
 public record TurnResult(
     CampaignState state,
@@ -12,8 +11,6 @@ public record TurnResult(
     String canonicalSnapshot
 ) {
     public TurnResult {
-        Objects.requireNonNull(state, "state must not be null");
-        phaseTrace = List.copyOf(Objects.requireNonNull(phaseTrace, "phaseTrace must not be null"));
-        Objects.requireNonNull(canonicalSnapshot, "canonicalSnapshot must not be null");
+        phaseTrace = List.copyOf(phaseTrace);
     }
 }

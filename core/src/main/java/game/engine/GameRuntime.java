@@ -10,7 +10,6 @@ import game.scenario.LoadedScenario;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
@@ -20,9 +19,6 @@ public final class GameRuntime {
      * Result of simulating one turn.
      */
     public record TurnSimulationResult(TurnResult turnResult) {
-        public TurnSimulationResult {
-            Objects.requireNonNull(turnResult, "turnResult must not be null");
-        }
     }
 
     private LoadedScenario loadedScenario;
@@ -33,7 +29,7 @@ public final class GameRuntime {
     private TurnExecutionSession activeTurnExecution;
 
     public GameRuntime(LoadedScenario loadedScenario) {
-        this.loadedScenario = Objects.requireNonNull(loadedScenario, "loadedScenario must not be null");
+        this.loadedScenario = loadedScenario;
         var ctx = DeterministicContext.withSeed(0L);
         this.engine = TurnEngine.fixedContext(ctx, loadedScenario.scenarioDefinition());
         this.gameClock = new GameClock();
@@ -143,7 +139,9 @@ public final class GameRuntime {
      * This method updates command state only and does not affect render-side movement projection.
      */
     public MoveCommandResult assignMoveTargetOrder(String unitId, int tileX, int tileY) {
-        Objects.requireNonNull(unitId, "unitId");
+        if (unitId == null) {
+            throw new NullPointerException("unitId");
+        }
         var state = currentCampaignState();
         var unit = findUnit(state, unitId);
         if (unit == null) {
@@ -173,7 +171,9 @@ public final class GameRuntime {
      * @return {@code true} when projection started for a known unit; {@code false} for unknown units
      */
     public boolean projectMoveTarget(String unitId, int tileX, int tileY) {
-        Objects.requireNonNull(unitId, "unitId");
+        if (unitId == null) {
+            throw new NullPointerException("unitId");
+        }
         var state = currentCampaignState();
         var unit = findUnit(state, unitId);
         if (unit == null) {

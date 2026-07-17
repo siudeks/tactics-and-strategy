@@ -9,8 +9,8 @@ public final class TurnEngine {
     private final Map<TurnPhase, TurnPhaseExecutor> phaseExecutors;
 
     private TurnEngine(DeterministicContext context, ScenarioDefinition scenarioDefinition) {
-        this.context = Objects.requireNonNull(context);
-        this.scenarioDefinition = Objects.requireNonNull(scenarioDefinition);
+        this.context = context;
+        this.scenarioDefinition = scenarioDefinition;
         this.phaseExecutors = Map.of(
             TurnPhase.ISSUE_ORDERS, new IssueOrdersPhaseExecutor(),
             TurnPhase.SIMULTANEOUS_MOVE, new SimultaneousMovePhaseExecutor(this.scenarioDefinition),
@@ -34,11 +34,11 @@ public final class TurnEngine {
     }
 
     public TurnExecutionSession beginExecution(CampaignState state) {
-        return new TurnExecutionSession(this, Objects.requireNonNull(state));
+        return new TurnExecutionSession(this, state);
     }
 
     PhaseExecution executePhase(TurnPhase phase, CampaignState state) {
-        var executor = phaseExecutors.get(Objects.requireNonNull(phase));
+        var executor = phaseExecutors.get(phase);
         if (executor == null) {
             throw new IllegalArgumentException("No executor registered for phase " + phase);
         }
@@ -70,7 +70,7 @@ public final class TurnEngine {
     }
 
     static Side flipSide(Side side) {
-        return switch (Objects.requireNonNull(side)) {
+        return switch (side) {
             case ALLIES -> Side.AXIS;
             case AXIS -> Side.ALLIES;
             case NEUTRAL -> throw new IllegalStateException("Cannot flip NEUTRAL side in turn engine");

@@ -4,7 +4,6 @@ import game.domain.CampaignState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
@@ -19,8 +18,8 @@ public final class TurnExecutionSession {
     private TurnResult completedTurnResult;
 
     TurnExecutionSession(TurnEngine engine, CampaignState startingState) {
-        this.engine = Objects.requireNonNull(engine, "engine must not be null");
-        this.currentState = Objects.requireNonNull(startingState, "startingState must not be null");
+        this.engine = engine;
+        this.currentState = startingState;
         this.startTimeMillis = System.currentTimeMillis();
         this.phaseTrace = new ArrayList<>(TurnEngine.phaseSequence().size());
     }
@@ -69,6 +68,6 @@ public final class TurnExecutionSession {
     }
 
     void replaceCurrentState(CampaignState updatedState) {
-        currentState = Objects.requireNonNull(updatedState, "updatedState must not be null");
+        currentState = updatedState;
     }
 }

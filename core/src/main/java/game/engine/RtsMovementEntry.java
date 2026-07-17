@@ -1,7 +1,5 @@
 package game.engine;
 
-import java.util.Objects;
-
 /**
  * Immutable snapshot of one unit's in-progress real-time movement toward a target tile.
  * Speed is fixed at 1 tile per real-time second, so {@code totalSeconds} equals the
@@ -18,7 +16,6 @@ record RtsMovementEntry(
 ) {
 
     RtsMovementEntry {
-        Objects.requireNonNull(unitId, "unitId");
     }
 
     /** Returns a copy of this entry with {@code progressSeconds} replaced. */

@@ -1,6 +1,8 @@
 package game;
 
+import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.core.domain.JavaMethodCall;
 import org.jspecify.annotations.NullMarked;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
@@ -43,6 +45,22 @@ class ArchitecturePackageInfoTest {
     static final ArchRule libGdxDependentClassesMustResideInPlatformOrScreens = noClasses()
         .that().resideOutsideOfPackages("game.platform..", "game.screens..")
         .should().dependOnClassesThat().resideInAPackage("com.badlogic.gdx..");
+
+    @ArchTest
+    static final ArchRule domainAndEnginePackagesMustNotUseObjectsRequireNonNull = noClasses()
+        .that().resideInAnyPackage("game.domain..", "game.engine..")
+        .should().callMethodWhere(requireNonNullCalls());
+
+    private static DescribedPredicate<JavaMethodCall> requireNonNullCalls() {
+        return new DescribedPredicate<>("call Objects.requireNonNull") {
+            @Override
+            public boolean test(JavaMethodCall methodCall) {
+                var target = methodCall.getTarget();
+                return target.getName().equals("requireNonNull")
+                    && target.getOwner().getFullName().equals("java.util.Objects");
+            }
+        };
+    }
 
     private static ArchCondition<JavaClass> resideInPackageWithPackageInfo() {
         return new ArchCondition<>("reside in package with package-info") {

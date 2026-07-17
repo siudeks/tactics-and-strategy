@@ -3,8 +3,6 @@ package game.engine;
 import game.domain.TileCoordinate;
 import game.domain.UnitId;
 
-import java.util.Objects;
-
 public record MovementPlayback(
     UnitId unitId,
     TileCoordinate from,
@@ -12,10 +10,6 @@ public record MovementPlayback(
     MovementPlaybackOutcome outcome
 ) {
     public MovementPlayback {
-        Objects.requireNonNull(unitId, "unitId must not be null");
-        Objects.requireNonNull(from, "from must not be null");
-        Objects.requireNonNull(to, "to must not be null");
-        Objects.requireNonNull(outcome, "outcome must not be null");
     }
 
     public boolean moved() {

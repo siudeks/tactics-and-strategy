@@ -3,7 +3,6 @@ package game.engine;
 import game.domain.CampaignState;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public record PhaseStepResult(
@@ -18,10 +17,10 @@ public record PhaseStepResult(
         List<MovementPlayback> movementPlayback,
         Optional<TurnResult> completedTurnResult
     ) {
-        this.phase = Objects.requireNonNull(phase, "phase must not be null");
-        this.state = Objects.requireNonNull(state, "state must not be null");
-        this.movementPlayback = List.copyOf(Objects.requireNonNull(movementPlayback, "movementPlayback must not be null"));
-        this.completedTurnResult = Objects.requireNonNull(completedTurnResult, "completedTurnResult must not be null");
+        this.phase = phase;
+        this.state = state;
+        this.movementPlayback = List.copyOf(movementPlayback);
+        this.completedTurnResult = completedTurnResult;
     }
 
     public boolean turnCompleted() {
