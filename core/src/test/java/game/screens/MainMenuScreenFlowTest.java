@@ -44,7 +44,7 @@ class MainMenuScreenFlowTest {
     }
 
     @Test
-    void launchSelected_handsSelectedScenarioToBattlefieldScreen() {
+    void launchSelected_routesThroughKeyboardShortcutsScreenBeforeBattlefield() {
         var game = new RecordingGame();
         var menuScreen = new MainMenuScreen(game);
         var entries = ScenarioLoader.listAvailableScenarios();
@@ -52,6 +52,17 @@ class MainMenuScreenFlowTest {
         injectEntries(menuScreen, entries);
 
         invokeLaunchSelected(menuScreen);
+
+        var shortcutsScreen = assertInstanceOf(ScenarioKeyboardShortcutsScreen.class, game.capturedScreen);
+        var loadedScenarioFromShortcuts = shortcutsScreen.loadedScenario();
+
+        assertEquals(
+            entries.getFirst().name(),
+            loadedScenarioFromShortcuts.scenarioDefinition().name()
+        );
+        assertEquals(entries.getFirst().resourcePath(), scenarioResourcePathFor(loadedScenarioFromShortcuts.scenarioDefinition().id()));
+
+        assertTrue(shortcutsScreen.handleKeyDown(com.badlogic.gdx.Input.Keys.ENTER));
 
         var battlefieldScreen = assertInstanceOf(BattlefieldScreen.class, game.capturedScreen);
         var loadedScenario = extractLoadedScenario(battlefieldScreen);
@@ -61,6 +72,20 @@ class MainMenuScreenFlowTest {
             loadedScenario.scenarioDefinition().name()
         );
         assertEquals(entries.getFirst().resourcePath(), scenarioResourcePathFor(loadedScenario.scenarioDefinition().id()));
+    }
+
+    @Test
+    void shortcutsScreen_escapeKey_startsBattlefieldWithSameScenario() {
+        var game = new RecordingGame();
+        var scenario = ScenarioLoader.loadFromResource(ScenarioLoader.listAvailableScenarios().getFirst().resourcePath());
+        var shortcutsScreen = new ScenarioKeyboardShortcutsScreen(game, scenario);
+
+        assertTrue(shortcutsScreen.handleKeyDown(com.badlogic.gdx.Input.Keys.ESCAPE));
+
+        var battlefieldScreen = assertInstanceOf(BattlefieldScreen.class, game.capturedScreen);
+        var loadedScenario = extractLoadedScenario(battlefieldScreen);
+
+        assertEquals(scenario.scenarioDefinition().id(), loadedScenario.scenarioDefinition().id());
     }
 
     private static void invokeLaunchSelected(MainMenuScreen menuScreen) {

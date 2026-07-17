@@ -89,7 +89,8 @@ public class MainMenuScreen extends ScreenAdapter {
     private void launchSelected() {
         var entry = entries.get(selectedIndex);
         stopMenuMusic();
-        game.setScreen(new BattlefieldScreen(game, ScenarioLoader.loadFromResource(entry.resourcePath())));
+        var loadedScenario = ScenarioLoader.loadFromResource(entry.resourcePath());
+        game.setScreen(new ScenarioKeyboardShortcutsScreen(game, loadedScenario));
     }
 
     @Override
