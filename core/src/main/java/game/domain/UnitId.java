@@ -1,12 +1,28 @@
 package game.domain;
 
-public record UnitId(String value) {
-    public static UnitId of(String value) {
-        return new UnitId(value);
+import org.jspecify.annotations.Nullable;
+
+public sealed interface UnitId permits UnitId.Value, UnitId.None {
+    static UnitId of(@Nullable String value) {
+        if (value == null) {
+            return none();
+        }
+        return new Value(value);
     }
 
-    @Override
-    public String toString() {
-        return value;
+    static UnitId none() {
+        return None.INSTANCE;
+    }
+
+    record Value(String value) implements UnitId {
+    }
+
+    enum None implements UnitId {
+        INSTANCE;
+
+        @Override
+        public String toString() {
+            return "none";
+        }
     }
 }

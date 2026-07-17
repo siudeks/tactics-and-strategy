@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import game.domain.CampaignState;
 import game.domain.Side;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.domain.UnitType;
 import game.screens.BattlefieldScreen.MoveTargetAssignment;
 import game.screens.BattlefieldScreen.TileCoord;
@@ -167,8 +168,15 @@ final class MapPanel extends Actor {
                     clickedTilePassable
                 );
                 if (assignment != null) {
-                    moveTargetsByUnit.put(assignment.unitId(), assignment.tile());
-                    moveTargetRecorder.assign(assignment.unitId(), assignment.tile());
+                    switch (assignment.unitId()) {
+                        case UnitId.None ignored -> {
+                            // move assignment is only created for a selected unit value
+                        }
+                        case UnitId.Value value -> {
+                            moveTargetsByUnit.put(value.value(), assignment.tile());
+                            moveTargetRecorder.assign(value.value(), assignment.tile());
+                        }
+                    }
                     if (BattlefieldScreen.shouldPlayMoveConfirmationSound(assignment)) {
                         onMoveTargetConfirmed.run();
                     }
@@ -246,7 +254,7 @@ final class MapPanel extends Actor {
                     return true;
                 }
                 if (keycode == Input.Keys.ESCAPE) {
-                    selectUnit(null);
+                    selectUnit(UnitId.none());
                     return true;
                 }
                 if (keycode == Input.Keys.M) {
@@ -440,7 +448,7 @@ final class MapPanel extends Actor {
         );
         UnitRenderPlacement selectedPlacement = null;
         for (UnitRenderPlacement placement : placements) {
-            if (placement.unit().id().equals(selectedUnitId)) {
+            if (selectedUnitId instanceof UnitId.Value value && placement.unit().id().equals(value.value())) {
                 selectedPlacement = placement;
                 continue;
             }
@@ -459,7 +467,7 @@ final class MapPanel extends Actor {
         var palette = BattlefieldScreen.paletteFor(placement.unit().side());
         var visibleType = BattlefieldScreen.visibleUnitType(placement.unit(), activeSide);
         drawUnitIcon(batch, placement.screenX(), placement.screenY(), placement.drawSize(), palette.fill(), palette.outline(), visibleType);
-        if (placement.unit().id().equals(selectedUnitId) && selectorVisible) {
+        if (selectedUnitId instanceof UnitId.Value value && placement.unit().id().equals(value.value()) && selectorVisible) {
             batch.setColor(Color.WHITE);
             drawBlock(batch, borderX, borderY, placement.drawSize() + border * 2f, border);
             drawBlock(batch, borderX, placement.screenY() + placement.drawSize(), placement.drawSize() + border * 2f, border);
@@ -468,16 +476,16 @@ final class MapPanel extends Actor {
         }
     }
 
-    public @Nullable String getSelectedUnitId() {
+    public UnitId getSelectedUnitId() {
         return selectionState.selectedUnitId();
     }
 
-    private void selectUnit(@Nullable String unitId) {
+    private void selectUnit(UnitId unitId) {
         var previousUnitId = selectionState.selectedUnitId();
         if (!Objects.equals(previousUnitId, unitId)) {
             selectionState.selectAndEnterMoveMode(unitId);
             clearMovePreview();
-        } else if (unitId == null) {
+        } else if (unitId instanceof UnitId.None) {
             selectionState.clearSelection();
         }
         selectorBlinkTimer = 0f;
@@ -490,7 +498,7 @@ final class MapPanel extends Actor {
     }
 
     public void toggleMoveMode() {
-        if (selectionState.selectedUnitId() == null) {
+        if (selectionState.selectedUnitId() instanceof UnitId.None) {
             selectionState.clearSelection();
             clearMovePreview();
             return;
@@ -503,7 +511,7 @@ final class MapPanel extends Actor {
 
     private void centerCameraOnSelectedUnitIfNeeded() {
         var selectedUnitId = selectionState.selectedUnitId();
-        if (selectedUnitId == null) {
+        if (selectedUnitId instanceof UnitId.None) {
             pendingSelectionCameraCenter = false;
             return;
         }
@@ -513,7 +521,7 @@ final class MapPanel extends Actor {
         }
         var state = campaignStateSupplier.get();
         var selectedUnit = state.units().stream()
-            .filter(unit -> unit.id().equals(selectedUnitId))
+            .filter(unit -> selectedUnitId instanceof UnitId.Value value && unit.id().equals(value.value()))
             .findFirst()
             .orElse(null);
         if (selectedUnit == null) {
@@ -546,7 +554,7 @@ final class MapPanel extends Actor {
         moveTargetsByUnit.clear();
         commandSide = state.activeSide();
         var active = unitsForCommandSide(state);
-        selectUnit(active.isEmpty() ? null : active.getFirst().id());
+        selectUnit(active.isEmpty() ? UnitId.none() : UnitId.of(active.getFirst().id()));
     }
 
     private void cycleSelectedUnit() {
@@ -599,7 +607,7 @@ final class MapPanel extends Actor {
         commandSide = oppositeCommandSide(commandSide);
         selectionState.deactivateMoveMode();
         clearMovePreview();
-        selectUnit(BattlefieldScreen.nextUnassignedUnitId(unitsForCommandSide(state), null, moveTargetsByUnit));
+        selectUnit(BattlefieldScreen.nextUnassignedUnitId(unitsForCommandSide(state), UnitId.none(), moveTargetsByUnit));
     }
 
     private boolean areAllMoveOrdersAssignedForCommandSide(CampaignState state) {

@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import game.domain.CampaignState;
 import game.domain.Side;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.domain.UnitType;
 import game.engine.GameRuntime;
 import game.engine.MoveCommandOutcome;
@@ -454,41 +455,49 @@ public class BattlefieldScreen extends ScreenAdapter {
         return unit.side() == activeSide ? unit.type() : null;
     }
 
-    static @Nullable String unitIdAtScreenPoint(List<UnitRenderPlacement> placements,
-                                                float sx, float sy, Side activeSide) {
+    static UnitId unitIdAtScreenPoint(List<UnitRenderPlacement> placements,
+                                      float sx, float sy, Side activeSide) {
         for (UnitRenderPlacement p : placements) {
             if (p.unit().side() != activeSide) continue;
             if (sx >= p.screenX() && sx < p.screenX() + p.drawSize()
                     && sy >= p.screenY() && sy < p.screenY() + p.drawSize()) {
-                return p.unit().id();
+                return UnitId.of(p.unit().id());
             }
         }
-        return null;
+        return UnitId.none();
     }
 
-    static @Nullable String nextSelectedUnitId(List<Unit> activeUnits, @Nullable String currentId) {
-        if (activeUnits.isEmpty()) return null;
+    static UnitId nextSelectedUnitId(List<Unit> activeUnits, UnitId currentId) {
+        if (activeUnits.isEmpty()) return UnitId.none();
         var idx = -1;
         for (int i = 0; i < activeUnits.size(); i++) {
-            if (activeUnits.get(i).id().equals(currentId)) {
+            var currentUnitId = switch (currentId) {
+                case UnitId.None ignored -> null;
+                case UnitId.Value value -> value.value();
+            };
+            if (activeUnits.get(i).id().equals(currentUnitId)) {
                 idx = i;
                 break;
             }
         }
-        return activeUnits.get((idx + 1) % activeUnits.size()).id();
+        return UnitId.of(activeUnits.get((idx + 1) % activeUnits.size()).id());
     }
 
-    static @Nullable String nextUnassignedUnitId(List<Unit> activeUnits,
-                                                 @Nullable String currentId,
-                                                 Map<String, TileCoord> moveTargetsByUnit) {
+    static UnitId nextUnassignedUnitId(List<Unit> activeUnits,
+                                      UnitId currentId,
+                                      Map<String, TileCoord> moveTargetsByUnit) {
         Objects.requireNonNull(moveTargetsByUnit, "moveTargetsByUnit must not be null");
         if (activeUnits.isEmpty()) {
-            return null;
+            return UnitId.none();
         }
 
         var currentIndex = -1;
         for (int i = 0; i < activeUnits.size(); i++) {
-            if (activeUnits.get(i).id().equals(currentId)) {
+            var currentUnitId = switch (currentId) {
+                case UnitId.None ignored -> null;
+                case UnitId.Value value -> value.value();
+            };
+            if (activeUnits.get(i).id().equals(currentUnitId)) {
                 currentIndex = i;
                 break;
             }
@@ -498,11 +507,11 @@ public class BattlefieldScreen extends ScreenAdapter {
             var index = (currentIndex + offset + activeUnits.size()) % activeUnits.size();
             var candidateId = activeUnits.get(index).id();
             if (!moveTargetsByUnit.containsKey(candidateId)) {
-                return candidateId;
+                return UnitId.of(candidateId);
             }
         }
 
-        return null;
+        return UnitId.none();
     }
 
     static float clampZoomLevel(float zoomLevel, float minZoomLevel, float maxZoomLevel) {
@@ -581,12 +590,12 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     static @Nullable MoveTargetAssignment moveTargetAssignmentForClick(boolean moveModeActive,
-                                                                       @Nullable String selectedUnitId,
+                                                                       UnitId selectedUnitId,
                                                                        @Nullable TileCoord activePreviewTile,
                                                                        @Nullable TileCoord clickedTile,
                                                                        boolean clickedTilePassable) {
         if (!moveModeActive
-            || selectedUnitId == null
+            || selectedUnitId instanceof UnitId.None
             || activePreviewTile == null
             || clickedTile == null
             || !clickedTilePassable
@@ -727,10 +736,10 @@ public class BattlefieldScreen extends ScreenAdapter {
     }
 
     static @Nullable TileCoord movePreviewTile(boolean moveModeActive,
-                                               @Nullable String selectedUnitId,
+                                               UnitId selectedUnitId,
                                                @Nullable TileCoord hoveredTile,
                                                boolean hoveredTilePassable) {
-        if (!moveModeActive || selectedUnitId == null || hoveredTile == null || !hoveredTilePassable) {
+        if (!moveModeActive || selectedUnitId instanceof UnitId.None || hoveredTile == null || !hoveredTilePassable) {
             return null;
         }
         return hoveredTile;
@@ -749,11 +758,10 @@ public class BattlefieldScreen extends ScreenAdapter {
         void hide();
     }
 
-    static void syncUnitInfoPanel(@Nullable String selectedUnitId, UnitInfoView view) {
-        if (selectedUnitId != null) {
-            view.showUnit(selectedUnitId);
-        } else {
-            view.hide();
+    static void syncUnitInfoPanel(UnitId selectedUnitId, UnitInfoView view) {
+        switch (selectedUnitId) {
+            case UnitId.None ignored -> view.hide();
+            case UnitId.Value value -> view.showUnit(value.value());
         }
     }
 
@@ -761,7 +769,7 @@ public class BattlefieldScreen extends ScreenAdapter {
         if (moveButton == null || mapPanel == null) {
             return;
         }
-        var hasSelection = mapPanel.getSelectedUnitId() != null;
+        var hasSelection = !(mapPanel.getSelectedUnitId() instanceof UnitId.None);
         var blocked = phasePlaybackController.interactionLockState().blocksHudActions();
         var enabled = hasSelection && !blocked;
         moveButton.setDisabled(!enabled);
@@ -830,7 +838,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     static record TileCoord(int tileX, int tileY) {
     }
 
-    static record MoveTargetAssignment(String unitId, TileCoord tile) {
+    static record MoveTargetAssignment(UnitId unitId, TileCoord tile) {
         MoveTargetAssignment {
             Objects.requireNonNull(unitId, "unitId must not be null");
             Objects.requireNonNull(tile, "tile must not be null");

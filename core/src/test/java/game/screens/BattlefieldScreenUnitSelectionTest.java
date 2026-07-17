@@ -1,12 +1,13 @@
 package game.screens;
 
 import com.badlogic.gdx.audio.Sound;
-import org.junit.jupiter.api.Test;
 import game.domain.Side;
 import game.domain.Unit;
+import game.domain.UnitId;
 import game.domain.UnitSize;
 import game.domain.UnitType;
 import game.terrain.GeneratedTerrainData;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -25,54 +26,54 @@ class BattlefieldScreenUnitSelectionTest {
     void nextSelectedUnitId_returnsFirstUnit_whenCurrentIdIsNull() {
         var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        var result = BattlefieldScreen.nextSelectedUnitId(units, null);
+        var result = BattlefieldScreen.nextSelectedUnitId(units, UnitId.none());
 
-        assertEquals("A", result);
+        assertEquals(UnitId.of("A"), result);
     }
 
     @Test
     void nextSelectedUnitId_advancesToNextUnit() {
         var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        var result = BattlefieldScreen.nextSelectedUnitId(units, "A");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, UnitId.of("A"));
 
-        assertEquals("B", result);
+        assertEquals(UnitId.of("B"), result);
     }
 
     @Test
     void nextSelectedUnitId_wrapsToFirstAfterLast() {
         var units = List.of(unit("A"), unit("B"), unit("C"));
 
-        var result = BattlefieldScreen.nextSelectedUnitId(units, "C");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, UnitId.of("C"));
 
-        assertEquals("A", result);
+        assertEquals(UnitId.of("A"), result);
     }
 
     @Test
     void nextSelectedUnitId_returnsNull_whenListIsEmpty() {
         List<Unit> units = List.of();
 
-        var result = BattlefieldScreen.nextSelectedUnitId(units, null);
+        var result = BattlefieldScreen.nextSelectedUnitId(units, UnitId.none());
 
-        assertNull(result);
+        assertEquals(UnitId.none(), result);
     }
 
     @Test
     void nextSelectedUnitId_returnsFirstUnit_whenCurrentIdNotFound() {
         var units = List.of(unit("A"), unit("B"));
 
-        var result = BattlefieldScreen.nextSelectedUnitId(units, "X");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, UnitId.of("X"));
 
-        assertEquals("A", result);
+        assertEquals(UnitId.of("A"), result);
     }
 
     @Test
     void nextSelectedUnitId_returnsSelf_whenSingleUnit() {
         var units = List.of(unit("A"));
 
-        var result = BattlefieldScreen.nextSelectedUnitId(units, "A");
+        var result = BattlefieldScreen.nextSelectedUnitId(units, UnitId.of("A"));
 
-        assertEquals("A", result);
+        assertEquals(UnitId.of("A"), result);
     }
 
     @Test
@@ -81,11 +82,11 @@ class BattlefieldScreenUnitSelectionTest {
 
         var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
-            "A",
+            UnitId.of("A"),
             Map.of("A", new BattlefieldScreen.TileCoord(1, 1), "B", new BattlefieldScreen.TileCoord(2, 2))
         );
 
-        assertEquals("C", result);
+        assertEquals(UnitId.of("C"), result);
     }
 
     @Test
@@ -94,11 +95,11 @@ class BattlefieldScreenUnitSelectionTest {
 
         var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
-            "C",
+            UnitId.of("C"),
             Map.of("C", new BattlefieldScreen.TileCoord(3, 3))
         );
 
-        assertEquals("A", result);
+        assertEquals(UnitId.of("A"), result);
     }
 
     @Test
@@ -107,11 +108,11 @@ class BattlefieldScreenUnitSelectionTest {
 
         var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
-            "A",
+            UnitId.of("A"),
             Map.of("A", new BattlefieldScreen.TileCoord(1, 1), "B", new BattlefieldScreen.TileCoord(2, 2))
         );
 
-        assertNull(result);
+        assertEquals(UnitId.none(), result);
     }
 
     @Test
@@ -120,38 +121,38 @@ class BattlefieldScreenUnitSelectionTest {
 
         var result = BattlefieldScreen.nextUnassignedUnitId(
             units,
-            null,
+            UnitId.none(),
             Map.of("A", new BattlefieldScreen.TileCoord(1, 1))
         );
 
-        assertEquals("B", result);
+        assertEquals(UnitId.of("B"), result);
     }
 
     @Test
     void unitIdAtScreenPoint_returnsId_whenPointInsideBoundsAndSideMatches() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
         var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
-        assertEquals("A", result);
+        assertEquals(UnitId.of("A"), result);
     }
 
     @Test
     void unitIdAtScreenPoint_returnsNull_whenPointInsideBoundsButWrongSide() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.AXIS), 10f, 10f, 20f);
         var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 15f, 15f, Side.ALLIES);
-        assertNull(result);
+        assertEquals(UnitId.none(), result);
     }
 
     @Test
-    void unitIdAtScreenPoint_returnsNull_whenPointOutsideBounds() {
+    void unitIdAtScreenPoint_returnsNone_whenPointOutsideBounds() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
         var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 31f, 15f, Side.ALLIES);
-        assertNull(result);
+        assertEquals(UnitId.none(), result);
     }
 
     @Test
-    void unitIdAtScreenPoint_returnsNull_whenPlacementsEmpty() {
+    void unitIdAtScreenPoint_returnsNone_whenPlacementsEmpty() {
         var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(), 15f, 15f, Side.ALLIES);
-        assertNull(result);
+        assertEquals(UnitId.none(), result);
     }
 
     @Test
@@ -159,14 +160,14 @@ class BattlefieldScreenUnitSelectionTest {
         var p1 = new BattlefieldScreen.UnitRenderPlacement(unit("FIRST", Side.ALLIES), 10f, 10f, 20f);
         var p2 = new BattlefieldScreen.UnitRenderPlacement(unit("SECOND", Side.ALLIES), 10f, 10f, 20f);
         var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p1, p2), 15f, 15f, Side.ALLIES);
-        assertEquals("FIRST", result);
+        assertEquals(UnitId.of("FIRST"), result);
     }
 
     @Test
     void unitIdAtScreenPoint_returnsNull_whenPointOnExclusiveUpperBound() {
         var p = new BattlefieldScreen.UnitRenderPlacement(unit("A", Side.ALLIES), 10f, 10f, 20f);
         var result = BattlefieldScreen.unitIdAtScreenPoint(List.of(p), 30f, 15f, Side.ALLIES);
-        assertNull(result);
+        assertEquals(UnitId.none(), result);
     }
 
     @Test
@@ -221,20 +222,20 @@ class BattlefieldScreenUnitSelectionTest {
     void moveTargetAssignmentForClick_returnsAssignment_whenMoveModeAndSelectionArePresent() {
         var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
-            "A",
+            UnitId.of("A"),
             new BattlefieldScreen.TileCoord(3, 4),
             new BattlefieldScreen.TileCoord(3, 4),
             true
         );
 
-        assertEquals(new BattlefieldScreen.MoveTargetAssignment("A", new BattlefieldScreen.TileCoord(3, 4)), assignment);
+        assertEquals(new BattlefieldScreen.MoveTargetAssignment(UnitId.of("A"), new BattlefieldScreen.TileCoord(3, 4)), assignment);
     }
 
     @Test
     void moveTargetAssignmentForClick_returnsNull_whenMoveModeIsDisabled() {
         var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             false,
-            "A",
+            UnitId.of("A"),
             new BattlefieldScreen.TileCoord(3, 4),
             new BattlefieldScreen.TileCoord(3, 4),
             true
@@ -247,7 +248,7 @@ class BattlefieldScreenUnitSelectionTest {
     void moveTargetAssignmentForClick_returnsNull_whenSelectionMissing() {
         var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
-            null,
+            UnitId.none(),
             new BattlefieldScreen.TileCoord(3, 4),
             new BattlefieldScreen.TileCoord(3, 4),
             true
@@ -260,7 +261,7 @@ class BattlefieldScreenUnitSelectionTest {
     void moveTargetAssignmentForClick_returnsNull_whenClickedTileIsImpassable() {
         var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
-            "A",
+            UnitId.of("A"),
             new BattlefieldScreen.TileCoord(3, 4),
             new BattlefieldScreen.TileCoord(3, 4),
             false
@@ -273,7 +274,7 @@ class BattlefieldScreenUnitSelectionTest {
     void moveTargetAssignmentForClick_returnsNull_whenPreviewIsMissing() {
         var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
-            "A",
+            UnitId.of("A"),
             null,
             new BattlefieldScreen.TileCoord(3, 4),
             true
@@ -286,7 +287,7 @@ class BattlefieldScreenUnitSelectionTest {
     void moveTargetAssignmentForClick_returnsNull_whenClickedTileDoesNotMatchPreview() {
         var assignment = BattlefieldScreen.moveTargetAssignmentForClick(
             true,
-            "A",
+            UnitId.of("A"),
             new BattlefieldScreen.TileCoord(3, 4),
             new BattlefieldScreen.TileCoord(4, 4),
             true
@@ -298,7 +299,7 @@ class BattlefieldScreenUnitSelectionTest {
     @Test
     void shouldPlayMoveConfirmationSound_returnsTrue_whenAssignmentExists() {
         var result = BattlefieldScreen.shouldPlayMoveConfirmationSound(
-            new BattlefieldScreen.MoveTargetAssignment("A", new BattlefieldScreen.TileCoord(3, 4))
+            new BattlefieldScreen.MoveTargetAssignment(UnitId.of("A"), new BattlefieldScreen.TileCoord(3, 4))
         );
 
         assertTrue(result);
@@ -367,7 +368,7 @@ class BattlefieldScreenUnitSelectionTest {
     void movePreviewTile_returnsHoveredTile_whenMoveModeSelectionAndTerrainAreValid() {
         var previewTile = BattlefieldScreen.movePreviewTile(
             true,
-            "A",
+            UnitId.of("A"),
             new BattlefieldScreen.TileCoord(7, 8),
             true
         );
@@ -379,7 +380,7 @@ class BattlefieldScreenUnitSelectionTest {
     void movePreviewTile_returnsNull_whenHoveredTileIsImpassable() {
         var previewTile = BattlefieldScreen.movePreviewTile(
             true,
-            "A",
+            UnitId.of("A"),
             new BattlefieldScreen.TileCoord(7, 8),
             false
         );

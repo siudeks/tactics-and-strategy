@@ -1,6 +1,6 @@
 package game.screens;
 
-import org.jspecify.annotations.Nullable;
+import game.domain.UnitId;
 
 /**
  * Finite-state machine for battlefield selection and MOVE-targeting mode.
@@ -9,8 +9,7 @@ final class SelectionState {
 
     private SelectionFsmState state = NoSelectionState.INSTANCE;
 
-    @Nullable
-    String selectedUnitId() {
+    UnitId selectedUnitId() {
         return state.selectedUnitId();
     }
 
@@ -27,8 +26,11 @@ final class SelectionState {
      * (or back to {@link NoSelectionState} when {@code unitId} is {@code null}), so
      * MOVE targeting is active immediately after selection.
      */
-    void selectAndEnterMoveMode(@Nullable String unitId) {
-        state = unitId == null ? NoSelectionState.INSTANCE : new MoveTargetingState(unitId);
+    void selectAndEnterMoveMode(UnitId unitId) {
+        state = switch (unitId) {
+            case UnitId.None ignored -> NoSelectionState.INSTANCE;
+            case UnitId.Value selected -> new MoveTargetingState(selected);
+        };
     }
 
     void toggleMoveMode() {
@@ -46,8 +48,7 @@ final class SelectionState {
     }
 
     private sealed interface SelectionFsmState permits NoSelectionState, UnitSelectedState, MoveTargetingState {
-        @Nullable
-        String selectedUnitId();
+        UnitId selectedUnitId();
     }
 
     private static final class NoSelectionState implements SelectionFsmState {
@@ -57,14 +58,14 @@ final class SelectionState {
         }
 
         @Override
-        public @Nullable String selectedUnitId() {
-            return null;
+        public UnitId selectedUnitId() {
+            return UnitId.none();
         }
     }
 
-    private record UnitSelectedState(String selectedUnitId) implements SelectionFsmState {
+    private record UnitSelectedState(UnitId selectedUnitId) implements SelectionFsmState {
     }
 
-    private record MoveTargetingState(String selectedUnitId) implements SelectionFsmState {
+    private record MoveTargetingState(UnitId selectedUnitId) implements SelectionFsmState {
     }
 }

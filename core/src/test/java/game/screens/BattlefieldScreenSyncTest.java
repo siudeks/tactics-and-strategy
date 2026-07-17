@@ -51,7 +51,7 @@ class BattlefieldScreenSyncTest {
     void syncUnitInfoPanel_showsUnitAndSetsId_whenUnitSelected() {
         var view = new FakeView();
 
-        BattlefieldScreen.syncUnitInfoPanel("tank-1", view);
+        BattlefieldScreen.syncUnitInfoPanel(UnitId.of("tank-1"), view);
 
         assertEquals("tank-1", view.shownId);
         assertTrue(view.visible);
@@ -62,7 +62,7 @@ class BattlefieldScreenSyncTest {
         var view = new FakeView();
         view.showUnit("tank-1");  // precondition: was visible
 
-        BattlefieldScreen.syncUnitInfoPanel(null, view);
+        BattlefieldScreen.syncUnitInfoPanel(UnitId.none(), view);
 
         assertFalse(view.visible);
         assertNull(view.shownId);
@@ -72,10 +72,10 @@ class BattlefieldScreenSyncTest {
     void syncUnitInfoPanel_updatesId_whenSelectionChanges() {
         var view = new FakeView();
 
-        BattlefieldScreen.syncUnitInfoPanel("unit-A", view);
+        BattlefieldScreen.syncUnitInfoPanel(UnitId.of("unit-A"), view);
         assertEquals("unit-A", view.shownId);
 
-        BattlefieldScreen.syncUnitInfoPanel("unit-B", view);
+        BattlefieldScreen.syncUnitInfoPanel(UnitId.of("unit-B"), view);
         assertEquals("unit-B", view.shownId);
         assertTrue(view.visible);
     }
