@@ -92,6 +92,18 @@ class OneTurnSimulationTest {
     }
 
     @Test
+    void oneTurn_bootstrapScenario_isDeterministicAcrossRepeatedRuns() {
+        var loaded = ScenarioLoader.loadBootstrapScenario();
+        var engine = engine();
+        var baseline = engine.runOneTurn(loaded.campaignState());
+
+        for (int i = 0; i < 10; i++) {
+            var next = engine.runOneTurn(loaded.campaignState());
+            assertTrue(TurnEngine.areSemanticallyEquivalent(baseline, next));
+        }
+    }
+
+    @Test
     void oneTurn_contestedDestination_isDeterministicAcrossRepeatedRuns() {
         var scenarioDefinition = new ScenarioDefinition(
             "stack-det",

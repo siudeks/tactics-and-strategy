@@ -12,7 +12,7 @@ Celem jest podniesienie utrzymywalności i przewidywalności silnika bez przepis
 7. Faza 3 [ZREALIZOWANE]: Zaimplementować ruch kosztowy z deterministycznym tie-break (REQ-MOVE-002) jako pierwszy pełny mechanizm gameplay ponad baseline. Krok zależy od kroku 6.
 8. Faza 3 [ZREALIZOWANE]: Dodać politykę stackingu i ograniczeń współlokacji (REQ-STACK-001) wraz z testami kolizji wielojednostkowych. Krok zależy od kroku 7.
 9. Faza 3 [ZREALIZOWANE]: Domknąć minimalnie użyteczny resolver walki kontekstowej (REQ-CBT-001) oparty o pozycję, teren i stan jednostki, bez rozszerzeń poza wymagany baseline. Krok zależy od kroku 8.
-10. Faza 4: Uzupełnić testy regresji, testy własności deterministycznych, ArchUnit oraz dokumentację traceability po każdym ukończonym mechanizmie. Krok zależy od kroku 9.
+10. Faza 4 [ZREALIZOWANE]: Uzupełnić testy regresji, testy własności deterministycznych, ArchUnit oraz dokumentację traceability po każdym ukończonym mechanizmie. Krok zależy od kroku 9.
 
 **Relevant files**
 - /workspaces/tactics-and-strategy/core/src/main/java/game/domain/Unit.java — model jednostki i punkt wejścia do wzmocnienia typów domenowych.

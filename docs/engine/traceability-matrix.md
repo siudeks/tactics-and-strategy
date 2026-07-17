@@ -3,6 +3,8 @@
 ## 1. Purpose
 This matrix links currently implemented behavior to requirements and executable evidence.
 
+Maintenance-refactor phase 4 evidence now includes regression coverage for repeated deterministic turn runs in `OneTurnSimulationTest` plus architecture-boundary enforcement in `ArchitecturePackageInfoTest`.
+
 Status legend:
 - `Implemented` - behavior exists in code and has evidence.
 - `Partial` - behavior is represented structurally but has no full domain logic.
@@ -11,7 +13,7 @@ Status legend:
 ## 2. Requirement Coverage
 | Requirement ID | Requirement Topic | v1 Status | Evidence Tests | Notes |
 |---|---|---|---|---|
-| REQ-LOOP-001 | Core gameplay loop and turn progression | Implemented | `OneTurnSimulationTest.oneTurn_phaseTraceContainsAllFivePhases`, `OneTurnSimulationTest.oneTurn_stepwiseSessionMatchesMonolithicRun`, `GameRuntimeTurnSessionTest.beginTurnExecution_advancesStepwise_andCommitsOnlyAfterEndTurn`, `TurnEngineOrderTest.turnNumber_incrementsAfterRunOneTurn`, `TurnEngineOrderTest.activeSide_flipsAfterRunOneTurn` | Five-phase order, stepwise runtime execution, deferred runtime commit, and turn transition are enforced. See `docs/engine/turn-semantics.md` for the live session contract. |
+| REQ-LOOP-001 | Core gameplay loop and turn progression | Implemented | `OneTurnSimulationTest.oneTurn_phaseTraceContainsAllFivePhases`, `OneTurnSimulationTest.oneTurn_stepwiseSessionMatchesMonolithicRun`, `OneTurnSimulationTest.oneTurn_bootstrapScenario_isDeterministicAcrossRepeatedRuns`, `GameRuntimeTurnSessionTest.beginTurnExecution_advancesStepwise_andCommitsOnlyAfterEndTurn`, `TurnEngineOrderTest.turnNumber_incrementsAfterRunOneTurn`, `TurnEngineOrderTest.activeSide_flipsAfterRunOneTurn` | Five-phase order, stepwise runtime execution, deferred runtime commit, and turn transition are enforced. Regression coverage now also checks repeated deterministic runs over the bootstrap scenario. See `docs/engine/turn-semantics.md` for the live session contract. |
 | REQ-TURN-001 | Turn sequence and validation | Implemented | `TurnEngineOrderTest.moveOrder_movesUnitToTarget`, `TurnEngineOrderTest.moveOrder_outOfBounds_unitStaysInPlace`, `TurnEngineOrderTest.moveOrder_toVoidTile_unitStaysInPlace`, `TurnEngineOrderTest.holdOrder_unitDoesNotMove`, `MovementPhaseConsumesTargetTest.simulateOneTurn_withAssignedMoveTarget_movesUnitToTarget`, `MovementPhaseConsumesTargetTest.simulateOneTurn_withOutOfBoundsTarget_leavesUnitInPlaceAndDoesNotThrow`, `MovementPhaseConsumesTargetTest.simulateOneTurn_withImpassableTerrainTarget_leavesUnitInPlaceAndDoesNotThrow`, `GameRuntimeTurnSessionTest.beginTurnExecution_advancesStepwise_andCommitsOnlyAfterEndTurn` | Turn order, stepwise runtime execution, and movement validation across bounds and terrain are covered by executable evidence. |
 | REQ-UNIT-001 | Formation-based units and states | Partial | `CampaignInitializationTest.initialCampaignState_alliesUnitsPresent`, `CampaignInitializationTest.initialCampaignState_axisUnitsPresent` | Formation units are implemented; operational unit states are not. |
 | REQ-MAP-001 | Square-tile map and terrain control model | Partial | `ScenarioLoaderTest.loadBootstrapScenario_parsesMapDimensions`, `TurnEngineOrderTest.moveOrder_toVoidTile_unitStaysInPlace`, `TerrainMapDefinitionTest.constructor_usesImprovedPaletteForSandColor`, `TerrainMapDefinitionTest.terrainColorsRgbDefault_returnsCopyOfImprovedPalette` | Map dimensions, improved/default terrain palette baseline, and impassable terrain checks are present; control points are not. |
