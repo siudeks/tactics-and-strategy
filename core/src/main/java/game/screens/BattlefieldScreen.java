@@ -89,6 +89,7 @@ public class BattlefieldScreen extends ScreenAdapter {
     private Label statusLabel;
     private Label timeLabel;
     private Label unitNameLabel;
+    private Label terrainLayerLabel;
     private Table unitInfoSection;
     private TextButton moveButton;
     private TextButton menuButton;
@@ -177,6 +178,8 @@ public class BattlefieldScreen extends ScreenAdapter {
         panel.defaults().growX().pad(8f);
 
         panel.add(timeLabel).growX().right().padTop(10f).row();
+        terrainLayerLabel = new Label("Layer: All", labelStyle);
+        panel.add(terrainLayerLabel).growX().left().padTop(4f).row();
         unitNameLabel = new Label("", labelStyle);
         unitInfoSection = new Table();
         unitInfoSection.add(unitNameLabel).left();
@@ -260,6 +263,9 @@ public class BattlefieldScreen extends ScreenAdapter {
         }
         if (statusLabel != null) {
             statusLabel.setText(runtimeStatusSummary());
+        }
+        if (terrainLayerLabel != null) {
+            terrainLayerLabel.setText("Layer: " + mapPanel.currentTerrainDebugLayerDisplayName());
         }
         if (unitNameLabel != null && unitInfoSection != null) {
             syncUnitInfoPanel(mapPanel.getSelectedUnitId(), new UnitInfoView() {

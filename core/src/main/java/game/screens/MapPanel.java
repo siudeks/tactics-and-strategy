@@ -17,6 +17,7 @@ import game.domain.UnitId;
 import game.domain.UnitType;
 import game.screens.BattlefieldScreen.TileCoord;
 import game.screens.BattlefieldScreen.UnitRenderPlacement;
+import game.terrain.GeneratedTerrainData;
 import game.terrain.TerrainMapDefinition;
 import game.platform.TerrainTileAtlas;
 import org.jspecify.annotations.Nullable;
@@ -50,7 +51,26 @@ final class MapPanel extends Actor {
     private final SelectionState selectionState;
     private final CameraController cameraController;
 
+    enum TerrainDebugLayer {
+        ALL("All"),
+        VOID("Void"),
+        SAND("Sand"),
+        MOUNTAIN("Mountain"),
+        WATER("Water");
+
+        private final String displayName;
+
+        TerrainDebugLayer(String displayName) {
+            this.displayName = displayName;
+        }
+
+        String displayName() {
+            return displayName;
+        }
+    }
+
     private boolean debugGridOverlay;
+    private TerrainDebugLayer terrainDebugLayer = TerrainDebugLayer.ALL;
     private float selectorBlinkTimer;
     private boolean selectorVisible = true;
     private boolean pendingSelectionCameraCenter;
@@ -236,6 +256,10 @@ final class MapPanel extends Actor {
                     onTogglePause.run();
                     return true;
                 }
+                if (keycode == Input.Keys.L) {
+                    terrainDebugLayer = cycleTerrainDebugLayer(terrainDebugLayer);
+                    return true;
+                }
                 if (shouldBlockInputPath(interactionLockState, InputPath.KEY_SHORTCUT)) {
                     return true;
                 }
@@ -292,6 +316,33 @@ final class MapPanel extends Actor {
         return true;
     }
 
+    static TerrainDebugLayer cycleTerrainDebugLayer(TerrainDebugLayer currentLayer) {
+        return switch (currentLayer) {
+            case ALL -> TerrainDebugLayer.VOID;
+            case VOID -> TerrainDebugLayer.SAND;
+            case SAND -> TerrainDebugLayer.MOUNTAIN;
+            case MOUNTAIN -> TerrainDebugLayer.WATER;
+            case WATER -> TerrainDebugLayer.ALL;
+        };
+    }
+
+    private boolean shouldDrawTerrainTile(int terrainCode) {
+        if (terrainDebugLayer == TerrainDebugLayer.ALL) {
+            return true;
+        }
+        return switch (terrainDebugLayer) {
+            case ALL -> true;
+            case VOID -> terrainCode == GeneratedTerrainData.TERRAIN_VOID;
+            case SAND -> terrainCode == GeneratedTerrainData.TERRAIN_SAND;
+            case MOUNTAIN -> terrainCode == GeneratedTerrainData.TERRAIN_MOUNTAIN;
+            case WATER -> terrainCode == GeneratedTerrainData.TERRAIN_WATER;
+        };
+    }
+
+    String currentTerrainDebugLayerDisplayName() {
+        return terrainDebugLayer.displayName();
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         var x = getX();
@@ -341,6 +392,10 @@ final class MapPanel extends Actor {
                 var screenX = panelX + (worldX - cameraX) * zoomLevel;
 
                 var tileId = mapDefinition.getMapTileId(col, rowTop);
+                var terrainCode = mapDefinition.getTerrainCode(rowTop * mapWidthTiles + col);
+                if (!shouldDrawTerrainTile(terrainCode)) {
+                    continue;
+                }
                 batch.draw(tileAtlas.getRegion(tileId), screenX, screenY, scaledTileSize, scaledTileSize);
             }
         }
