@@ -21,16 +21,19 @@ public final class ScenarioKeyboardShortcutsScreen extends ScreenAdapter {
 
     private static final float MARGIN_LEFT = 32f;
     private static final float LINE_HEIGHT = 20f;
+    private static final float SHORTCUT_KEY_X = MARGIN_LEFT;
+    private static final float SHORTCUT_SEPARATOR_X = MARGIN_LEFT + 200f;
+    private static final float SHORTCUT_DESCRIPTION_X = MARGIN_LEFT + 220f;
 
-    private static final String[] BATTLEFIELD_SHORTCUTS = {
-        "SPACE         : pauza / wznow zegar gry",
-        "L             : zmiana warstwy debug terenu",
-        "G             : pokaz/ukryj siatke debug",
-        "ENTER         : wykonaj akcje tury",
-        "TAB           : wybierz kolejna jednostke",
-        "ESC           : wyczysc zaznaczenie jednostki",
-        "M             : wlacz/wylacz tryb ruchu",
-        "CTRL + SCROLL : przybliz/oddal kamere"
+    private static final ShortcutLine[] BATTLEFIELD_SHORTCUTS = {
+        new ShortcutLine("SPACE", "pauza / wznow zegar gry"),
+        new ShortcutLine("L", "zmiana warstwy debug terenu"),
+        new ShortcutLine("G", "pokaz/ukryj siatke debug"),
+        new ShortcutLine("ENTER", "wykonaj akcje tury"),
+        new ShortcutLine("TAB", "wybierz kolejna jednostke"),
+        new ShortcutLine("ESC", "wyczysc zaznaczenie jednostki"),
+        new ShortcutLine("M", "wlacz/wylacz tryb ruchu"),
+        new ShortcutLine("CTRL + SCROLL", "przybliz/oddal kamere")
     };
 
     private final Game game;
@@ -127,12 +130,17 @@ public final class ScenarioKeyboardShortcutsScreen extends ScreenAdapter {
         return loadedScenario;
     }
 
-    private float drawShortcutLines(String[] lines, float y) {
+    private float drawShortcutLines(ShortcutLine[] lines, float y) {
         font.setColor(COLOR_ITEM);
-        for (String line : lines) {
-            font.draw(batch, line, MARGIN_LEFT, y);
+        for (var line : lines) {
+            font.draw(batch, line.key(), SHORTCUT_KEY_X, y);
+            font.draw(batch, ":", SHORTCUT_SEPARATOR_X, y);
+            font.draw(batch, line.description(), SHORTCUT_DESCRIPTION_X, y);
             y -= LINE_HEIGHT;
         }
         return y;
+    }
+
+    private record ShortcutLine(String key, String description) {
     }
 }
