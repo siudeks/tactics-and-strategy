@@ -13212,7 +13212,85 @@ public final class GeneratedTerrainData {
         loadDominantTerrain11(data);
         loadDominantTerrain12(data);
         loadDominantTerrain13(data);
+        keepLargestMountainRegion(data);
         return data;
+    }
+
+    private static void keepLargestMountainRegion(byte[] data) {
+        var tileCount = MAP_WIDTH_TILES * MAP_HEIGHT_TILES;
+        var visited = new boolean[tileCount];
+        var queue = new int[tileCount];
+        var component = new int[tileCount];
+        var largestComponent = new int[tileCount];
+        var largestSize = 0;
+
+        for (int index = 0; index < tileCount; index++) {
+            if ((data[index] & 0xFF) != TERRAIN_MOUNTAIN || visited[index]) {
+                continue;
+            }
+
+            var head = 0;
+            var tail = 0;
+            var componentSize = 0;
+            queue[tail++] = index;
+            visited[index] = true;
+
+            while (head < tail) {
+                var current = queue[head++];
+                component[componentSize++] = current;
+
+                var x = current % MAP_WIDTH_TILES;
+                var y = current / MAP_WIDTH_TILES;
+
+                if (x > 0) {
+                    var neighbor = current - 1;
+                    if (!visited[neighbor] && (data[neighbor] & 0xFF) == TERRAIN_MOUNTAIN) {
+                        visited[neighbor] = true;
+                        queue[tail++] = neighbor;
+                    }
+                }
+                if (x + 1 < MAP_WIDTH_TILES) {
+                    var neighbor = current + 1;
+                    if (!visited[neighbor] && (data[neighbor] & 0xFF) == TERRAIN_MOUNTAIN) {
+                        visited[neighbor] = true;
+                        queue[tail++] = neighbor;
+                    }
+                }
+                if (y > 0) {
+                    var neighbor = current - MAP_WIDTH_TILES;
+                    if (!visited[neighbor] && (data[neighbor] & 0xFF) == TERRAIN_MOUNTAIN) {
+                        visited[neighbor] = true;
+                        queue[tail++] = neighbor;
+                    }
+                }
+                if (y + 1 < MAP_HEIGHT_TILES) {
+                    var neighbor = current + MAP_WIDTH_TILES;
+                    if (!visited[neighbor] && (data[neighbor] & 0xFF) == TERRAIN_MOUNTAIN) {
+                        visited[neighbor] = true;
+                        queue[tail++] = neighbor;
+                    }
+                }
+            }
+
+            if (componentSize > largestSize) {
+                largestSize = componentSize;
+                System.arraycopy(component, 0, largestComponent, 0, componentSize);
+            }
+        }
+
+        if (largestSize == 0) {
+            return;
+        }
+
+        for (int index = 0; index < tileCount; index++) {
+            if ((data[index] & 0xFF) == TERRAIN_MOUNTAIN) {
+                data[index] = (byte) TERRAIN_SAND;
+            }
+        }
+
+        for (int i = 0; i < largestSize; i++) {
+            data[largestComponent[i]] = (byte) TERRAIN_MOUNTAIN;
+        }
     }
 
     private static void loadDominantTerrain0(byte[] data) {
