@@ -1,5 +1,9 @@
 package game.terrain;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 public final class GeneratedTerrainData {
     private GeneratedTerrainData() {}
 
@@ -15,12 +19,25 @@ public final class GeneratedTerrainData {
     public static final int TERRAIN_SAND = 1;
     public static final int TERRAIN_MOUNTAIN = 2;
     public static final int TERRAIN_WATER = 3;
+    public static final int TERRAIN_FORT = 4;
+
+    private static final int FORT_ICON_WIDTH_PIXELS = 16;
+    private static final int FORT_ICON_HEIGHT_PIXELS = 16;
+    private static final int CANONICAL_FORT_MARKER_INDEX = 0;
+
+    private static final FortMarker[] FORT_MARKERS = {
+        new FortMarker(356, 183),
+        new FortMarker(500, 150),
+        new FortMarker(870, 214),
+        new FortMarker(1399, 231)
+    };
 
     private static final int[][] TERRAIN_COLORS_RGB_IMPROVED = new int[][] {
         {0, 0, 0},
         {194, 171, 109},
         {146, 96, 78},
-        {56, 92, 137}
+        {56, 92, 137},
+        {125, 101, 76}
     };
 
     public static int[][] terrainColorsRgbImproved() {
@@ -31,9 +48,60 @@ public final class GeneratedTerrainData {
         return terrainColorsRgbImproved();
     }
 
-    public static final byte[][] UNIQUE_TILE_PATTERNS = createUniqueTilePatterns();
-    public static final short[] MAP_TILE_IDS = createMapTileIds();
+    private static final TerrainDataPatch TERRAIN_DATA_PATCH = buildTerrainDataPatch();
+
+    public static final byte[][] UNIQUE_TILE_PATTERNS = TERRAIN_DATA_PATCH.uniqueTilePatterns();
+    public static final short[] MAP_TILE_IDS = TERRAIN_DATA_PATCH.mapTileIds();
     public static final byte[] TILE_DOMINANT_TERRAIN = createDominantTerrain();
+
+    private static final class TerrainDataPatch {
+        private final byte[][] uniqueTilePatterns;
+        private final short[] mapTileIds;
+
+        private TerrainDataPatch(byte[][] uniqueTilePatterns, short[] mapTileIds) {
+            this.uniqueTilePatterns = uniqueTilePatterns;
+            this.mapTileIds = mapTileIds;
+        }
+
+        private byte[][] uniqueTilePatterns() {
+            return uniqueTilePatterns;
+        }
+
+        private short[] mapTileIds() {
+            return mapTileIds;
+        }
+    }
+
+    private record FortMarker(int sourceX, int sourceY) {
+        private int alignedX() {
+            return alignToNearestGridLine(sourceX, MAP_WIDTH_TILES * SOURCE_TILE_SIZE - FORT_ICON_WIDTH_PIXELS);
+        }
+
+        private int alignedY() {
+            return alignToNearestGridLine(sourceY, MAP_HEIGHT_TILES * SOURCE_TILE_SIZE - FORT_ICON_HEIGHT_PIXELS);
+        }
+
+        private int tileX() {
+            return alignedX() / SOURCE_TILE_SIZE;
+        }
+
+        private int tileYTop() {
+            return alignedY() / SOURCE_TILE_SIZE;
+        }
+    }
+
+    private static int alignToNearestGridLine(int coordinate, int maxAlignedCoordinate) {
+        var lower = coordinate - coordinate % SOURCE_TILE_SIZE;
+        var upper = lower + SOURCE_TILE_SIZE;
+        var nearest = coordinate - lower <= upper - coordinate ? lower : upper;
+        return Math.max(0, Math.min(nearest, maxAlignedCoordinate));
+    }
+
+    private static TerrainDataPatch buildTerrainDataPatch() {
+        var uniqueTilePatterns = createUniqueTilePatterns();
+        var mapTileIds = createMapTileIds();
+        return alignFortMarkerToGrid(uniqueTilePatterns, mapTileIds);
+    }
 
     private static int[][] deepCopy2d(int[][] source) {
         int[][] copy = new int[source.length][];
@@ -1293,6 +1361,118 @@ public final class GeneratedTerrainData {
         loadMapIds12(data);
         loadMapIds13(data);
         return data;
+    }
+
+    private static TerrainDataPatch alignFortMarkerToGrid(byte[][] uniqueTilePatterns, short[] mapTileIds) {
+        var pixels = buildMapPixels(uniqueTilePatterns, mapTileIds);
+        var canonicalFortMask = extractFortMask(pixels, FORT_MARKERS[CANONICAL_FORT_MARKER_INDEX]);
+
+        for (var fortMarker : FORT_MARKERS) {
+            var fortMask = extractFortMask(pixels, fortMarker);
+            clearFortMarkerFromSource(pixels, fortMask, fortMarker);
+        }
+
+        for (var fortMarker : FORT_MARKERS) {
+            drawFortMarkerAtAlignedLocation(pixels, canonicalFortMask, fortMarker);
+        }
+
+        var patchedMapTileIds = mapTileIds.clone();
+        var patterns = new ArrayList<byte[]>(Arrays.asList(uniqueTilePatterns));
+        var patternIdByKey = new HashMap<String, Integer>();
+        for (int tileId = 0; tileId < patterns.size(); tileId++) {
+            patternIdByKey.put(patternKey(patterns.get(tileId)), tileId);
+        }
+
+        for (var fortMarker : FORT_MARKERS) {
+            var minTileX = Math.min(fortMarker.sourceX(), fortMarker.alignedX()) / SOURCE_TILE_SIZE;
+            var minTileY = Math.min(fortMarker.sourceY(), fortMarker.alignedY()) / SOURCE_TILE_SIZE;
+            var maxTileX = Math.max(fortMarker.sourceX() + FORT_ICON_WIDTH_PIXELS - 1,
+                fortMarker.alignedX() + FORT_ICON_WIDTH_PIXELS - 1) / SOURCE_TILE_SIZE;
+            var maxTileY = Math.max(fortMarker.sourceY() + FORT_ICON_HEIGHT_PIXELS - 1,
+                fortMarker.alignedY() + FORT_ICON_HEIGHT_PIXELS - 1) / SOURCE_TILE_SIZE;
+
+            for (int rowTop = minTileY; rowTop <= maxTileY; rowTop++) {
+                for (int col = minTileX; col <= maxTileX; col++) {
+                    var tilePattern = extractTilePattern(pixels, col, rowTop);
+                    var key = patternKey(tilePattern);
+                    var tileId = patternIdByKey.get(key);
+                    if (tileId == null) {
+                        tileId = patterns.size();
+                        patterns.add(tilePattern);
+                        patternIdByKey.put(key, tileId);
+                    }
+                    patchedMapTileIds[rowTop * MAP_WIDTH_TILES + col] = (short) (int) tileId;
+                }
+            }
+        }
+
+        return new TerrainDataPatch(patterns.toArray(byte[][]::new), patchedMapTileIds);
+    }
+
+    private static byte[][] buildMapPixels(byte[][] uniqueTilePatterns, short[] mapTileIds) {
+        var widthPixels = MAP_WIDTH_TILES * SOURCE_TILE_SIZE;
+        var heightPixels = MAP_HEIGHT_TILES * SOURCE_TILE_SIZE;
+        var pixels = new byte[heightPixels][widthPixels];
+
+        for (int rowTop = 0; rowTop < MAP_HEIGHT_TILES; rowTop++) {
+            for (int col = 0; col < MAP_WIDTH_TILES; col++) {
+                var tileId = mapTileIds[rowTop * MAP_WIDTH_TILES + col] & 0xFFFF;
+                var pattern = uniqueTilePatterns[tileId];
+                for (int py = 0; py < SOURCE_TILE_SIZE; py++) {
+                    for (int px = 0; px < SOURCE_TILE_SIZE; px++) {
+                        pixels[rowTop * SOURCE_TILE_SIZE + py][col * SOURCE_TILE_SIZE + px] =
+                            pattern[py * SOURCE_TILE_SIZE + px];
+                    }
+                }
+            }
+        }
+
+        return pixels;
+    }
+
+    private static boolean[][] extractFortMask(byte[][] pixels, FortMarker fortMarker) {
+        var mask = new boolean[FORT_ICON_HEIGHT_PIXELS][FORT_ICON_WIDTH_PIXELS];
+        for (int y = 0; y < FORT_ICON_HEIGHT_PIXELS; y++) {
+            for (int x = 0; x < FORT_ICON_WIDTH_PIXELS; x++) {
+                mask[y][x] = (pixels[fortMarker.sourceY() + y][fortMarker.sourceX() + x] & 0xFF)
+                    == TERRAIN_VOID;
+            }
+        }
+        return mask;
+    }
+
+    private static void clearFortMarkerFromSource(byte[][] pixels, boolean[][] fortMask, FortMarker fortMarker) {
+        for (int y = 0; y < FORT_ICON_HEIGHT_PIXELS; y++) {
+            for (int x = 0; x < FORT_ICON_WIDTH_PIXELS; x++) {
+                if (fortMask[y][x]) {
+                    pixels[fortMarker.sourceY() + y][fortMarker.sourceX() + x] = (byte) TERRAIN_SAND;
+                }
+            }
+        }
+    }
+
+    private static void drawFortMarkerAtAlignedLocation(byte[][] pixels, boolean[][] fortMask, FortMarker fortMarker) {
+        for (int y = 0; y < FORT_ICON_HEIGHT_PIXELS; y++) {
+            for (int x = 0; x < FORT_ICON_WIDTH_PIXELS; x++) {
+                pixels[fortMarker.alignedY() + y][fortMarker.alignedX() + x] =
+                    fortMask[y][x] ? (byte) TERRAIN_VOID : (byte) TERRAIN_SAND;
+            }
+        }
+    }
+
+    private static byte[] extractTilePattern(byte[][] pixels, int tileX, int tileYTop) {
+        var pattern = new byte[SOURCE_TILE_SIZE * SOURCE_TILE_SIZE];
+        for (int py = 0; py < SOURCE_TILE_SIZE; py++) {
+            for (int px = 0; px < SOURCE_TILE_SIZE; px++) {
+                pattern[py * SOURCE_TILE_SIZE + px] =
+                    pixels[tileYTop * SOURCE_TILE_SIZE + py][tileX * SOURCE_TILE_SIZE + px];
+            }
+        }
+        return pattern;
+    }
+
+    private static String patternKey(byte[] pattern) {
+        return Arrays.toString(pattern);
     }
 
     private static void loadMapIds0(short[] data) {
@@ -13213,7 +13393,18 @@ public final class GeneratedTerrainData {
         loadDominantTerrain12(data);
         loadDominantTerrain13(data);
         keepLargestMountainRegion(data);
+        assignFortTerrain(data);
         return data;
+    }
+
+    private static void assignFortTerrain(byte[] data) {
+        for (var fortMarker : FORT_MARKERS) {
+            for (int rowTop = fortMarker.tileYTop(); rowTop < fortMarker.tileYTop() + 2; rowTop++) {
+                for (int col = fortMarker.tileX(); col < fortMarker.tileX() + 2; col++) {
+                    data[rowTop * MAP_WIDTH_TILES + col] = (byte) TERRAIN_FORT;
+                }
+            }
+        }
     }
 
     private static void keepLargestMountainRegion(byte[] data) {

@@ -56,6 +56,7 @@ final class MapPanel extends Actor {
         VOID("Void"),
         SAND("Sand"),
         MOUNTAIN("Mountain"),
+        FORT("Fort"),
         WATER("Water");
 
         private final String displayName;
@@ -321,7 +322,8 @@ final class MapPanel extends Actor {
             case ALL -> TerrainDebugLayer.VOID;
             case VOID -> TerrainDebugLayer.SAND;
             case SAND -> TerrainDebugLayer.MOUNTAIN;
-            case MOUNTAIN -> TerrainDebugLayer.WATER;
+            case MOUNTAIN -> TerrainDebugLayer.FORT;
+            case FORT -> TerrainDebugLayer.WATER;
             case WATER -> TerrainDebugLayer.ALL;
         };
     }
@@ -335,6 +337,7 @@ final class MapPanel extends Actor {
             case VOID -> terrainCode == GeneratedTerrainData.TERRAIN_VOID;
             case SAND -> terrainCode == GeneratedTerrainData.TERRAIN_SAND;
             case MOUNTAIN -> terrainCode == GeneratedTerrainData.TERRAIN_MOUNTAIN;
+            case FORT -> terrainCode == GeneratedTerrainData.TERRAIN_FORT;
             case WATER -> terrainCode == GeneratedTerrainData.TERRAIN_WATER;
         };
     }

@@ -395,9 +395,10 @@ class BattlefieldScreenUnitSelectionTest {
     }
 
     @Test
-    void isPassableTerrainCode_returnsTrue_forSandAndMountain() {
+    void isPassableTerrainCode_returnsTrue_forSandMountainAndFort() {
         assertTrue(BattlefieldScreen.isPassableTerrainCode(GeneratedTerrainData.TERRAIN_SAND));
         assertTrue(BattlefieldScreen.isPassableTerrainCode(GeneratedTerrainData.TERRAIN_MOUNTAIN));
+        assertTrue(BattlefieldScreen.isPassableTerrainCode(GeneratedTerrainData.TERRAIN_FORT));
     }
 
     @Test

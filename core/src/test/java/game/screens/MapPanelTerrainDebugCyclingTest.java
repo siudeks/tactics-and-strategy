@@ -28,6 +28,13 @@ class MapPanelTerrainDebugCyclingTest {
     }
 
     @Test
+    void cycleTerrainDebugLayer_advancesFromMountainToFort() {
+        var nextLayer = MapPanel.cycleTerrainDebugLayer(MapPanel.TerrainDebugLayer.MOUNTAIN);
+
+        assertEquals(MapPanel.TerrainDebugLayer.FORT, nextLayer);
+    }
+
+    @Test
     void currentTerrainDebugLayerName_returnsHumanReadableLabel() {
         var layerName = MapPanel.TerrainDebugLayer.MOUNTAIN.displayName();
 
